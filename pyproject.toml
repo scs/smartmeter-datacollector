@@ -1,2 +1,6 @@
 [tool.autopep8]
 max_line_length = 120
+
+[tool.pylint]
+    [tool.pylint.FORMAT]
+    max-line-length=120

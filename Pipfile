@@ -9,6 +9,7 @@ aioserial = "*"
 
 [dev-packages]
 autopep8 = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.8"
@@ -16,3 +17,4 @@ python_version = "3.8"
 [scripts]
 format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
+lint = "pylint smartmeter_datacollector/"
