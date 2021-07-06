@@ -1,15 +1,14 @@
 from abc import ABC
-
-from asyncio.queues import Queue
+from typing import List
+from .reader_data import ReaderDataPoint
 
 class Reader(ABC):
     def __init__(self) -> None:
         self._observers = []
-        self._queue = Queue()
 
     def register(self, observer) -> None:
         self._observers.append(observer)
 
-    def notify_observers(self, *args, **kwargs) -> None:
-        for obs in self._observers:
-            obs.notify(*args, **kwargs)
+    def _notify_observers(self, data_points: List[ReaderDataPoint]) -> None:
+        for observer in self._observers:
+            observer.notify(data_points)
