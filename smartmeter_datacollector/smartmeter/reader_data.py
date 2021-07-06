@@ -2,10 +2,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
+
 @dataclass
 class ReaderDataPointType:
     name: str
     unit: str
+
 
 class ReaderDataPointTypes(Enum):
     ACTIVE_POWER_P = ReaderDataPointType("Active Power +", "W")
@@ -19,6 +21,7 @@ class ReaderDataPointTypes(Enum):
     REACTIVE_POWER_Q3_INT = ReaderDataPointType("Reactive Power Q3 Time Integral", "VAh")
     REACTIVE_POWER_Q4_INT = ReaderDataPointType("Reactive Power Q4 Time Integral", "VAh")
     POWER_FACTOR = ReaderDataPointType("Power Factor", "")
+
 
 @dataclass
 class ReaderDataPoint:

@@ -11,6 +11,7 @@ from .serial_reader import SerialConfig, SerialReader
 
 LOGGER = logging.getLogger("smartmeter")
 
+
 class LGE450(Reader):
     HDLC_FLAG = b"\x7e"
 
@@ -29,8 +30,8 @@ class LGE450(Reader):
         self._parser = HdlcDlmsParser({
             "1.0.1.7.0.255": ReaderDataPointTypes.ACTIVE_POWER_P
         },
-        "0.0.42.0.0.255",
-        "0.0.1.0.0.255")
+            "0.0.42.0.0.255",
+            "0.0.1.0.0.255")
 
     async def start(self) -> None:
         await self._serial.start_and_listen()

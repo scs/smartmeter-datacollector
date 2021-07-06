@@ -5,6 +5,7 @@ from smartmeter.lge450 import LGE450
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 async def main():
     meter = LGE450("/dev/ttyUSB0")
     await meter.start()

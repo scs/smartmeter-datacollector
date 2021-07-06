@@ -2,6 +2,7 @@ from abc import ABC
 from typing import List
 from .reader_data import ReaderDataPoint
 
+
 class Reader(ABC):
     def __init__(self) -> None:
         self._observers = []

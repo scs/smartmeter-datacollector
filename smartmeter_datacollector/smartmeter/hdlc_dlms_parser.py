@@ -25,7 +25,7 @@ class HdlcDlmsParser:
         self._selected_obis = selected_obis
         self._id_obis = id_obis
         self._clock_obis = clock_obis
-        self._meter_id:str = None
+        self._meter_id: str = None
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         self._hdlc_buffer.set(data)
@@ -68,7 +68,8 @@ class HdlcDlmsParser:
                     # Skip first (meta-data) object
                     continue
                 self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
-                LOGGER.debug(str(obj.objectType) + " " + obj.logicalName + " " + str(attr_ind) + ": " + str(obj.getValues()[attr_ind - 1]))
+                LOGGER.debug(str(obj.objectType) + " " + obj.logicalName + " " +
+                             str(attr_ind) + ": " + str(obj.getValues()[attr_ind - 1]))
         self._dlms_data.clear()
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
@@ -77,7 +78,7 @@ class HdlcDlmsParser:
         ts = None
         if clock_obj:
             ts = self._extract_datetime(clock_obj)
-        
+
         id_obj = dlms_objects.get(self._id_obis, None)
         id = None
         if id_obj:
@@ -93,7 +94,7 @@ class HdlcDlmsParser:
                     LOGGER.warning("No value received for %s.", obis)
                     continue
                 type = self._selected_obis[obis]
-                value = float(raw_value) # TODO add value scaling
+                value = float(raw_value)  # TODO add value scaling
                 data_points.append(ReaderDataPoint(type, value, self._meter_id, ts))
         return data_points
 
