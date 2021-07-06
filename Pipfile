@@ -8,6 +8,11 @@ gurux-dlms = "*"
 aioserial = "*"
 
 [dev-packages]
+autopep8 = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
+format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
