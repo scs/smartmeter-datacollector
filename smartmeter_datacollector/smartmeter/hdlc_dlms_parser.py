@@ -1,30 +1,24 @@
-from datetime import datetime
 import logging
-from time import time
+from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
 
-from gurux_dlms import GXDLMSClient
-from gurux_dlms.GXByteBuffer import GXByteBuffer
-from gurux_dlms.GXDateTime import GXDateTime
-from gurux_dlms.GXReplyData import GXReplyData
-from gurux_dlms.enums.ObjectType import ObjectType
-from gurux_dlms.objects import GXDLMSObject, GXDLMSClock
-from gurux_dlms.objects.GXDLMSData import GXDLMSData
-from gurux_dlms.objects.GXDLMSRegister import GXDLMSRegister
+from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
+from gurux_dlms.enums import ObjectType
+from gurux_dlms.objects import (GXDLMSClock, GXDLMSData, GXDLMSObject,
+                                GXDLMSRegister)
 
-from .reader_data import ReaderDataPoint, ReaderDataPointType
+from .cosem import CosemConfig
+from .reader_data import ReaderDataPoint
 
 LOGGER = logging.getLogger("smartmeter")
 
 
 class HdlcDlmsParser:
-    def __init__(self, selected_obis: Dict[str, ReaderDataPointType], id_obis: str, clock_obis: str) -> None:
+    def __init__(self, cosem_config: CosemConfig) -> None:
         self._client = GXDLMSClient(True)
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
-        self._selected_obis = selected_obis
-        self._id_obis = id_obis
-        self._clock_obis = clock_obis
+        self._cosem = cosem_config
         self._meter_id: str = None
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
@@ -74,12 +68,12 @@ class HdlcDlmsParser:
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
     def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[ReaderDataPoint]:
-        clock_obj = dlms_objects.get(self._clock_obis, None)
+        clock_obj = dlms_objects.get(self._cosem.clock_obis, None)
         ts = None
         if clock_obj:
             ts = self._extract_datetime(clock_obj)
 
-        id_obj = dlms_objects.get(self._id_obis, None)
+        id_obj = dlms_objects.get(self._cosem.id_obis, None)
         id = None
         if id_obj:
             id = self._extract_value_from_data_object(id_obj)
@@ -88,13 +82,14 @@ class HdlcDlmsParser:
 
         data_points: List[ReaderDataPoint] = []
         for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, dlms_objects.items()):
-            if obis in self._selected_obis:
+            reg_type = self._cosem.get_register(obis)
+            if reg_type:
                 raw_value = self._extract_register_value(obj)
                 if raw_value is None:
                     LOGGER.warning("No value received for %s.", obis)
                     continue
-                type = self._selected_obis[obis]
-                value = float(raw_value)  # TODO add value scaling
+                type = reg_type.data_point_type
+                value = float(raw_value) * reg_type.scaling
                 data_points.append(ReaderDataPoint(type, value, self._meter_id, ts))
         return data_points
 

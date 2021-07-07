@@ -1,0 +1,30 @@
+from dataclasses import dataclass
+from typing import List
+
+from .reader_data import ReaderDataPointType
+
+
+@dataclass
+class RegisterCosem:
+    obis: str
+    data_point_type: ReaderDataPointType
+    scaling: float = 1.0
+
+
+class CosemConfig:
+    def __init__(self, id_obis: str, clock_obis: str, register_obis: List[RegisterCosem]) -> None:
+
+        self._id_obis = id_obis
+        self._clock_obis = clock_obis
+        self._register_obis = {r.obis: r for r in register_obis}
+
+    @property
+    def id_obis(self) -> str:
+        return self._id_obis
+
+    @property
+    def clock_obis(self) -> str:
+        return self._clock_obis
+
+    def get_register(self, obis) -> RegisterCosem:
+        return self._register_obis.get(obis, None)

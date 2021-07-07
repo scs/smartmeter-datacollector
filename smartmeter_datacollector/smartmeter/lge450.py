@@ -1,4 +1,5 @@
 import logging
+from .cosem import CosemConfig, RegisterCosem
 from typing import List
 
 import serial
@@ -27,11 +28,20 @@ class LGE450(Reader):
             termination=LGE450.HDLC_FLAG
         )
         self._serial = SerialReader(serial_config, self._data_received)
-        self._parser = HdlcDlmsParser({
-            "1.0.1.7.0.255": ReaderDataPointTypes.ACTIVE_POWER_P
-        },
-            "0.0.42.0.0.255",
-            "0.0.1.0.0.255")
+        cosem_config = CosemConfig(
+            id_obis="0.0.42.0.0.255",
+            clock_obis="0.0.1.0.0.255",
+            register_obis=[
+                RegisterCosem("1.0.1.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_P),
+                RegisterCosem("1.0.2.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_N),
+                RegisterCosem("1.0.3.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_P),
+                RegisterCosem("1.0.4.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_N),
+                RegisterCosem("1.1.1.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_P_INT),
+                RegisterCosem("1.1.2.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_N_INT),
+                RegisterCosem("1.0.13.7.0.255", ReaderDataPointTypes.POWER_FACTOR, 0.001),
+            ]
+        )
+        self._parser = HdlcDlmsParser(cosem_config)
 
     async def start(self) -> None:
         await self._serial.start_and_listen()
