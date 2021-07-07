@@ -19,7 +19,7 @@ class HdlcDlmsParser:
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
-        self._meter_id: str = None
+        self._meter_id: str = "n/a"
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         self._hdlc_buffer.set(data)
@@ -72,6 +72,10 @@ class HdlcDlmsParser:
         ts = None
         if clock_obj:
             ts = self._extract_datetime(clock_obj)
+
+        if ts is None:
+            LOGGER.warning("No timestamp available. Using SW UTC timestamp.")
+            ts = datetime.utcnow()
 
         id_obj = dlms_objects.get(self._cosem.id_obis, None)
         id = None
