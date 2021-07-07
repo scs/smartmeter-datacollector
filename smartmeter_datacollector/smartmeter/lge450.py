@@ -32,13 +32,13 @@ class LGE450(Reader):
             id_obis="0.0.42.0.0.255",
             clock_obis="0.0.1.0.0.255",
             register_obis=[
-                RegisterCosem("1.0.1.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_P),
-                RegisterCosem("1.0.2.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_N),
-                RegisterCosem("1.0.3.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_P),
-                RegisterCosem("1.0.4.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_N),
-                RegisterCosem("1.1.1.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_P_INT),
-                RegisterCosem("1.1.2.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_N_INT),
-                RegisterCosem("1.0.13.7.0.255", ReaderDataPointTypes.POWER_FACTOR, 0.001),
+                RegisterCosem("1.0.1.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_P.value),
+                RegisterCosem("1.0.2.7.0.255", ReaderDataPointTypes.ACTIVE_POWER_N.value),
+                RegisterCosem("1.0.3.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_P.value),
+                RegisterCosem("1.0.4.7.0.255", ReaderDataPointTypes.REACTIVE_POWER_N.value),
+                RegisterCosem("1.1.1.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_P_INT.value),
+                RegisterCosem("1.1.2.8.0.255", ReaderDataPointTypes.ACTIVE_POWER_N_INT.value),
+                RegisterCosem("1.0.13.7.0.255", ReaderDataPointTypes.POWER_FACTOR.value, 0.001),
             ]
         )
         self._parser = HdlcDlmsParser(cosem_config)
