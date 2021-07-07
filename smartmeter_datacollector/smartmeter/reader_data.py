@@ -29,3 +29,6 @@ class ReaderDataPoint:
     value: float
     source: str
     ts: datetime
+
+    def __str__(self) -> str:
+        return f"{self.source} - {self.ts.isoformat()} - {self.type.name}: {self.value} {self.type.unit}"
