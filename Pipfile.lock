@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c4fef37f77349f6db6820455114bed17d74518e05c2b25f52bb7edf2f6c23428"
+            "sha256": "67e25b51d6ffe6120f4b7e7f83479040754bbb9e833f827527c7fedd7751ce3b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -24,6 +24,14 @@
             "index": "pypi",
             "version": "==1.3.0"
         },
+        "dsmr-parser": {
+            "hashes": [
+                "sha256:258e4a60aaefc2bc8fa08f77b2ceb0b2758d3202317a320416bb7d024660dc3c",
+                "sha256:72986da96f53a43d1067520fb941323e314041a0d38260c59b060f0b77d99e83"
+            ],
+            "index": "pypi",
+            "version": "==0.29"
+        },
         "gurux-dlms": {
             "hashes": [
                 "sha256:71a6f47e2b1526ac8ab10d0c0ee00fd819d758103dd3c4f5590ff67e2df2ad41",
@@ -38,6 +46,26 @@
                 "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"
             ],
             "version": "==3.5"
+        },
+        "pyserial-asyncio": {
+            "hashes": [
+                "sha256:1641e5433a866eeaf6464b3ab88b741e7a89dd8cd0f851b3343b15f425138d33",
+                "sha256:4cf1e97d92ae239fe104d76a3a42074c771b7da17ed89aea3c0251c16c950d3e"
+            ],
+            "version": "==0.5"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:83a4a90894bf38e243cf052c8b58f381bfe9a7a483f6a9cab140bc7f702ac4da",
+                "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"
+            ],
+            "version": "==2021.1"
+        },
+        "tailer": {
+            "hashes": [
+                "sha256:78d60f23a1b8a2d32f400b3c8c06b01142ac7841b75d8a1efcb33515877ba531"
+            ],
+            "version": "==0.4.1"
         }
     },
     "develop": {

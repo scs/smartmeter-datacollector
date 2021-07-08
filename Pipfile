@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 gurux-dlms = "*"
 aioserial = "*"
+dsmr-parser = "*"
 
 [dev-packages]
 autopep8 = "*"
