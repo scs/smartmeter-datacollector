@@ -3,6 +3,7 @@ import logging
 
 from collector import Collector
 from sinks.logger_sink import LoggerSink
+from sinks.mqtt_sink import MqttDataSink
 from smartmeter.lge450 import LGE450
 
 logging.basicConfig(level=logging.DEBUG)
@@ -11,9 +12,12 @@ logging.basicConfig(level=logging.DEBUG)
 async def main():
     meter = LGE450("/dev/ttyUSB0")
     collector = Collector()
-    sink = LoggerSink("DataLogger")
+    logger_sink = LoggerSink("DataLogger")
+    mqtt_sink = MqttDataSink("localhost")
+    await mqtt_sink.start()
 
-    collector.register_sink(sink)
+    collector.register_sink(logger_sink)
+    collector.register_sink(mqtt_sink)
     meter.register(collector)
 
     await asyncio.gather(

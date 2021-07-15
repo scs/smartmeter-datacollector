@@ -19,7 +19,7 @@ class HdlcDlmsParser:
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
-        self._meter_id: str = "n/a"
+        self._meter_id: str = "unknown"
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         self._hdlc_buffer.set(data)
