@@ -16,6 +16,7 @@ LOGGER = logging.getLogger("smartmeter")
 class HdlcDlmsParser:
     def __init__(self, cosem_config: CosemConfig) -> None:
         self._client = GXDLMSClient(True)
+        # self._client.settings.standard = Standard.IDIS use IDIS for ISKRA meter?
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
@@ -35,7 +36,7 @@ class HdlcDlmsParser:
         """
         tmp = GXReplyData()
         try:
-            LOGGER.debug(GXByteBuffer.hex(self._hdlc_buffer))
+            LOGGER.debug("HDLC Buffer: %s", GXByteBuffer.hex(self._hdlc_buffer))
             self._client.getData(self._hdlc_buffer, tmp, self._dlms_data)
         except ValueError as ex:
             LOGGER.debug("Unable to extract data from hdlc frame: '%s'", ex)
@@ -49,6 +50,7 @@ class HdlcDlmsParser:
 
         if not self._dlms_data.isMoreData():
             LOGGER.debug("DLMS packet complete and ready for parsing.")
+            LOGGER.debug("DLMS Buffer: %s", GXByteBuffer.hex(self._dlms_data.data))
             self._hdlc_buffer.clear()
             return True
         return False
