@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 gurux-dlms = "*"
 aioserial = "*"
+asyncio-mqtt = "*"
 
 [dev-packages]
 autopep8 = "*"
