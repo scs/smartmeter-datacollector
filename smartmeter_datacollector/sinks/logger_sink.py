@@ -9,5 +9,11 @@ class LoggerSink(DataSink):
         self._logger = logging.getLogger(logger_name)
         self._logger.setLevel(logging.INFO)
 
+    async def start(self) -> None:
+        pass
+
+    async def stop(self) -> None:
+        pass
+
     async def send(self, data_point: ReaderDataPoint) -> None:
         self._logger.info(str(data_point))
