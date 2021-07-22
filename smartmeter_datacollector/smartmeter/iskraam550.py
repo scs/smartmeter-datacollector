@@ -26,8 +26,8 @@ class IskraAM550(Reader):
         )
         self._serial = SerialReader(serial_config, self._data_received)
         cosem_config = CosemConfig(
-            id_obis="0.0.42.0.0.255",
-            clock_obis="0.0.1.0.0.255",
+            id_obis="0.0.42.0.0.255", # TODO: set correct OBIS
+            clock_obis="0.0.1.0.0.255", # TODO: set correct OBIS
             register_obis=[]
         )
         self._parser = HdlcDlmsParser(cosem_config)
