@@ -1,3 +1,4 @@
+import json
 import logging
 
 from asyncio_mqtt import Client
@@ -43,7 +44,7 @@ class MqttDataSink(DataSink):
     async def send(self, data_point: ReaderDataPoint) -> None:
         topic = MqttDataSink.get_topic_name_for_datapoint(data_point)
         try:
-            dp_json = data_point.to_json()
+            dp_json = self.data_point_to_mqtt_json(data_point)
             LOGGER.debug("Sending DP over MQTT: %s", dp_json)
             await self._client.publish(topic, dp_json)
         except (MqttError, ValueError) as ex:
@@ -52,3 +53,10 @@ class MqttDataSink(DataSink):
     @staticmethod
     def get_topic_name_for_datapoint(data_point: ReaderDataPoint) -> str:
         return f"smartmeter/{data_point.source}/{data_point.type.id}"
+
+    @staticmethod
+    def data_point_to_mqtt_json(data_point: ReaderDataPoint) -> str:
+        return json.dumps({
+            "value": data_point.value,
+            "timestamp": int(data_point.ts.timestamp())
+        })
