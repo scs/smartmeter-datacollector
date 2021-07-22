@@ -16,6 +16,7 @@ LOGGER = logging.getLogger("smartmeter")
 class HdlcDlmsParser:
     def __init__(self, cosem_config: CosemConfig) -> None:
         self._client = GXDLMSClient(True)
+        # self._client.settings.standard = Standard.IDIS use IDIS for ISKRA meter?
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
@@ -35,6 +36,7 @@ class HdlcDlmsParser:
         """
         tmp = GXReplyData()
         try:
+            LOGGER.debug("HDLC Buffer: %s", GXByteBuffer.hex(self._hdlc_buffer))
             self._client.getData(self._hdlc_buffer, tmp, self._dlms_data)
         except ValueError as ex:
             LOGGER.debug("Unable to extract data from hdlc frame: '%s'", ex)
@@ -42,20 +44,21 @@ class HdlcDlmsParser:
             self._dlms_data.clear()
             return False
 
-        self._hdlc_buffer.clear()
         if not self._dlms_data.isComplete():
-            LOGGER.debug("Incomplete HDLC frame. DLMS buffer is cleared.")
-            self._dlms_data.clear()
+            LOGGER.debug("Incomplete HDLC frame.")
             return False
 
         if not self._dlms_data.isMoreData():
             LOGGER.debug("DLMS packet complete and ready for parsing.")
+            LOGGER.debug("DLMS Buffer: %s", GXByteBuffer.hex(self._dlms_data.data))
+            self._hdlc_buffer.clear()
             return True
         return False
 
     def parse_to_dlms_objects(self) -> Dict[str, GXDLMSObject]:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
         if isinstance(self._dlms_data.value, list):
+            #pylint: disable=unsubscriptable-object
             parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
             for index, (obj, attr_ind) in enumerate(parsed_objects):
                 if index == 0:

@@ -4,13 +4,15 @@ import logging
 from collector import Collector
 from sinks.logger_sink import LoggerSink
 from sinks.mqtt_sink import MqttDataSink
+from smartmeter.iskraam550 import IskraAM550
 from smartmeter.lge450 import LGE450
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 async def main():
-    meter = LGE450("/dev/ttyUSB0")
+    # meter = LGE450("/dev/ttyUSB1")
+    meter = IskraAM550("/dev/ttyUSB0")
     collector = Collector()
     logger_sink = LoggerSink("DataLogger")
     mqtt_sink = MqttDataSink("localhost")
