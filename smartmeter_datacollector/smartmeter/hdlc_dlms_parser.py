@@ -3,10 +3,10 @@ from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
-from gurux_dlms.secure import GXDLMSSecureClient
 from gurux_dlms.enums import ObjectType, Security
 from gurux_dlms.objects import (GXDLMSClock, GXDLMSData, GXDLMSObject,
                                 GXDLMSRegister)
+from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import CosemConfig
 from .reader_data import ReaderDataPoint
@@ -27,7 +27,6 @@ class HdlcDlmsParser:
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
-        self._meter_id: str = "unknown"
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         self._hdlc_buffer.set(data)
@@ -78,22 +77,25 @@ class HdlcDlmsParser:
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
     def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[ReaderDataPoint]:
+        # Extract timestamp
         clock_obj = dlms_objects.get(self._cosem.clock_obis, None)
-        ts = None
+        timestamp = None
         if clock_obj:
-            ts = self._extract_datetime(clock_obj)
+            timestamp = self._extract_datetime(clock_obj)
+        if timestamp is None:
+            LOGGER.warning("No timestamp available. Ignoring data bundle.")
+            return []
 
-        if ts is None:
-            LOGGER.warning("No timestamp available. Using SW UTC timestamp.")
-            ts = datetime.utcnow()
-
+        # Extract meter id
         id_obj = dlms_objects.get(self._cosem.id_obis, None)
-        id = None
+        meter_id = None
         if id_obj:
-            id = self._extract_value_from_data_object(id_obj)
-        if isinstance(id, str) and len(id) > 0:
-            self._meter_id = id
+            meter_id = self._extract_value_from_data_object(id_obj)
+        if not isinstance(meter_id, str) or len(meter_id) == 0:
+            LOGGER.warning("No meter ID available. Ignoring data bundle.")
+            return []
 
+        # Extract register data
         data_points: List[ReaderDataPoint] = []
         for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, dlms_objects.items()):
             reg_type = self._cosem.get_register(obis)
@@ -103,8 +105,12 @@ class HdlcDlmsParser:
                     LOGGER.warning("No value received for %s.", obis)
                     continue
                 type = reg_type.data_point_type
-                value = float(raw_value) * reg_type.scaling
-                data_points.append(ReaderDataPoint(type, value, self._meter_id, ts))
+                try:
+                    value = float(raw_value) * reg_type.scaling
+                except (TypeError, ValueError, OverflowError):
+                    LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
+                    continue
+                data_points.append(ReaderDataPoint(type, value, meter_id, timestamp))
         return data_points
 
     @staticmethod
