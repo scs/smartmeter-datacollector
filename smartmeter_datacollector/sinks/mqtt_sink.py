@@ -24,8 +24,8 @@ class MqttDataSink(DataSink):
         )
 
     async def start(self) -> None:
-        await self._connect_to_server()
-        LOGGER.info("Connected to MQTT broker.")
+        if await self._connect_to_server():
+            LOGGER.info("Connected to MQTT broker.")
 
     async def stop(self) -> None:
         await self._disconnect_from_server()
