@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
-from gurux_dlms.enums import ObjectType
+from gurux_dlms.secure import GXDLMSSecureClient
+from gurux_dlms.enums import ObjectType, Security
 from gurux_dlms.objects import (GXDLMSClock, GXDLMSData, GXDLMSObject,
                                 GXDLMSRegister)
 
@@ -14,8 +15,14 @@ LOGGER = logging.getLogger("smartmeter")
 
 
 class HdlcDlmsParser:
-    def __init__(self, cosem_config: CosemConfig) -> None:
-        self._client = GXDLMSClient(True)
+    def __init__(self, cosem_config: CosemConfig, block_cipher_key: str = None) -> None:
+        if block_cipher_key:
+            self._client = GXDLMSSecureClient(True)
+            self._client.ciphering.security = Security.ENCRYPTION
+            self._client.ciphering.blockCipherKey = GXByteBuffer.hexToBytes(block_cipher_key)
+        else:
+            self._client = GXDLMSClient(True)
+
         # self._client.settings.standard = Standard.IDIS use IDIS for ISKRA meter?
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()

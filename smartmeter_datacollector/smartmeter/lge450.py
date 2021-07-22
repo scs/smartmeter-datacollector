@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("smartmeter")
 class LGE450(Reader):
     HDLC_FLAG = b"\x7e"
 
-    def __init__(self, port: str) -> None:
+    def __init__(self, port: str, decryption_key: str = None) -> None:
         super().__init__()
 
         serial_config = SerialConfig(
@@ -41,7 +41,7 @@ class LGE450(Reader):
                 RegisterCosem("1.0.13.7.0.255", ReaderDataPointTypes.POWER_FACTOR.value, 0.001),
             ]
         )
-        self._parser = HdlcDlmsParser(cosem_config)
+        self._parser = HdlcDlmsParser(cosem_config, decryption_key)
 
     async def start(self) -> None:
         await self._serial.start_and_listen()
