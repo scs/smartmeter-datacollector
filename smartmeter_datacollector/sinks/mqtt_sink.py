@@ -9,7 +9,7 @@ from smartmeter.reader_data import ReaderDataPoint
 
 from .data_sink import DataSink
 
-LOGGER = logging.getLogger("MQTTDataSink")
+LOGGER = logging.getLogger("sink")
 
 
 class MqttDataSink(DataSink):
