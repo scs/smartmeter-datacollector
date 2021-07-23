@@ -1,30 +1,48 @@
 import asyncio
 import logging
+from asyncio.exceptions import CancelledError
+from configparser import ConfigParser
 
-from collector import Collector
-from sinks.logger_sink import LoggerSink
-from sinks.mqtt_sink import MqttDataSink
-from smartmeter.iskraam550 import IskraAM550
-from smartmeter.lge450 import LGE450
+import config
+import factory
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
+
+CONFIG_PATHS = [
+    "./datacollector.ini",
+    "/etc/datacollector/datacollector.ini"
+]
 
 
 async def main():
-    meter = LGE450("/dev/ttyUSB0")
-    # meter = IskraAM550("/dev/ttyUSB0")
-    collector = Collector()
-    logger_sink = LoggerSink("DataLogger")
-    mqtt_sink = MqttDataSink("localhost")
-    await mqtt_sink.start()
+    app_config = config.read_config_files(CONFIG_PATHS)
+    set_logging_levels(app_config)
 
-    collector.register_sink(logger_sink)
-    collector.register_sink(mqtt_sink)
-    meter.register(collector)
+    readers = factory.build_readers(app_config)
+    sinks = factory.build_sinks(app_config)
+    data_collector = factory.build_collector(readers, sinks)
 
-    await asyncio.gather(
-        meter.start(),
-        collector.process_queue())
+    await asyncio.gather(*[sink.start() for sink in sinks], return_exceptions=True)
+
+    try:
+        await asyncio.gather(
+            *[reader.start() for reader in readers],
+            data_collector.process_queue(),
+            return_exceptions=True)
+    except CancelledError:
+        logging.info("App shutting down now.")
+        await asyncio.gather(*[sink.stop() for sink in sinks], return_exceptions=True)
+
+
+def set_logging_levels(app_config: ConfigParser) -> None:
+    if not app_config.has_section("logging"):
+        return
+    # configure root logger
+    logging.getLogger().setLevel(app_config["logging"].get('default', logging.WARNING))
+    # configure individual loggers
+    for name, level in app_config["logging"].items():
+        logging.getLogger(name).setLevel(level)
+
 
 if __name__ == '__main__':
     asyncio.run(main(), debug=True)
