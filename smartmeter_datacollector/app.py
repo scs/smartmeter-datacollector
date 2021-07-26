@@ -22,7 +22,7 @@ async def main():
     sinks = factory.build_sinks(app_config)
     data_collector = factory.build_collector(readers, sinks)
 
-    await asyncio.gather(*[sink.start() for sink in sinks], return_exceptions=True)
+    await asyncio.gather(*[sink.start() for sink in sinks])
 
     try:
         await asyncio.gather(
@@ -31,7 +31,7 @@ async def main():
             return_exceptions=True)
     except CancelledError:
         logging.info("App shutting down now.")
-        await asyncio.gather(*[sink.stop() for sink in sinks], return_exceptions=True)
+        await asyncio.gather(*[sink.stop() for sink in sinks])
 
 
 def set_logging_levels(app_config: ConfigParser) -> None:
