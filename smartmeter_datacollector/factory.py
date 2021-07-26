@@ -12,7 +12,7 @@ from .collector import Collector
 from .config import InvalidConfigError
 from .sinks.data_sink import DataSink
 from .sinks.logger_sink import LoggerSink
-from .sinks.mqtt_sink import MqttDataSink
+from .sinks.mqtt_sink import MqttConfig, MqttDataSink
 from .smartmeter.iskraam550 import IskraAM550
 from .smartmeter.lge450 import LGE450
 from .smartmeter.reader import Reader
@@ -49,9 +49,8 @@ def build_sinks(config: ConfigParser) -> List[DataSink]:
                 logger_name=sink_config.get('name', "DataLogger")
             ))
         elif sink_type == "mqtt":
-            sinks.append(MqttDataSink(
-                broker_host=sink_config.get('host', "localhost")
-            ))
+            mqtt_config = MqttConfig.from_sink_config(sink_config)
+            sinks.append(MqttDataSink(mqtt_config))
         else:
             raise InvalidConfigError(f"'type' is invalid or missing: {sink_type}")
     return sinks

@@ -7,6 +7,10 @@
 #
 import json
 import logging
+import ssl
+from configparser import SectionProxy
+from dataclasses import dataclass
+from typing import Optional
 
 from asyncio_mqtt import Client
 from asyncio_mqtt.client import ProtocolVersion
@@ -19,16 +23,97 @@ from .data_sink import DataSink
 LOGGER = logging.getLogger("sink")
 
 
+@dataclass
+class MqttConfig:
+    broker_host: str
+    port: int = 1883
+    use_tls: bool = False
+    username: Optional[str] = None
+    password: Optional[str] = None
+    client_id: Optional[str] = None
+    ca_cert_path: Optional[str] = None
+    check_hostname: bool = True
+    client_cert_path: Optional[str] = None
+    client_key_path: Optional[str] = None
+
+    def with_tls(self, ca_cert_path: Optional[str] = None, check_hostname: bool = True) -> "MqttConfig":
+        self.use_tls = True
+        self.ca_cert_path = ca_cert_path
+        self.check_hostname = check_hostname
+        return self
+
+    def with_user_pass_auth(self, username: str, password: str) -> "MqttConfig":
+        self.username = username
+        self.password = password
+        return self
+
+    def with_client_cert_auth(self, cert_path: str, key_path: str) -> "MqttConfig":
+        self.use_tls = True
+        self.client_cert_path = cert_path
+        self.client_key_path = key_path
+        return self
+
+    @staticmethod
+    def from_sink_config(config: SectionProxy) -> "MqttConfig":
+        mqtt_cfg = MqttConfig(config.get("host"), config.getint("port", 1883))
+        if config.getboolean("tls", fallback=False):
+            mqtt_cfg.with_tls(config.get("ca_file_path"), config.getboolean("check_hostname", True))
+        if config.get("username") and config.get("password"):
+            mqtt_cfg.with_user_pass_auth(
+                config.get("username"),
+                config.get("password"))
+        if config.get("client_cert_path") and config.get("client_key_path"):
+            mqtt_cfg.with_client_cert_auth(
+                config.get("client_cert_path"),
+                config.get("client_key_path")
+            )
+        return mqtt_cfg
+
+
 class MqttDataSink(DataSink):
     TIMEOUT = 3
 
-    def __init__(self, broker_host: str) -> None:
+    def __init__(self, config: MqttConfig) -> None:
+        tls_context = None
+        if config.use_tls:
+            tls_context = self._build_ssl_context(
+                config.ca_cert_path,
+                config.check_hostname,
+                config.client_cert_path,
+                config.client_key_path)
+
+        user_pass_auth = {}
+        if config.username and config.password:
+            user_pass_auth["username"] = config.username
+            user_pass_auth["password"] = config.password
+
         self._client = Client(
-            hostname=broker_host,
-            port=1883,
+            hostname=config.broker_host,
+            port=config.port,
+            client_id=config.client_id,
+            tls_context=tls_context,
+            protocol=ProtocolVersion.V311,
             clean_session=True,
-            protocol=ProtocolVersion.V311
-        )
+            **user_pass_auth)
+
+    @staticmethod
+    def _build_ssl_context(
+        ca_file_path: Optional[str] = None,
+        check_hostname: bool = True,
+        client_cert_path: Optional[str] = None,
+        client_key_path: Optional[str] = None
+    ) -> ssl.SSLContext:
+        context = ssl.create_default_context(cafile=ca_file_path)
+
+        if ca_file_path:
+            context.check_hostname = check_hostname
+
+        if client_cert_path:
+            try:
+                context.load_cert_chain(client_cert_path, client_key_path, None)
+            except ssl.SSLError as e:
+                LOGGER.error("Client certificate does not match with the key and is ignored. '%s'", e)
+        return context
 
     async def start(self) -> None:
         if await self._connect_to_server():
