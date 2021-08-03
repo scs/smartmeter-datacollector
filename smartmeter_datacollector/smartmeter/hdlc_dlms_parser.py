@@ -11,8 +11,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import ObjectType, Security
-from gurux_dlms.objects import (GXDLMSClock, GXDLMSData, GXDLMSObject,
-                                GXDLMSRegister)
+from gurux_dlms.objects import GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSRegister
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import CosemConfig

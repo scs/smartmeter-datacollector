@@ -1,6 +1,9 @@
 [tool.autopep8]
 max_line_length = 120
 
+[tool.isort]
+line_length = 120
+
 [tool.pylint]
     [tool.pylint.MASTER]
     init-hook='import sys; sys.path.append("./smartmeter_datacollector")'

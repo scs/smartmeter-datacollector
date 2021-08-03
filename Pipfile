@@ -10,6 +10,7 @@ asyncio-mqtt = "*"
 
 [dev-packages]
 autopep8 = "*"
+isort = "*"
 pylint = "*"
 licenseheaders = "*"
 
@@ -19,5 +20,7 @@ python_version = "3.8"
 [scripts]
 format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
+isort = "isort ."
+isort_check = "isort --check ."
 lint = "pylint smartmeter_datacollector/"
 license = "licenseheaders -t .copyright.tmpl --ext 'python:.py' --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"

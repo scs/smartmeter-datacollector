@@ -6,12 +6,12 @@
 # See LICENSES/README.md for more information.
 #
 import logging
-from .cosem import CosemConfig, RegisterCosem
 from typing import List
 
 import serial
 from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
+from .cosem import CosemConfig, RegisterCosem
 from .hdlc_dlms_parser import HdlcDlmsParser
 from .reader import Reader
 from .reader_data import ReaderDataPoint, ReaderDataPointTypes
