@@ -9,3 +9,9 @@ line_length = 120
     init-hook='import sys; sys.path.append("./smartmeter_datacollector")'
     [tool.pylint.FORMAT]
     max-line-length=120
+    [tool.pylint."MESSAGES CONTROL"]
+    disable = [
+        "missing-module-docstring",
+        "missing-class-docstring",
+        "missing-function-docstring"
+    ]
