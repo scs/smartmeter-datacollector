@@ -77,8 +77,7 @@ class HdlcDlmsParser:
                     # Skip first (meta-data) object
                     continue
                 self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
-                LOGGER.debug(str(obj.objectType) + " " + obj.logicalName + " " +
-                             str(attr_ind) + ": " + str(obj.getValues()[attr_ind - 1]))
+                LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
         self._dlms_data.clear()
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
