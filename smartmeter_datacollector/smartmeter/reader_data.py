@@ -14,7 +14,7 @@ from enum import Enum
 
 @dataclass
 class ReaderDataPointType:
-    id: str
+    identifier: str
     name: str
     unit: str
 
@@ -38,12 +38,12 @@ class ReaderDataPoint:
     type: ReaderDataPointType
     value: float
     source: str
-    ts: datetime
+    timestamp: datetime
 
     def __str__(self) -> str:
-        return f"{self.source} - {self.ts.isoformat()} - {self.type.name}: {self.value} {self.type.unit}"
+        return f"{self.source} - {self.timestamp.isoformat()} - {self.type.name}: {self.value} {self.type.unit}"
 
     def to_json(self) -> str:
         dict_repr = dataclasses.asdict(self)
-        dict_repr['ts'] = self.ts.isoformat()
+        dict_repr['timestamp'] = self.timestamp.isoformat()
         return json.dumps(dict_repr)

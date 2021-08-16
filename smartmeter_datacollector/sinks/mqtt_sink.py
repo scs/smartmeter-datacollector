@@ -77,11 +77,11 @@ class MqttDataSink(DataSink):
 
     @staticmethod
     def get_topic_name_for_datapoint(data_point: ReaderDataPoint) -> str:
-        return f"smartmeter/{data_point.source}/{data_point.type.id}"
+        return f"smartmeter/{data_point.source}/{data_point.type.identifier}"
 
     @staticmethod
     def data_point_to_mqtt_json(data_point: ReaderDataPoint) -> str:
         return json.dumps({
             "value": data_point.value,
-            "timestamp": int(data_point.ts.timestamp())
+            "timestamp": int(data_point.timestamp.timestamp())
         })
