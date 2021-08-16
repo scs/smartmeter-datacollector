@@ -22,19 +22,19 @@ def build_readers(config: ConfigParser) -> List[Reader]:
     readers = []
     for section_name in filter(lambda sec: sec.startswith("reader"), config.sections()):
         reader_config = config[section_name]
-        type = reader_config.get('type')
+        reader_type = reader_config.get('type')
 
-        if type == "lge450":
+        if reader_type == "lge450":
             readers.append(LGE450(
                 port=reader_config.get('port', "/dev/ttyUSB0"),
                 decryption_key=reader_config.get('key')
             ))
-        elif type == "iskraam550":
+        elif reader_type == "iskraam550":
             readers.append(IskraAM550(
                 port=reader_config.get('port', "/dev/ttyUSB0")
             ))
         else:
-            raise InvalidConfigError(f"'type' is invalid or missing: {type}")
+            raise InvalidConfigError(f"'type' is invalid or missing: {reader_type}")
     return readers
 
 
@@ -42,18 +42,18 @@ def build_sinks(config: ConfigParser) -> List[DataSink]:
     sinks = []
     for section_name in filter(lambda sec: sec.startswith("sink"), config.sections()):
         sink_config = config[section_name]
-        type = sink_config.get('type')
+        sink_type = sink_config.get('type')
 
-        if type == "logger":
+        if sink_type == "logger":
             sinks.append(LoggerSink(
                 logger_name=sink_config.get('name', "DataLogger")
             ))
-        elif type == "mqtt":
+        elif sink_type == "mqtt":
             sinks.append(MqttDataSink(
                 broker_host=sink_config.get('host', "localhost")
             ))
         else:
-            raise InvalidConfigError(f"'type' is invalid or missing: {type}")
+            raise InvalidConfigError(f"'type' is invalid or missing: {sink_type}")
     return sinks
 
 

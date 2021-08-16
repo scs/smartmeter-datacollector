@@ -110,13 +110,13 @@ class HdlcDlmsParser:
                 if raw_value is None:
                     LOGGER.warning("No value received for %s.", obis)
                     continue
-                type = reg_type.data_point_type
+                data_point_type = reg_type.data_point_type
                 try:
                     value = float(raw_value) * reg_type.scaling
                 except (TypeError, ValueError, OverflowError):
                     LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
                     continue
-                data_points.append(ReaderDataPoint(type, value, meter_id, timestamp))
+                data_points.append(ReaderDataPoint(data_point_type, value, meter_id, timestamp))
         return data_points
 
     @staticmethod
