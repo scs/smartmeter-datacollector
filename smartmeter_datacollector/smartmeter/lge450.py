@@ -9,7 +9,6 @@ import logging
 from typing import List
 
 import serial
-from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
 from .cosem import CosemConfig, RegisterCosem
 from .hdlc_dlms_parser import HdlcDlmsParser
