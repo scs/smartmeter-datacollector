@@ -22,6 +22,7 @@ class SerialConfig:
     termination: Union[bytes, None] = serial.LF
 
 
+# pylint: disable=too-few-public-methods
 class SerialReader:
     CHUNK_SIZE = 16
 
