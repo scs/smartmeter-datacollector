@@ -7,7 +7,7 @@
 #
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import ObjectType, Security
@@ -85,7 +85,7 @@ class HdlcDlmsParser:
         # Extract timestamp
         clock_obj = dlms_objects.get(self._cosem.clock_obis, None)
         timestamp = None
-        if clock_obj:
+        if clock_obj and isinstance(clock_obj, GXDLMSClock):
             timestamp = self._extract_datetime(clock_obj)
         if timestamp is None:
             LOGGER.warning("No timestamp available. Ignoring data bundle.")
@@ -94,7 +94,7 @@ class HdlcDlmsParser:
         # Extract meter id
         id_obj = dlms_objects.get(self._cosem.id_obis, None)
         meter_id = None
-        if id_obj:
+        if id_obj and isinstance(id_obj, GXDLMSData):
             meter_id = self._extract_value_from_data_object(id_obj)
         if not isinstance(meter_id, str) or len(meter_id) == 0:
             LOGGER.warning("No meter ID available. Ignoring data bundle.")
@@ -104,7 +104,7 @@ class HdlcDlmsParser:
         data_points: List[ReaderDataPoint] = []
         for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, dlms_objects.items()):
             reg_type = self._cosem.get_register(obis)
-            if reg_type:
+            if reg_type and isinstance(obj, GXDLMSRegister):
                 raw_value = self._extract_register_value(obj)
                 if raw_value is None:
                     LOGGER.warning("No value received for %s.", obis)
@@ -119,19 +119,16 @@ class HdlcDlmsParser:
         return data_points
 
     @staticmethod
-    def _extract_datetime(clock_object: GXDLMSClock) -> Union[datetime, None]:
-        assert isinstance(clock_object, GXDLMSClock)
+    def _extract_datetime(clock_object: GXDLMSClock) -> Optional[datetime]:
         time_obj: GXDateTime = clock_object.getValues()[1]
         if isinstance(time_obj, GXDateTime):
             return time_obj.value
         return None
 
     @staticmethod
-    def _extract_value_from_data_object(data_object: GXDLMSData) -> Union[Any, None]:
-        assert isinstance(data_object, GXDLMSData)
+    def _extract_value_from_data_object(data_object: GXDLMSData) -> Optional[Any]:
         return data_object.getValues()[1]
 
     @staticmethod
-    def _extract_register_value(register: GXDLMSRegister) -> Union[Any, None]:
-        assert isinstance(register, GXDLMSRegister)
+    def _extract_register_value(register: GXDLMSRegister) -> Optional[Any]:
         return register.getValues()[1]

@@ -6,7 +6,6 @@
 # See LICENSES/README.md for more information.
 #
 from dataclasses import dataclass
-from typing import Union
 
 import serial
 from aioserial import AioSerial
@@ -19,7 +18,7 @@ class SerialConfig:
     data_bits: int = serial.EIGHTBITS
     parity: str = serial.PARITY_NONE
     stop_bits: int = serial.STOPBITS_ONE
-    termination: Union[bytes, None] = serial.LF
+    termination: bytes = serial.LF
 
 
 # pylint: disable=too-few-public-methods

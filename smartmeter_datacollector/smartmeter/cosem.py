@@ -6,7 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from .reader_data import ReaderDataPointType
 
@@ -33,5 +33,5 @@ class CosemConfig:
     def clock_obis(self) -> str:
         return self._clock_obis
 
-    def get_register(self, obis) -> RegisterCosem:
+    def get_register(self, obis: str) -> Optional[RegisterCosem]:
         return self._register_obis.get(obis, None)
