@@ -4,15 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-gurux-dlms = "*"
 aioserial = "*"
 asyncio-mqtt = "*"
+gurux-dlms = "*"
 
 [dev-packages]
 autopep8 = "*"
 isort = "*"
-pylint = "*"
 licenseheaders = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.8"
