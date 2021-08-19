@@ -10,14 +10,22 @@ gurux-dlms = "~=1.0.104"
 
 [dev-packages]
 autopep8 = "*"
+chardet = "*"
 isort = "*"
 licenseheaders = "*"
+pipenv-setup = "*"
 pylint = "*"
+setuptools = "*"
+twine = "*"
+wheel = "*"
 
 [requires]
 python_version = "3.8"
 
 [scripts]
+build = "bash ./scripts/build.sh"
+build_check = "twine check dist/*"
+clean = "rm -rf .eggs build dist *.egg-info"
 format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
 isort = "isort ."
@@ -25,3 +33,5 @@ isort_check = "isort --check ."
 lint = "pylint smartmeter_datacollector/"
 lint_check = "pylint smartmeter_datacollector/ --exit-zero"
 license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
+setup = "pipenv-setup sync"
+setup_check = "pipenv-setup check"
