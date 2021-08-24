@@ -4,7 +4,7 @@ Description=Smartmeter Datacollector Service
 [Service]
 Type=simple
 Restart=on-failure
-ExecStart=/usr/bin/python3 smartmeter_datacollector_configurator/app.py
+ExecStart=/usr/bin/python3 smartmeter_datacollector/app.py -c /var/lib/smartmeter-datacollector/datacollector.ini
 
 [Install]
 WantedBy=multi-user.target
