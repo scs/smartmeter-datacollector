@@ -1,0 +1,10 @@
+[Unit]
+Description=Smartmeter Datacollector Service
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/bin/python3 smartmeter_datacollector_configurator/app.py
+
+[Install]
+WantedBy=multi-user.target
