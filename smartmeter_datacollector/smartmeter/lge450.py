@@ -50,7 +50,7 @@ LGE450_COSEM_REGISTERS = [
 
     RegisterCosem("1.0.71.7.0.255", ReaderDataPointTypes.CURRENT_L3.value),
     RegisterCosem("1.0.72.7.0.255", ReaderDataPointTypes.VOLTAGE_L3.value),
-    
+
     RegisterCosem("1.0.81.7.40.255", ReaderDataPointTypes.ANGLE_UI_L1.value),
     RegisterCosem("1.0.81.7.51.255", ReaderDataPointTypes.ANGLE_UI_L2.value),
     RegisterCosem("1.0.81.7.62.255", ReaderDataPointTypes.ANGLE_UI_L3.value),
@@ -59,6 +59,11 @@ LGE450_COSEM_REGISTERS = [
     RegisterCosem("1.1.2.8.0.255", ReaderDataPointTypes.ACTIVE_ENERGY_N.value),
     RegisterCosem("1.1.3.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_P.value),
     RegisterCosem("1.1.4.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_N.value),
+
+    RegisterCosem("1.1.5.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_Q1.value),
+    RegisterCosem("1.1.6.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_Q2.value),
+    RegisterCosem("1.1.7.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_Q3.value),
+    RegisterCosem("1.1.8.8.0.255", ReaderDataPointTypes.REACTIVE_ENERGY_Q4.value),
 ]
 
 

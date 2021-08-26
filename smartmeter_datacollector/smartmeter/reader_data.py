@@ -58,6 +58,11 @@ class ReaderDataPointTypes(Enum):
     REACTIVE_ENERGY_P = ReaderDataPointType("REACTIVE_ENERGY_P", "Reactive Energy +", "VAh")
     REACTIVE_ENERGY_N = ReaderDataPointType("REACTIVE_ENERGY_N", "Reactive Energy -", "VAh")
 
+    REACTIVE_ENERGY_Q1 = ReaderDataPointType("REACTIVE_ENERGY_Q1", "Reactive Energy +Ri Q1", "VAh")
+    REACTIVE_ENERGY_Q2 = ReaderDataPointType("REACTIVE_ENERGY_Q2", "Reactive Energy +Rc Q2", "VAh")
+    REACTIVE_ENERGY_Q3 = ReaderDataPointType("REACTIVE_ENERGY_Q3", "Reactive Energy -Ri Q3", "VAh")
+    REACTIVE_ENERGY_Q4 = ReaderDataPointType("REACTIVE_ENERGY_Q4", "Reactive Energy -Rc Q4", "VAh")
+
     POWER_FACTOR = ReaderDataPointType("POWER_FACTOR", "Power Factor", "")
     NET_FREQUENCY = ReaderDataPointType("NET_FREQUENCY", "Net Frequency any Phase", "Hz")
 
