@@ -27,9 +27,18 @@ DEFAULT_CONFIG = {
     'sink1': {
         'type': "mqtt",
         'host': "localhost",
+        'port': 1883,
+        'tls': False,
+        'ca_file_path': "",
+        'check_hostname': True,
+        'username': "",
+        'password': "",
+        'client_cert_path': "",
+        'client_key_path': "",
     },
     'logging': {
         'default': 'DEBUG',
+        'collector': 'DEBUG',
         'smartmeter': 'DEBUG',
         'sink': 'DEBUG',
     }
