@@ -7,8 +7,7 @@
 #
 import logging
 
-from smartmeter.reader_data import ReaderDataPoint
-
+from ..smartmeter.reader_data import ReaderDataPoint
 from .data_sink import DataSink
 
 

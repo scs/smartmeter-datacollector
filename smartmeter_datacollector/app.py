@@ -11,13 +11,12 @@ import logging
 from asyncio.exceptions import CancelledError
 from configparser import ConfigParser
 
-import config
-import factory
+from . import config, factory
 
 logging.basicConfig(level=logging.WARNING)
 
 
-async def main(app_config: ConfigParser):
+async def build_and_start(app_config: ConfigParser):
     readers = factory.build_readers(app_config)
     sinks = factory.build_sinks(app_config)
     data_collector = factory.build_collector(readers, sinks)
@@ -54,10 +53,9 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
     args = parse_arguments()
     debug_mode = True if args.dev else False
     app_config = config.read_config_files(args.config)
     set_logging_levels(app_config)
-
-    asyncio.run(main(app_config), debug=debug_mode)
+    asyncio.run(build_and_start(app_config), debug=debug_mode)
