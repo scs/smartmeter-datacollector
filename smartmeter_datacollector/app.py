@@ -5,26 +5,18 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
+import argparse
 import asyncio
 import logging
 from asyncio.exceptions import CancelledError
 from configparser import ConfigParser
 
-import config
-import factory
+from . import config, factory
 
 logging.basicConfig(level=logging.WARNING)
 
-CONFIG_PATHS = [
-    "./datacollector.ini",
-    "/etc/datacollector/datacollector.ini"
-]
 
-
-async def main():
-    app_config = config.read_config_files(CONFIG_PATHS)
-    set_logging_levels(app_config)
-
+async def build_and_start(app_config: ConfigParser):
     readers = factory.build_readers(app_config)
     sinks = factory.build_sinks(app_config)
     data_collector = factory.build_collector(readers, sinks)
@@ -51,5 +43,19 @@ def set_logging_levels(app_config: ConfigParser) -> None:
         logging.getLogger(name).setLevel(level)
 
 
-if __name__ == '__main__':
-    asyncio.run(main(), debug=True)
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Smartmeter Datacollector", add_help=True)
+    parser.add_argument(
+        '-c', '--config', help="File path of the configuration (.ini) file.", default="./datacollector.ini")
+    parser.add_argument(
+        '-d', '--dev', help="Development mode", action='store_true')
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
+    debug_mode = True if args.dev else False
+    app_config = config.read_config_files(args.config)
+    set_logging_levels(app_config)
+    asyncio.run(build_and_start(app_config), debug=debug_mode)

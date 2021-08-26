@@ -8,14 +8,14 @@
 from configparser import ConfigParser
 from typing import List
 
-from collector import Collector
-from config import InvalidConfigError
-from sinks.data_sink import DataSink
-from sinks.logger_sink import LoggerSink
-from sinks.mqtt_sink import MqttDataSink
-from smartmeter.iskraam550 import IskraAM550
-from smartmeter.lge450 import LGE450
-from smartmeter.reader import Reader
+from .collector import Collector
+from .config import InvalidConfigError
+from .sinks.data_sink import DataSink
+from .sinks.logger_sink import LoggerSink
+from .sinks.mqtt_sink import MqttDataSink
+from .smartmeter.iskraam550 import IskraAM550
+from .smartmeter.lge450 import LGE450
+from .smartmeter.reader import Reader
 
 
 def build_readers(config: ConfigParser) -> List[Reader]:

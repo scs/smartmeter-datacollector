@@ -1,0 +1,10 @@
+[Unit]
+Description=Smartmeter Datacollector Service
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=smartmeter-datacollector -c /var/lib/smartmeter-datacollector/datacollector.ini
+
+[Install]
+WantedBy=multi-user.target
