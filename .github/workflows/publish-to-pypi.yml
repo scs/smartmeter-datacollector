@@ -39,6 +39,7 @@ jobs:
           pipenv run build
 
       - name: Publish the Python package to Test PyPI
+        if: github.ref == 'refs/heads/master'
         uses: pypa/gh-action-pypi-publish@v1.4.2
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
