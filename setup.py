@@ -56,6 +56,7 @@ setup(
         "paho-mqtt==1.5.1",
         "pyserial==3.5",
     ],
+    scripts=['scripts/smartmeter-datacollector'],
     zip_safe=True,
     dependency_links=[],
 )
