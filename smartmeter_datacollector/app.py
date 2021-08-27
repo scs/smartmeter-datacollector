@@ -8,7 +8,7 @@
 import argparse
 import asyncio
 import logging
-from asyncio.exceptions import CancelledError
+from asyncio import CancelledError
 from configparser import ConfigParser
 
 from . import config, factory

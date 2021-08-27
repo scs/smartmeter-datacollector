@@ -7,7 +7,7 @@
 #
 import asyncio
 import logging
-from asyncio.queues import QueueFull
+from asyncio import QueueFull
 from typing import List
 
 from .sinks.data_sink import DataSink
