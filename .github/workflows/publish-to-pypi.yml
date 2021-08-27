@@ -51,3 +51,22 @@ jobs:
         uses: pypa/gh-action-pypi-publish@v1.4.2
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Get the tag name
+        id: tag-name
+        if: startsWith(github.ref, 'refs/tags')
+        uses: olegtarasov/get-tag@v2.1.1
+
+      - name: Create a new release
+        if: startsWith(github.ref, 'refs/tags')
+        uses: ncipollo/release-action@v1.8.8
+        with:
+          allowUpdates: true
+          artifacts: dist/*.tar.gz,dist/*.whl
+          draft: true
+          name: Smart Meter Data Collector ${{ steps.tag-name.outputs.tag }}
+          omitBody: true
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          token: ${{ secrets.GITHUB_TOKEN }}
