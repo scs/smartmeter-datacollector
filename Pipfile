@@ -19,6 +19,9 @@ setuptools = "*"
 stdeb = {version="*", markers="sys_platform == 'linux'"}
 twine = "*"
 wheel = "*"
+pytest = "*"
+pytest-mock = "*"
+pytest-asyncio = "*"
 
 [requires]
 python_version = "3.8"
