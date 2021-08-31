@@ -16,8 +16,13 @@ python setup.py \
     --compat=10 \
     --build-depends="dh-systemd (>= 1.5)"
 
+# add Pre-Depends to debian/control for python3-pip
+sed -i 's/^\(Depends: \)/Pre-Depends: python3-pip\n\1/' debian/control
+
 # fix the debhelper compatibility level in debian/control
 sed -i 's/>= 9/>= 10/' debian/control
+
+PIP_REQUIREMENTS=$(pipenv lock -r)
 
 # write the debian/postinst file
 cat <<EOT >> debian/postinst
@@ -62,6 +67,14 @@ fi
 if ! groups \${USERNAME} | cut -d: -f2 | grep -qw \${GROUP}; then
     adduser \${USERNAME} \${GROUP} > /dev/null 2>&1
 fi
+
+echo -n "Installing dependencies using pip.."
+# write a pip requirements.txt for automatic dependency installation
+echo "${PIP_REQUIREMENTS}" > /tmp/requirements.txt
+# install all required dependencies
+python3 -m pip install -r /tmp/requirements.txt > /dev/null 2>&1
+rm /tmp/requirements.txt
+echo "..done"
 
 #DEBHELPER#
 
