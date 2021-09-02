@@ -25,7 +25,7 @@ python_version = "3.8"
 [scripts]
 build = "bash ./scripts/build.sh"
 build_check = "twine check dist/*"
-clean = "rm -rf .eggs build dist *.egg-info"
+clean = "rm -rf .eggs build dist smartmeter_datacollector.egg-info"
 format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
 isort = "isort ."
