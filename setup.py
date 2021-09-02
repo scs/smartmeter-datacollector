@@ -48,7 +48,6 @@ setup(
         exclude=["contrib", "doc", "LICENSES", "scripts", "tests", "tests."]
     ),
     include_package_data=True,
-    package_data={"": ["LICENSE"],},
     install_requires=[
         "aioserial==1.3.0",
         "asyncio-mqtt==0.10.0",
