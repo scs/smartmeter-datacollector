@@ -4,7 +4,7 @@
 set -e
 
 # Delete previously built distribution
-rm -rf build/* dist/*
+rm -rf build dist
 
 # fail if setup.py is not up-to-date
 echo -n "Checking whether Pipfile and setup.py are synchronized..."
