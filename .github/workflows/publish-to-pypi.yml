@@ -41,6 +41,12 @@ jobs:
         run: |
           pipenv run build
 
+      - name: Archive the built Python package
+        uses: actions/upload-artifact@v2
+        with:
+          name: smartmeter-datacollector-py
+          path: dist/*
+
       - name: Publish the Python package to Test PyPI
         if: github.ref == 'refs/heads/master'
         uses: pypa/gh-action-pypi-publish@v1.4.2
