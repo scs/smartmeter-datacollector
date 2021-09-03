@@ -7,28 +7,25 @@
 #
 from dataclasses import dataclass
 
-import serial
-from aioserial import AioSerial
+import aioserial
 
 
 @dataclass
 class SerialConfig:
     port: str
     baudrate: int = 9600
-    data_bits: int = serial.EIGHTBITS
-    parity: str = serial.PARITY_NONE
-    stop_bits: int = serial.STOPBITS_ONE
-    termination: bytes = serial.LF
+    data_bits: int = aioserial.EIGHTBITS
+    parity: str = aioserial.PARITY_NONE
+    stop_bits: int = aioserial.STOPBITS_ONE
+    termination: bytes = aioserial.LF
 
 
 # pylint: disable=too-few-public-methods
 class SerialReader:
-    CHUNK_SIZE = 16
-
     def __init__(self, serial_config: SerialConfig, callback) -> None:
         self._callback = callback
         self._termination = serial_config.termination
-        self._serial = AioSerial(
+        self._serial = aioserial.AioSerial(
             port=serial_config.port,
             baudrate=serial_config.baudrate,
             bytesize=serial_config.data_bits,
