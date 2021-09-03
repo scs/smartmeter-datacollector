@@ -6,8 +6,11 @@
 # See LICENSES/README.md for more information.
 #
 from dataclasses import dataclass
+from typing import Callable
 
 import aioserial
+
+from .reader import Reader
 
 
 @dataclass
@@ -21,9 +24,9 @@ class SerialConfig:
 
 
 # pylint: disable=too-few-public-methods
-class SerialReader:
-    def __init__(self, serial_config: SerialConfig, callback) -> None:
-        self._callback = callback
+class SerialReader(Reader):
+    def __init__(self, serial_config: SerialConfig, callback: Callable[[bytes], None]) -> None:
+        super().__init__(callback)
         self._termination = serial_config.termination
         self._serial = aioserial.AioSerial(
             port=serial_config.port,
