@@ -38,7 +38,7 @@ def set_logging_levels(app_config: ConfigParser) -> None:
     if not app_config.has_section("logging"):
         return
     # configure root logger
-    logging.getLogger().setLevel(app_config["logging"].get('default', logging.WARNING))
+    logging.getLogger().setLevel(app_config["logging"].get('default', "WARNING"))
     # configure individual loggers
     for name, level in app_config["logging"].items():
         logging.getLogger(name).setLevel(level)
@@ -56,7 +56,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    debug_mode = True if args.dev else False
+    debug_mode = bool(args.dev)
     app_config = config.read_config_files(args.config)
     set_logging_levels(app_config)
     asyncio.run(build_and_start(app_config), debug=debug_mode)

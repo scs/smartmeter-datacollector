@@ -23,6 +23,7 @@ from .data_sink import DataSink
 LOGGER = logging.getLogger("sink")
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class MqttConfig:
     broker_host: str
@@ -111,8 +112,8 @@ class MqttDataSink(DataSink):
         if client_cert_path:
             try:
                 context.load_cert_chain(client_cert_path, client_key_path, None)
-            except ssl.SSLError as e:
-                LOGGER.error("Client certificate does not match with the key and is ignored. '%s'", e)
+            except ssl.SSLError as ex:
+                LOGGER.error("Client certificate does not match with the key and is ignored. '%s'", ex)
         return context
 
     async def start(self) -> None:
