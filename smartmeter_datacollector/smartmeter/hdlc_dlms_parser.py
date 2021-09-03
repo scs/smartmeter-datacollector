@@ -21,6 +21,8 @@ LOGGER = logging.getLogger("smartmeter")
 
 
 class HdlcDlmsParser:
+    HDLC_BUFFER_MAX_SIZE = 10000
+
     def __init__(self, cosem_config: CosemConfig, block_cipher_key: str = None) -> None:
         if block_cipher_key:
             self._client = GXDLMSSecureClient(True)
@@ -35,6 +37,9 @@ class HdlcDlmsParser:
         self._cosem = cosem_config
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
+        if self._hdlc_buffer.getSize() > self.HDLC_BUFFER_MAX_SIZE:
+            LOGGER.info("HDLC byte-buffer > %i. Cleared.", self.HDLC_BUFFER_MAX_SIZE)
+            self._hdlc_buffer.clear()
         self._hdlc_buffer.set(data)
 
     def clear_hdlc_buffer(self) -> None:
