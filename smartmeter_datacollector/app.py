@@ -45,7 +45,7 @@ def set_logging_levels(app_config: ConfigParser) -> None:
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Smartmeter Datacollector", add_help=True)
+        description="Smart Meter Data Collector", add_help=True)
     parser.add_argument(
         '-c', '--config', help="File path of the configuration (.ini) file.", default="./datacollector.ini")
     parser.add_argument(
