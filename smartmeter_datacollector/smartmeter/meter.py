@@ -11,6 +11,10 @@ from typing import List
 from .meter_data import MeterDataPoint
 
 
+class MeterError(Exception):
+    pass
+
+
 class Meter(ABC):
     def __init__(self) -> None:
         self._observers = []

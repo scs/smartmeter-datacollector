@@ -26,9 +26,10 @@ async def build_and_start(app_config: ConfigParser):
     try:
         await asyncio.gather(
             *[reader.start() for reader in readers],
-            data_collector.process_queue(),
-            return_exceptions=True)
+            data_collector.process_queue())
     except CancelledError:
+        pass
+    finally:
         logging.info("App shutting down now.")
         await asyncio.gather(*[sink.stop() for sink in sinks])
 

@@ -16,7 +16,7 @@ from .sinks.logger_sink import LoggerSink
 from .sinks.mqtt_sink import MqttConfig, MqttDataSink
 from .smartmeter.iskraam550 import IskraAM550
 from .smartmeter.lge450 import LGE450
-from .smartmeter.meter import Meter
+from .smartmeter.meter import Meter, MeterError
 
 
 def build_meters(config: ConfigParser) -> List[Meter]:
@@ -36,7 +36,7 @@ def build_meters(config: ConfigParser) -> List[Meter]:
                 ))
             else:
                 raise InvalidConfigError(f"'type' is invalid or missing: {meter_type}")
-        except Exception as ex:
+        except MeterError as ex:
             logging.warning("%s Skipping smart meter.", ex)
             continue
     return meters

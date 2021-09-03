@@ -10,7 +10,7 @@ from typing import Callable
 
 import aioserial
 
-from .reader import Reader
+from .reader import Reader, ReaderError
 
 
 @dataclass
@@ -28,13 +28,16 @@ class SerialReader(Reader):
     def __init__(self, serial_config: SerialConfig, callback: Callable[[bytes], None]) -> None:
         super().__init__(callback)
         self._termination = serial_config.termination
-        self._serial = aioserial.AioSerial(
-            port=serial_config.port,
-            baudrate=serial_config.baudrate,
-            bytesize=serial_config.data_bits,
-            parity=serial_config.parity,
-            stopbits=serial_config.stop_bits
-        )
+        try:
+            self._serial = aioserial.AioSerial(
+                port=serial_config.port,
+                baudrate=serial_config.baudrate,
+                bytesize=serial_config.data_bits,
+                parity=serial_config.parity,
+                stopbits=serial_config.stop_bits
+            )
+        except aioserial.SerialException as ex:
+            raise ReaderError(ex) from ex
 
     async def start_and_listen(self) -> None:
         while True:

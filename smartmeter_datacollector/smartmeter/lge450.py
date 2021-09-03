@@ -12,8 +12,9 @@ import serial
 
 from .cosem import CosemConfig, RegisterCosem
 from .hdlc_dlms_parser import HdlcDlmsParser
-from .meter import Meter
+from .meter import Meter, MeterError
 from .meter_data import MeterDataPoint, MeterDataPointTypes
+from .reader import ReaderError
 from .serial_reader import SerialConfig, SerialReader
 
 LOGGER = logging.getLogger("smartmeter")
@@ -81,13 +82,19 @@ class LGE450(Meter):
             stop_bits=serial.STOPBITS_ONE,
             termination=LGE450.HDLC_FLAG
         )
-        self._serial = SerialReader(serial_config, self._data_received)
+        try:
+            self._serial = SerialReader(serial_config, self._data_received)
+        except ReaderError as ex:
+            LOGGER.fatal("Unable to setup serial reader for L+G E450. '%s'", ex)
+            raise MeterError("Failed setting up L+G E450.") from ex
+
         cosem_config = CosemConfig(
             id_obis="0.0.42.0.0.255",
             clock_obis="0.0.1.0.0.255",
             register_obis=LGE450_COSEM_REGISTERS
         )
         self._parser = HdlcDlmsParser(cosem_config, decryption_key)
+        LOGGER.info("Successfully set up L+G E450 smartmeter on '%s'.", port)
 
     async def start(self) -> None:
         await self._serial.start_and_listen()

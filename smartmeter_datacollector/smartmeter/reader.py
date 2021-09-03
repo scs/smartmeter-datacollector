@@ -9,6 +9,10 @@ from abc import ABC, abstractmethod
 from typing import Callable
 
 
+class ReaderError(Exception):
+    pass
+
+
 # pylint: disable=too-few-public-methods
 class Reader(ABC):
     def __init__(self, callback: Callable[[bytes], None]) -> None:
