@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.WARNING)
 
 
 async def build_and_start(app_config: ConfigParser):
-    readers = factory.build_readers(app_config)
+    readers = factory.build_meters(app_config)
     sinks = factory.build_sinks(app_config)
     data_collector = factory.build_collector(readers, sinks)
 

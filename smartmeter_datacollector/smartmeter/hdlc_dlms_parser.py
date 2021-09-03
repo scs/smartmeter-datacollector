@@ -15,7 +15,7 @@ from gurux_dlms.objects import GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSRegi
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import CosemConfig
-from .reader_data import ReaderDataPoint
+from .meter_data import MeterDataPoint
 
 LOGGER = logging.getLogger("smartmeter")
 
@@ -81,7 +81,7 @@ class HdlcDlmsParser:
         self._dlms_data.clear()
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
-    def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[ReaderDataPoint]:
+    def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[MeterDataPoint]:
         # Extract timestamp
         clock_obj = dlms_objects.get(self._cosem.clock_obis, None)
         timestamp = None
@@ -101,7 +101,7 @@ class HdlcDlmsParser:
             return []
 
         # Extract register data
-        data_points: List[ReaderDataPoint] = []
+        data_points: List[MeterDataPoint] = []
         for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, dlms_objects.items()):
             reg_type = self._cosem.get_register(obis)
             if reg_type and isinstance(obj, GXDLMSRegister):
@@ -115,7 +115,7 @@ class HdlcDlmsParser:
                 except (TypeError, ValueError, OverflowError):
                     LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
                     continue
-                data_points.append(ReaderDataPoint(data_point_type, value, meter_id, timestamp))
+                data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp))
         return data_points
 
     @staticmethod

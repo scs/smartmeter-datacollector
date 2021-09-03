@@ -8,10 +8,10 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from .reader_data import ReaderDataPoint
+from .meter_data import MeterDataPoint
 
 
-class Reader(ABC):
+class Meter(ABC):
     def __init__(self) -> None:
         self._observers = []
 
@@ -22,6 +22,6 @@ class Reader(ABC):
     async def start(self) -> None:
         raise NotImplementedError()
 
-    def _notify_observers(self, data_points: List[ReaderDataPoint]) -> None:
+    def _notify_observers(self, data_points: List[MeterDataPoint]) -> None:
         for observer in self._observers:
             observer.notify(data_points)
