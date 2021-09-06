@@ -17,12 +17,13 @@ from asyncio_mqtt.client import ProtocolVersion
 from asyncio_mqtt.error import MqttCodeError, MqttError
 from paho.mqtt.client import MQTT_ERR_NO_CONN
 
-from ..smartmeter.reader_data import ReaderDataPoint
+from ..smartmeter.meter_data import MeterDataPoint
 from .data_sink import DataSink
 
 LOGGER = logging.getLogger("sink")
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class MqttConfig:
     broker_host: str
@@ -111,8 +112,8 @@ class MqttDataSink(DataSink):
         if client_cert_path:
             try:
                 context.load_cert_chain(client_cert_path, client_key_path, None)
-            except ssl.SSLError as e:
-                LOGGER.error("Client certificate does not match with the key and is ignored. '%s'", e)
+            except ssl.SSLError as ex:
+                LOGGER.error("Client certificate does not match with the key and is ignored. '%s'", ex)
         return context
 
     async def start(self) -> None:
@@ -123,7 +124,7 @@ class MqttDataSink(DataSink):
         await self._disconnect_from_server()
         LOGGER.info("Disconnected from MQTT broker.")
 
-    async def send(self, data_point: ReaderDataPoint) -> None:
+    async def send(self, data_point: MeterDataPoint) -> None:
         topic = MqttDataSink.get_topic_name_for_datapoint(data_point)
         dp_json = self.data_point_to_mqtt_json(data_point)
         try:
@@ -161,11 +162,11 @@ class MqttDataSink(DataSink):
             await self._client.force_disconnect()
 
     @staticmethod
-    def get_topic_name_for_datapoint(data_point: ReaderDataPoint) -> str:
+    def get_topic_name_for_datapoint(data_point: MeterDataPoint) -> str:
         return f"smartmeter/{data_point.source}/{data_point.type.identifier}"
 
     @staticmethod
-    def data_point_to_mqtt_json(data_point: ReaderDataPoint) -> str:
+    def data_point_to_mqtt_json(data_point: MeterDataPoint) -> str:
         return json.dumps({
             "value": data_point.value,
             "timestamp": int(data_point.timestamp.timestamp())

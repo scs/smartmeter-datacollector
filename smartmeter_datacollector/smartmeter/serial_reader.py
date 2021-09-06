@@ -6,35 +6,38 @@
 # See LICENSES/README.md for more information.
 #
 from dataclasses import dataclass
+from typing import Callable
 
-import serial
-from aioserial import AioSerial
+import aioserial
+
+from .reader import Reader, ReaderError
 
 
 @dataclass
 class SerialConfig:
     port: str
     baudrate: int = 9600
-    data_bits: int = serial.EIGHTBITS
-    parity: str = serial.PARITY_NONE
-    stop_bits: int = serial.STOPBITS_ONE
-    termination: bytes = serial.LF
+    data_bits: int = aioserial.EIGHTBITS
+    parity: str = aioserial.PARITY_NONE
+    stop_bits: int = aioserial.STOPBITS_ONE
+    termination: bytes = aioserial.LF
 
 
 # pylint: disable=too-few-public-methods
-class SerialReader:
-    CHUNK_SIZE = 16
-
-    def __init__(self, serial_config: SerialConfig, callback) -> None:
-        self._callback = callback
+class SerialReader(Reader):
+    def __init__(self, serial_config: SerialConfig, callback: Callable[[bytes], None]) -> None:
+        super().__init__(callback)
         self._termination = serial_config.termination
-        self._serial = AioSerial(
-            port=serial_config.port,
-            baudrate=serial_config.baudrate,
-            bytesize=serial_config.data_bits,
-            parity=serial_config.parity,
-            stopbits=serial_config.stop_bits
-        )
+        try:
+            self._serial = aioserial.AioSerial(
+                port=serial_config.port,
+                baudrate=serial_config.baudrate,
+                bytesize=serial_config.data_bits,
+                parity=serial_config.parity,
+                stopbits=serial_config.stop_bits
+            )
+        except aioserial.SerialException as ex:
+            raise ReaderError(ex) from ex
 
     async def start_and_listen(self) -> None:
         while True:

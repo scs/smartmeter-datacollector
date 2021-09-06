@@ -8,13 +8,13 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from .reader_data import ReaderDataPointType
+from .meter_data import MeterDataPointType
 
 
 @dataclass
 class RegisterCosem:
     obis: str
-    data_point_type: ReaderDataPointType
+    data_point_type: MeterDataPointType
     scaling: float = 1.0
 
 

@@ -6,22 +6,18 @@
 # See LICENSES/README.md for more information.
 #
 from abc import ABC, abstractmethod
-from typing import List
-
-from .reader_data import ReaderDataPoint
+from typing import Callable
 
 
+class ReaderError(Exception):
+    pass
+
+
+# pylint: disable=too-few-public-methods
 class Reader(ABC):
-    def __init__(self) -> None:
-        self._observers = []
-
-    def register(self, observer) -> None:
-        self._observers.append(observer)
+    def __init__(self, callback: Callable[[bytes], None]) -> None:
+        self._callback = callback
 
     @abstractmethod
-    async def start(self) -> None:
-        raise NotImplementedError()
-
-    def _notify_observers(self, data_points: List[ReaderDataPoint]) -> None:
-        for observer in self._observers:
-            observer.notify(data_points)
+    async def start_and_listen(self) -> None:
+        pass

@@ -64,5 +64,5 @@ def get_default_config() -> configparser.ConfigParser:
 
 def write_default_config(config_path: str):
     config = get_default_config()
-    with open(config_path, 'w') as file:
+    with open(config_path, 'w', encoding='utf-8') as file:
         config.write(file, True)

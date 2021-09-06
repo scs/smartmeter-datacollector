@@ -11,13 +11,13 @@ import serial
 
 from .cosem import CosemConfig
 from .hdlc_dlms_parser import HdlcDlmsParser
-from .reader import Reader
+from .meter import Meter
 from .serial_reader import SerialConfig, SerialReader
 
 LOGGER = logging.getLogger("smartmeter")
 
 
-class IskraAM550(Reader):
+class IskraAM550(Meter):
     HDLC_FLAG = b"\x7e"
 
     def __init__(self, port: str) -> None:

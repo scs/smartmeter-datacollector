@@ -15,12 +15,14 @@ from gurux_dlms.objects import GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSRegi
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import CosemConfig
-from .reader_data import ReaderDataPoint
+from .meter_data import MeterDataPoint
 
 LOGGER = logging.getLogger("smartmeter")
 
 
 class HdlcDlmsParser:
+    HDLC_BUFFER_MAX_SIZE = 10000
+
     def __init__(self, cosem_config: CosemConfig, block_cipher_key: str = None) -> None:
         if block_cipher_key:
             self._client = GXDLMSSecureClient(True)
@@ -35,6 +37,10 @@ class HdlcDlmsParser:
         self._cosem = cosem_config
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
+        if self._hdlc_buffer.getSize() > self.HDLC_BUFFER_MAX_SIZE:
+            LOGGER.warning("HDLC byte-buffer > %i. Buffer is cleared, some data is lost.",
+                           self.HDLC_BUFFER_MAX_SIZE)
+            self._hdlc_buffer.clear()
         self._hdlc_buffer.set(data)
 
     def clear_hdlc_buffer(self) -> None:
@@ -51,21 +57,22 @@ class HdlcDlmsParser:
             LOGGER.debug("HDLC Buffer: %s", GXByteBuffer.hex(self._hdlc_buffer))
             self._client.getData(self._hdlc_buffer, tmp, self._dlms_data)
         except ValueError as ex:
-            LOGGER.debug("Unable to extract data from hdlc frame: '%s'", ex)
+            LOGGER.warning("Failed to extract data from HDLC frame: '%s' Some data got lost.", ex)
             self._hdlc_buffer.clear()
             self._dlms_data.clear()
             return False
 
         if not self._dlms_data.isComplete():
-            LOGGER.debug("Incomplete HDLC frame.")
+            LOGGER.debug("HDLC frame incomplete and will not be parsed yet.")
             return False
 
-        if not self._dlms_data.isMoreData():
-            LOGGER.debug("DLMS packet complete and ready for parsing.")
-            LOGGER.debug("DLMS Buffer: %s", GXByteBuffer.hex(self._dlms_data.data))
-            self._hdlc_buffer.clear()
-            return True
-        return False
+        if self._dlms_data.isMoreData():
+            LOGGER.debug("More DLMS data expected. Not yet ready to be parsed.")
+            return False
+
+        LOGGER.debug("DLMS packet complete and ready for parsing.")
+        self._hdlc_buffer.clear()
+        return True
 
     def parse_to_dlms_objects(self) -> Dict[str, GXDLMSObject]:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
@@ -81,7 +88,7 @@ class HdlcDlmsParser:
         self._dlms_data.clear()
         return {obj.getName(): obj for obj, _ in parsed_objects}
 
-    def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[ReaderDataPoint]:
+    def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[MeterDataPoint]:
         # Extract timestamp
         clock_obj = dlms_objects.get(self._cosem.clock_obis, None)
         timestamp = None
@@ -101,7 +108,7 @@ class HdlcDlmsParser:
             return []
 
         # Extract register data
-        data_points: List[ReaderDataPoint] = []
+        data_points: List[MeterDataPoint] = []
         for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, dlms_objects.items()):
             reg_type = self._cosem.get_register(obis)
             if reg_type and isinstance(obj, GXDLMSRegister):
@@ -115,7 +122,7 @@ class HdlcDlmsParser:
                 except (TypeError, ValueError, OverflowError):
                     LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
                     continue
-                data_points.append(ReaderDataPoint(data_point_type, value, meter_id, timestamp))
+                data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp))
         return data_points
 
     @staticmethod
