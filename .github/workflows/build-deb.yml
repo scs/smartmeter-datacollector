@@ -51,7 +51,7 @@ jobs:
 
       - name: Prepare to build a Debian source package
         run: |
-          sudo apt-get -y install python3-all debhelper dh-python dh-systemd
+          sudo apt-get -y install python3-all debhelper dh-python dh-systemd rename
 
       - name: Build a Debian source package
         run: |
@@ -75,6 +75,7 @@ jobs:
         run: |
           cd deb_dist
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder build *.dsc
+          sudo rename "s/_all\./_${{ matrix.arch }}\./" /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
 
       - name: Archive the built Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v2
