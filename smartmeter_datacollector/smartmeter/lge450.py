@@ -94,7 +94,7 @@ class LGE450(Meter):
             register_obis=LGE450_COSEM_REGISTERS
         )
         self._parser = HdlcDlmsParser(cosem_config, decryption_key)
-        LOGGER.info("Successfully set up L+G E450 smartmeter on '%s'.", port)
+        LOGGER.info("Successfully set up L+G E450 smart meter on '%s'.", port)
 
     async def start(self) -> None:
         await self._serial.start_and_listen()

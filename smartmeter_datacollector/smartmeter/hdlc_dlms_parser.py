@@ -38,7 +38,8 @@ class HdlcDlmsParser:
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         if self._hdlc_buffer.getSize() > self.HDLC_BUFFER_MAX_SIZE:
-            LOGGER.info("HDLC byte-buffer > %i. Cleared.", self.HDLC_BUFFER_MAX_SIZE)
+            LOGGER.warning("HDLC byte-buffer > %i. Buffer is cleared, some data is lost.",
+                           self.HDLC_BUFFER_MAX_SIZE)
             self._hdlc_buffer.clear()
         self._hdlc_buffer.set(data)
 
@@ -56,21 +57,22 @@ class HdlcDlmsParser:
             LOGGER.debug("HDLC Buffer: %s", GXByteBuffer.hex(self._hdlc_buffer))
             self._client.getData(self._hdlc_buffer, tmp, self._dlms_data)
         except ValueError as ex:
-            LOGGER.debug("Unable to extract data from hdlc frame: '%s'", ex)
+            LOGGER.warning("Failed to extract data from HDLC frame: '%s' Some data got lost.", ex)
             self._hdlc_buffer.clear()
             self._dlms_data.clear()
             return False
 
         if not self._dlms_data.isComplete():
-            LOGGER.debug("Incomplete HDLC frame.")
+            LOGGER.debug("HDLC frame incomplete and will not be parsed yet.")
             return False
 
-        if not self._dlms_data.isMoreData():
-            LOGGER.debug("DLMS packet complete and ready for parsing.")
-            LOGGER.debug("DLMS Buffer: %s", GXByteBuffer.hex(self._dlms_data.data))
-            self._hdlc_buffer.clear()
-            return True
-        return False
+        if self._dlms_data.isMoreData():
+            LOGGER.debug("More DLMS data expected. Not yet ready to be parsed.")
+            return False
+
+        LOGGER.debug("DLMS packet complete and ready for parsing.")
+        self._hdlc_buffer.clear()
+        return True
 
     def parse_to_dlms_objects(self) -> Dict[str, GXDLMSObject]:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
