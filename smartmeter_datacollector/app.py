@@ -50,6 +50,8 @@ def parse_arguments():
     parser.add_argument(
         '-c', '--config', help="File path of the configuration (.ini) file.", default="./datacollector.ini")
     parser.add_argument(
+        '-s', '--saveconfig', help="Create default configuration (.ini) file at path defined with -c", action='store_true')
+    parser.add_argument(
         '-d', '--dev', help="Development mode", action='store_true')
     return parser.parse_args()
 
@@ -57,6 +59,10 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     debug_mode = bool(args.dev)
+    if args.saveconfig:
+        config.write_default_config(args.config)
+        logging.warning("Default configuration written to file '%s'.", args.config)
+        return
     app_config = config.read_config_files(args.config)
     set_logging_levels(app_config)
     asyncio.run(build_and_start(app_config), debug=debug_mode)
