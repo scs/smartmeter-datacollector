@@ -51,3 +51,6 @@ jobs:
       - name: Lint with pylint 
         run: |
           pipenv run lint_check
+      - name: Run unit tests
+        run: |
+          pipenv run test

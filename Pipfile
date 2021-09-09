@@ -19,6 +19,9 @@ setuptools = "*"
 stdeb = {version="*", markers="sys_platform == 'linux'"}
 twine = "*"
 wheel = "*"
+pytest = "*"
+pytest-mock = "*"
+pytest-asyncio = "*"
 
 [requires]
 python_version = "3.8"
@@ -39,3 +42,4 @@ lint_check = "pylint smartmeter_datacollector/ --exit-zero"
 license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
 setup = "pipenv-setup sync"
 setup_check = "pipenv-setup check"
+test = "pytest"
