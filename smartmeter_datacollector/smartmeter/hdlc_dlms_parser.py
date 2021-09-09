@@ -21,7 +21,7 @@ LOGGER = logging.getLogger("smartmeter")
 
 
 class HdlcDlmsParser:
-    HDLC_BUFFER_MAX_SIZE = 10000
+    HDLC_BUFFER_MAX_SIZE = 5000
 
     def __init__(self, cosem_config: CosemConfig, block_cipher_key: str = None) -> None:
         if block_cipher_key:
