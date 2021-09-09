@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aioserial = "~=1.3"
-asyncio-mqtt = "~=0.10"
-gurux-dlms = "~=1.0.104"
+aioserial = "~=1.3.0"
+asyncio-mqtt = "~=0.10.0"
+gurux-dlms = "==1.0.107"
 
 [dev-packages]
 autopep8 = "*"
