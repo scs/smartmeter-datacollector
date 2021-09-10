@@ -1,3 +1,9 @@
+smartmeter-datacollector (0.6.0-1) unstable; urgency=low
+
+  * improved error handling and unit tests
+
+ -- Supercomputing Systems AG <info@scs.ch>  Fri, 10 Sep 2021 09:09:58 +0200
+
 smartmeter-datacollector (0.5.0-1) unstable; urgency=low
 
   * support building Debian source and binary packages for distribution on Debian Buster amd64 and raspios
