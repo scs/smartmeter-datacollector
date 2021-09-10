@@ -32,7 +32,8 @@ def build_meters(config: ConfigParser) -> List[Meter]:
                 ))
             elif meter_type == "iskraam550":
                 meters.append(IskraAM550(
-                    port=meter_config.get('port', "/dev/ttyUSB0")
+                    port=meter_config.get('port', "/dev/ttyUSB0"),
+                    decryption_key=meter_config.get('key')
                 ))
             else:
                 raise InvalidConfigError(f"'type' is invalid or missing: {meter_type}")
