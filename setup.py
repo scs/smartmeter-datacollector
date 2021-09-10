@@ -51,11 +51,11 @@ setup(
     install_requires=[
         "aioserial==1.3.0",
         "asyncio-mqtt==0.10.0",
-        "gurux-dlms==1.0.104",
+        "gurux-dlms==1.0.107",
         "paho-mqtt==1.5.1",
         "pyserial==3.5",
     ],
-    scripts=['bin/smartmeter-datacollector'],
+    scripts=["bin/smartmeter-datacollector"],
     zip_safe=True,
     dependency_links=[],
 )

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6367536ce38b926f5f7a646fc0f4e4c4c3824b1423e351cea5d9f271149a6bb9"
+            "sha256": "5068628c6c80cf3a86a2726b752f8aa084ba8e94b4c074bf225c82f5e131ea91"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -34,11 +34,11 @@
         },
         "gurux-dlms": {
             "hashes": [
-                "sha256:71a6f47e2b1526ac8ab10d0c0ee00fd819d758103dd3c4f5590ff67e2df2ad41",
-                "sha256:82c78a70f3650e094007128ef6a9102aeabb366c4363a96847652212985bee33"
+                "sha256:77defe59bca3f2df0111998652c2665d0241b55cea1662c2c6e7503424a66282",
+                "sha256:e8bf152addf13fb877538b61562911c20dfa39e96fc466073aed27ce14ac2695"
             ],
             "index": "pypi",
-            "version": "==1.0.104"
+            "version": "==1.0.107"
         },
         "paho-mqtt": {
             "hashes": [
