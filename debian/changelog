@@ -1,4 +1,10 @@
-smartmeter-datacollector (0.6.0-1) unstable; urgency=low
+smartmeter-datacollector (0.6.1-1) unstable; urgency=low
+
+  * bugfix for clearing the HDLC buffer if it gets too large
+
+ -- Supercomputing Systems AG <info@scs.ch>  Mon, 13 Sep 2021 11:15:19 +0200
+
+ smartmeter-datacollector (0.6.0-1) unstable; urgency=low
 
   * improved error handling and unit tests
 
