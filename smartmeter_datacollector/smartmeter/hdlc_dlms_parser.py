@@ -44,6 +44,7 @@ class HdlcDlmsParser:
             LOGGER.warning("HDLC byte-buffer > %i. Buffer is cleared, some data is lost.",
                            self.HDLC_BUFFER_MAX_SIZE)
             self._hdlc_buffer.clear()
+            self._dlms_data.clear()
         self._hdlc_buffer.set(data)
 
     def clear_hdlc_buffer(self) -> None:
