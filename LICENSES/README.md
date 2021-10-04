@@ -12,7 +12,7 @@ Furthermore by acquiring the commercial license for `Gurux.DLMS.Python`  [Gurux]
 Using dual licensing to provide `smartmeter-datacollector` combines the benefits of licensing the product under *GPL-2.0-only* with the possibility to use it in situations where *GPL-2.0-only* is not applicable.
 
 ## Contributing
-`smartmeter-datacollector` has been developed by **[Supercomputing Systems AG](https://www.scs.ch/)** but is meant to be used and extended by the open source community. Therefore **every contribution is welcome** in the form of [pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
+`smartmeter-datacollector` has been developed by **[Supercomputing Systems AG](https://www.scs.ch/)** on behalf of and funded by **[EKZ](https://www.ekz.ch/)** but is meant to be used and extended by the open source community. Therefore **every contribution is welcome** in the form of [pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
 
 Every developer contributing to `smartmeter-datacollector` must do so under the license(s) described above.
 

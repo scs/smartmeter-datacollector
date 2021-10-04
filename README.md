@@ -63,6 +63,7 @@ The following data sinks are implemented:
   - [Checkout the code](#checkout-the-code)
   - [Setup Development Environment](#setup-development-environment)
   - [Custom Commands / Workflows](#custom-commands--workflows)
+- [Acknowledgements](#acknowledgements)
 
 # How to install
 
@@ -333,4 +334,7 @@ This will install all runtime and development dependencies for `smartmeter-datac
 * `build_srcdeb` builds a Debian source package which can be used to build a Debian (binary) package for any platform (e.g. using [`pbuilder`](https://pbuilder-docs.readthedocs.io/en/latest/usage.html))
 * `build_deb` builds a Debian package for the current development plattform.
 
-Make sure to run `format_check` / `format`, `isort_check` / `isort`, `lint_check` / `lint`, `license`, `setup_check` / `setup` before commiting changes to the repository to avoid unnecessary development cycles. `smartmeter-datacollector` uses [GitHub Actions](https://github.com/scs/smartmeter-datacollector/actions) to check if these rules apply. 
+Make sure to run `format_check` / `format`, `isort_check` / `isort`, `lint_check` / `lint`, `license`, `setup_check` / `setup` before commiting changes to the repository to avoid unnecessary development cycles. `smartmeter-datacollector` uses [GitHub Actions](https://github.com/scs/smartmeter-datacollector/actions) to check if these rules apply.
+
+# Acknowledgements
+`smartmeter-datacollector` and its companion project [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) have been developed by **[Supercomputing Systems AG](https://www.scs.ch)** on behalf of and funded by **[EKZ](https://www.ekz.ch/)**.
