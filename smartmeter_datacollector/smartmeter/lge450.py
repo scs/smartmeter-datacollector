@@ -89,8 +89,7 @@ class LGE450(Meter):
             raise MeterError("Failed setting up L+G E450.") from ex
 
         cosem_config = CosemConfig(
-            id_obis="0.0.42.0.0.255",
-            clock_obis="0.0.1.0.0.255",
+            fallback_id=port,
             register_obis=LGE450_COSEM_REGISTERS
         )
         self._parser = HdlcDlmsParser(cosem_config, decryption_key)
