@@ -20,8 +20,7 @@ def cosem_config_lg() -> Cosem:
         RegisterCosem("1.0.2.7.0.255", MeterDataPointTypes.ACTIVE_POWER_N.value),
     ]
     return Cosem(
-        id_obis="0.0.42.0.0.255",
-        clock_obis="0.0.1.0.0.255",
+        fallback_id="fallback_id",
         register_obis=obis_registers
     )
 
