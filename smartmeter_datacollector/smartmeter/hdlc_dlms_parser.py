@@ -13,7 +13,7 @@ from gurux_dlms.enums import InterfaceType, ObjectType, Security
 from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister
 from gurux_dlms.secure import GXDLMSSecureClient
 
-from .cosem import CosemConfig
+from .cosem import Cosem
 from .meter_data import MeterDataPoint
 
 LOGGER = logging.getLogger("smartmeter")
@@ -22,7 +22,7 @@ LOGGER = logging.getLogger("smartmeter")
 class HdlcDlmsParser:
     HDLC_BUFFER_MAX_SIZE = 5000
 
-    def __init__(self, cosem_config: CosemConfig, block_cipher_key: str = None) -> None:
+    def __init__(self, cosem_config: Cosem, block_cipher_key: str = None) -> None:
         if block_cipher_key:
             self._client = GXDLMSSecureClient(
                 useLogicalNameReferencing=True,

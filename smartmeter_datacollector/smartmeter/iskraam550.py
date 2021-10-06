@@ -9,7 +9,7 @@ import logging
 
 import serial
 
-from .cosem import CosemConfig
+from .cosem import Cosem
 from .hdlc_dlms_parser import HdlcDlmsParser
 from .meter import Meter
 from .serial_reader import SerialConfig, SerialReader
@@ -32,7 +32,7 @@ class IskraAM550(Meter):
             termination=IskraAM550.HDLC_FLAG
         )
         self._serial = SerialReader(serial_config, self._data_received)
-        cosem_config = CosemConfig(
+        cosem_config = Cosem(
             fallback_id=port,
             register_obis=[]
         )

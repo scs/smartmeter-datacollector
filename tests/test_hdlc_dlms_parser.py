@@ -10,7 +10,7 @@ import re
 
 from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
-from smartmeter_datacollector.smartmeter.cosem import CosemConfig
+from smartmeter_datacollector.smartmeter.cosem import Cosem
 from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
 
 from .utils import *
@@ -18,7 +18,7 @@ from .utils import *
 
 class TestHdlcParserUnencrypted:
     def test_extract_hdlc_data_framewise(self, unencrypted_valid_data_lg):
-        parser = HdlcDlmsParser(CosemConfig("", "", []))
+        parser = HdlcDlmsParser(Cosem("", "", []))
 
         for frame in unencrypted_valid_data_lg:
             assert not parser.extract_data_from_hdlc_frames()
@@ -27,7 +27,7 @@ class TestHdlcParserUnencrypted:
         assert parser.extract_data_from_hdlc_frames()
 
     def test_extract_hdlc_data_in_halfframes(self, unencrypted_valid_data_lg):
-        parser = HdlcDlmsParser(CosemConfig("", "", []))
+        parser = HdlcDlmsParser(Cosem("", "", []))
 
         for frame in unencrypted_valid_data_lg:
             frame: bytes
@@ -39,7 +39,7 @@ class TestHdlcParserUnencrypted:
         assert parser.extract_data_from_hdlc_frames()
 
     def test_extract_hdlc_data_with_random_prefix(self, unencrypted_valid_data_lg):
-        parser = HdlcDlmsParser(CosemConfig("", "", []))
+        parser = HdlcDlmsParser(Cosem("", "", []))
         random.seed(123)
         prefix = bytes(random.getrandbits(8) for _ in range(32))
         parser.append_to_hdlc_buffer(prefix)

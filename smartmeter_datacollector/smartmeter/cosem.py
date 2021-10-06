@@ -36,7 +36,7 @@ class RegisterCosem:
     scaling: float = 1.0
 
 
-class CosemConfig:
+class Cosem:
     def __init__(self, fallback_id: str, register_obis: List[RegisterCosem]) -> None:
         self._id: Optional[str] = None
         self._fallback_id = fallback_id
