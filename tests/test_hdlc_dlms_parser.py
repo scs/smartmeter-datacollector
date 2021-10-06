@@ -93,4 +93,4 @@ class TestDlmsParserUnencrypted:
         dlms_objects = invalid_hdlc_buffer.parse_to_dlms_objects()
         meter_data = invalid_hdlc_buffer.convert_dlms_bundle_to_reader_data(dlms_objects)
         assert isinstance(meter_data, list)
-        assert len(meter_data) == 0
+        assert len(meter_data) == 2
