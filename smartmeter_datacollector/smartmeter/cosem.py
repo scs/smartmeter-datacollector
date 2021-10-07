@@ -6,6 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 import logging
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -39,6 +40,9 @@ class RegisterCosem:
 class Cosem:
     def __init__(self, fallback_id: str, register_obis: List[RegisterCosem]) -> None:
         self._id: Optional[str] = None
+        if not fallback_id:
+            fallback_id = str(uuid.uuid1())
+            LOGGER.warning("Empty or no fallback ID. Setting to random UUID %s.", fallback_id)
         self._fallback_id = fallback_id
         self._register_obis = {r.obis: r for r in register_obis}
         self._id_detect_countdown = COSEM_OBJECT_DETECT_ATTEMPTS
