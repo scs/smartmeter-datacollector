@@ -10,11 +10,10 @@ import logging
 import serial
 
 from .cosem import Cosem, RegisterCosem
-from .hdlc_dlms_parser import HdlcDlmsParser
-from .meter import Meter, MeterError
+from .meter import MeterError, SerialHdlcDlmsMeter
 from .meter_data import MeterDataPointTypes
 from .reader import ReaderError
-from .serial_reader import SerialConfig, SerialReader
+from .serial_reader import SerialConfig
 
 LOGGER = logging.getLogger("smartmeter")
 
@@ -67,12 +66,8 @@ ISKRA_AM550_COSEM_REGISTERS = [
 ]
 
 
-class IskraAM550(Meter):
-    HDLC_FLAG = b"\x7e"
-
+class IskraAM550(SerialHdlcDlmsMeter):
     def __init__(self, port: str, decryption_key: str = None) -> None:
-        super().__init__()
-
         serial_config = SerialConfig(
             port=port,
             baudrate=115200,
@@ -88,29 +83,9 @@ class IskraAM550(Meter):
         if decryption_key:
             LOGGER.warning("Using the Iskra AM550 meter with encrypted data has NOT BEEN TESTED yet!")
         try:
-            self._serial = SerialReader(serial_config, self._data_received)
+            super().__init__(serial_config, cosem, decryption_key)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for Iskra AM550. '%s'", ex)
             raise MeterError("Failed setting up Iskra AM550.") from ex
-        cosem_config = Cosem(
-            fallback_id=port,
-            register_obis=ISKRA_AM550_COSEM_REGISTERS
-        )
-        self._parser = HdlcDlmsParser(cosem_config, decryption_key)
+
         LOGGER.info("Successfully set up Iskra AM550 smart meter on '%s'.", port)
-
-    async def start(self) -> None:
-        await self._serial.start_and_listen()
-
-    def _data_received(self, received_data: bytes) -> None:
-        if not received_data:
-            return
-        if received_data == IskraAM550.HDLC_FLAG:
-            self._parser.append_to_hdlc_buffer(received_data)
-            return
-
-        self._parser.append_to_hdlc_buffer(received_data)
-        if self._parser.extract_data_from_hdlc_frames():
-            dlms_objects = self._parser.parse_to_dlms_objects()
-            data_points = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects)
-            self._notify_observers(data_points)

@@ -6,16 +6,14 @@
 # See LICENSES/README.md for more information.
 #
 import logging
-from typing import List
 
 import serial
 
 from .cosem import Cosem, RegisterCosem
-from .hdlc_dlms_parser import HdlcDlmsParser
-from .meter import Meter, MeterError
-from .meter_data import MeterDataPoint, MeterDataPointTypes
+from .meter import MeterError, SerialHdlcDlmsMeter
+from .meter_data import MeterDataPointTypes
 from .reader import ReaderError
-from .serial_reader import SerialConfig, SerialReader
+from .serial_reader import SerialConfig
 
 LOGGER = logging.getLogger("smartmeter")
 
@@ -68,12 +66,8 @@ LGE450_COSEM_REGISTERS = [
 ]
 
 
-class LGE450(Meter):
-    HDLC_FLAG = b"\x7e"
-
+class LGE450(SerialHdlcDlmsMeter):
     def __init__(self, port: str, decryption_key: str = None) -> None:
-        super().__init__()
-
         serial_config = SerialConfig(
             port=port,
             baudrate=2400,
@@ -82,34 +76,14 @@ class LGE450(Meter):
             stop_bits=serial.STOPBITS_ONE,
             termination=LGE450.HDLC_FLAG
         )
+        cosem = Cosem(
+            fallback_id=port,
+            register_obis=LGE450_COSEM_REGISTERS
+        )
         try:
-            self._serial = SerialReader(serial_config, self._data_received)
+            super().__init__(serial_config, cosem, decryption_key)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for L+G E450. '%s'", ex)
             raise MeterError("Failed setting up L+G E450.") from ex
 
-        cosem_config = Cosem(
-            fallback_id=port,
-            register_obis=LGE450_COSEM_REGISTERS
-        )
-        self._parser = HdlcDlmsParser(cosem_config, decryption_key)
         LOGGER.info("Successfully set up L+G E450 smart meter on '%s'.", port)
-
-    async def start(self) -> None:
-        await self._serial.start_and_listen()
-
-    def _data_received(self, received_data: bytes) -> None:
-        if not received_data:
-            return
-        if received_data == LGE450.HDLC_FLAG:
-            self._parser.append_to_hdlc_buffer(received_data)
-            return
-
-        self._parser.append_to_hdlc_buffer(received_data)
-        if self._parser.extract_data_from_hdlc_frames():
-            dlms_objects = self._parser.parse_to_dlms_objects()
-            data_points = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects)
-            self._forward_data_points(data_points)
-
-    def _forward_data_points(self, data_points: List[MeterDataPoint]) -> None:
-        self._notify_observers(data_points)

@@ -22,7 +22,7 @@ from .utils import *
 async def test_lge450_initialization(mocker: MockerFixture):
     observer = mocker.stub()
     test_bytes = bytes([1, 2, 3])
-    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.lge450.SerialReader",
+    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = LGE450("/test/port")
     serial_mock.start_and_listen.side_effect = meter._data_received(test_bytes)
@@ -39,7 +39,7 @@ async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture,
                                                          unencrypted_valid_data_lg: List[bytes]):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
-    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.lge450.SerialReader",
+    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = LGE450("/test/port")
     meter.register(observer)
@@ -76,7 +76,7 @@ async def test_lge450_do_not_provide_invalid_data(mocker: MockerFixture,
                                                   unencrypted_invalid_data_lg: List[bytes]):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
-    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.lge450.SerialReader",
+    serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = LGE450("/test/port")
     meter.register(observer)
