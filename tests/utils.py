@@ -9,19 +9,18 @@ from typing import List
 
 import pytest
 
-from smartmeter_datacollector.smartmeter.cosem import CosemConfig, RegisterCosem
+from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
 
 
 @pytest.fixture
-def cosem_config_lg() -> CosemConfig:
+def cosem_config_lg() -> Cosem:
     obis_registers = [
         RegisterCosem("1.0.1.7.0.255", MeterDataPointTypes.ACTIVE_POWER_P.value),
         RegisterCosem("1.0.2.7.0.255", MeterDataPointTypes.ACTIVE_POWER_N.value),
     ]
-    return CosemConfig(
-        id_obis="0.0.42.0.0.255",
-        clock_obis="0.0.1.0.0.255",
+    return Cosem(
+        fallback_id="fallback_id",
         register_obis=obis_registers
     )
 

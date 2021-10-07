@@ -10,7 +10,7 @@ from typing import List
 
 import serial
 
-from .cosem import CosemConfig, RegisterCosem
+from .cosem import Cosem, RegisterCosem
 from .hdlc_dlms_parser import HdlcDlmsParser
 from .meter import Meter, MeterError
 from .meter_data import MeterDataPoint, MeterDataPointTypes
@@ -88,9 +88,8 @@ class LGE450(Meter):
             LOGGER.fatal("Unable to setup serial reader for L+G E450. '%s'", ex)
             raise MeterError("Failed setting up L+G E450.") from ex
 
-        cosem_config = CosemConfig(
-            id_obis="0.0.42.0.0.255",
-            clock_obis="0.0.1.0.0.255",
+        cosem_config = Cosem(
+            fallback_id=port,
             register_obis=LGE450_COSEM_REGISTERS
         )
         self._parser = HdlcDlmsParser(cosem_config, decryption_key)
