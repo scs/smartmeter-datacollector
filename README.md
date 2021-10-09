@@ -17,6 +17,10 @@ The following smart meters are supported:
   Data pushed by smart meter over CII interface (wired M-Bus). Encoded with HDLC and DLMS/COSEM.
   * Unencrypted data
   * Encrypted data
+* Iskraemeco AM550: \
+  Data pushed by smart meter over [P1 interface (DSMR)](https://www.netbeheernederland.nl/_upload/Files/Slimme_meter_15_a727fce1f1.pdf). Encoded with HDLC (IEC 62056-46) and DLMS/COSEM.
+  * Unencrypted data
+  * Encrypted data
 
 The following data sinks are implemented:
 * MQTT (v3.1.1):
