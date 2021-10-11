@@ -50,7 +50,8 @@ def parse_arguments():
     parser.add_argument(
         '-c', '--config', help="File path of the configuration (.ini) file.", default="./datacollector.ini")
     parser.add_argument(
-        '-s', '--saveconfig', help="Create default configuration (.ini) file at path defined with -c", action='store_true')
+        '-s', '--saveconfig', help="Create default configuration (.ini) file at path defined with -c",
+        action='store_true')
     parser.add_argument(
         '-d', '--dev', help="Development mode", action='store_true')
     return parser.parse_args()
