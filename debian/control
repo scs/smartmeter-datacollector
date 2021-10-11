@@ -19,3 +19,7 @@ Description: Smart Meter Data Collector
  * Landis+Gyr E450: Data pushed by smart meter over CII interface (wired M-Bus). Encoded with HDLC and DLMS/COSEM.
    * Unencrypted data
    * Encrypted data
+ * Iskraemeco AM550: Data pushed by smart meter over P1 interface (DSMR). Encoded with HDLC (IEC 62056-46) and DLMS/COSEM.
+  * Unencrypted data
+  * Encrypted data
+

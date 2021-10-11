@@ -1,3 +1,12 @@
+smartmeter-datacollector (1.0.0-1) unstable; urgency=low
+
+  * extend cosem logic to allow multiple device ID obis codes
+  * use system time if the smart meter doesn't provide a clock
+  * use random uuid if no fallback id is given
+  * support ISKRAEMECO AM550 smart meter over P1
+
+ -- Supercomputing Systems AG <info@scs.ch>  Mon, 11 Oct 2021 07:31:05 +0200
+
 smartmeter-datacollector (0.6.1-1) unstable; urgency=low
 
   * bugfix for clearing the HDLC buffer if it gets too large
