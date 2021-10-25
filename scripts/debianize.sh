@@ -19,6 +19,9 @@ python setup.py \
 # add Pre-Depends to debian/control for python3-pip
 sed -i 's/^\(Depends: \)/Pre-Depends: python3-pip\n\1/' debian/control
 
+# replace "${python3:Depends}" with "python3:any" because we install all dependencies using pip
+sed -i 's/${python3:Depends}/python3:any/' debian/control
+
 # fix the debhelper compatibility level in debian/control
 sed -i 's/>= 9/>= 10/' debian/control
 
