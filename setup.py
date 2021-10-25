@@ -34,7 +34,7 @@ setup(
     author="Supercomputing Systems AG",
     author_email="info@scs.ch",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.7",
