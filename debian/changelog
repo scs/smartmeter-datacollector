@@ -1,3 +1,9 @@
+smartmeter-datacollector (1.0.1-1) unstable; urgency=low
+
+  * don't automatically determine Python package dependencies when building a Debian package
+
+ -- Supercomputing Systems AG <info@scs.ch>  Mon, 25 Oct 2021 11:56:46 +0200
+
 smartmeter-datacollector (1.0.0-1) unstable; urgency=low
 
   * extend cosem logic to allow multiple device ID obis codes
