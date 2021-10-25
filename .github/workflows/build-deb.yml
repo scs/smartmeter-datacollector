@@ -74,6 +74,7 @@ jobs:
       - name: Build the Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }} using pbuilder
         run: |
           cd deb_dist
+          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder update
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder build *.dsc
           sudo rename "s/_all\./_${{ matrix.arch }}\./" /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
 
