@@ -30,6 +30,11 @@ jobs:
     name: Build a Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Update apt cache
+        run: |
+          sudo apt-get update
+
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
