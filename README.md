@@ -4,12 +4,16 @@
     <a href="LICENSE"><img alt="License: GPL-2.0-only" src="https://img.shields.io/badge/license-GPLv2-blue.svg"></a> <a href="https://github.com/scs/smartmeter-datacollector/pulls"><img alt="Pull Requests Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a> <a href="https://github.com/scs/smartmeter-datacollector/pulls"><img alt="Contributions Welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg"></a>
     <br />
     <img alt="Python Code Checks" src="https://github.com/scs/smartmeter-datacollector/actions/workflows/python-code-checks.yml/badge.svg?branch=master"> <a href="https://pypi.org/project/smartmeter-datacollector/"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/smartmeter-datacollector"></a>
+    <br />
+    <img src='ekz_logo.png' width="220">
 </p>
 
 ---
 
 The `smartmeter-datacollector` tool is a Python3 software which allows you to continuously retrieve data from supported smart meters (listed below).
 The acquired values can be forwarded to one or more data sinks like a MQTT broker or logger.
+
+This tool is an open source software funded by **[EKZ (Elektrizitätswerke des Kantons Zürich)](https://www.ekz.ch)** and developed by **[Supercomputing Systems AG](https://www.scs.ch)**. The goal of this voluntary initiative is to create a tool that can read, decode and decrypt data (if necessary) from the local interface of various smart meters and convert it into human-readable and simple formats. This should eliminate the complexity of decoding DLMS and similar protocols for the user. The user has the data in a format, which he can easily use in various use-cases ranging from simple vizualization (see [Method 1: Raspberry Pi image with demo](#method-1-raspberry-pi-image-with-demo)) to integration in energy management algorithms or in custom home automation software. 
 
 The following smart meters are supported:
 
