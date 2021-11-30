@@ -59,7 +59,7 @@ class HdlcDlmsParser:
         try:
             LOGGER.debug("HDLC Buffer: %s", GXByteBuffer.hex(self._hdlc_buffer))
             self._client.getData(self._hdlc_buffer, tmp, self._dlms_data)
-        except ValueError as ex:
+        except (ValueError, TypeError) as ex:
             LOGGER.warning("Failed to extract data from HDLC frame: '%s' Some data got lost.", ex)
             self._hdlc_buffer.clear()
             self._dlms_data.clear()
