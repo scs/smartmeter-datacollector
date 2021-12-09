@@ -5,7 +5,7 @@
     <br />
     <img alt="Python Code Checks" src="https://github.com/scs/smartmeter-datacollector/actions/workflows/python-code-checks.yml/badge.svg?branch=master"> <a href="https://pypi.org/project/smartmeter-datacollector/"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/smartmeter-datacollector"></a>
     <br />
-    <img src='ekz_logo.png' width="200">
+    <img src='ekz_logo.png' width="150">
 </p>
 
 ---
