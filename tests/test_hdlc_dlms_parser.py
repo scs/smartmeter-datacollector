@@ -94,3 +94,16 @@ class TestDlmsParserUnencrypted:
         meter_data = invalid_hdlc_buffer.convert_dlms_bundle_to_reader_data(dlms_objects)
         assert isinstance(meter_data, list)
         assert len(meter_data) == 2
+
+
+class TestDlmsParserEncrypted:
+    def test_parsing_encrypted_data_wrong_key(self, cosem_config_lg, encrypted_valid_data_lg):
+        default_key = "000102030405060708090A0B0C0D0E0F"
+        parser = HdlcDlmsParser(cosem_config_lg, default_key)
+        for frame in encrypted_valid_data_lg:
+            parser.append_to_hdlc_buffer(frame)
+            parser.extract_data_from_hdlc_frames()
+        dlms_objects = parser.parse_to_dlms_objects()
+
+        assert isinstance(dlms_objects, dict)
+        assert len(dlms_objects) == 0
