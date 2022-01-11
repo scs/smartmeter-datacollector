@@ -81,7 +81,13 @@ class HdlcDlmsParser:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
         if isinstance(self._dlms_data.value, list):
             #pylint: disable=unsubscriptable-object
-            parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
+            try:
+                parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
+            except TypeError as ex:
+                LOGGER.warning("Invalid push data. Unable to parse objects. Wrong block cipher key? (%s)", ex)
+                self._dlms_data.clear()
+                return {}
+
             for index, (obj, attr_ind) in enumerate(parsed_objects):
                 if index == 0:
                     # Skip first (meta-data) object
