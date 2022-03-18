@@ -6,7 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from .cosem import Cosem
 from .hdlc_dlms_parser import HdlcDlmsParser
@@ -37,7 +37,7 @@ class Meter(ABC):
 class SerialHdlcDlmsMeter(Meter):
     HDLC_FLAG = b"\x7e"
 
-    def __init__(self, serial_config: SerialConfig, cosem: Cosem, decryption_key: str = None) -> None:
+    def __init__(self, serial_config: SerialConfig, cosem: Cosem, decryption_key: Optional[str] = None) -> None:
         super().__init__()
         self._parser = HdlcDlmsParser(cosem, decryption_key)
         self._serial = SerialReader(serial_config, self._data_received)

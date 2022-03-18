@@ -6,6 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 import logging
+from typing import Optional
 
 import serial
 
@@ -67,7 +68,7 @@ ISKRA_AM550_COSEM_REGISTERS = [
 
 
 class IskraAM550(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, decryption_key: str = None) -> None:
+    def __init__(self, port: str, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=115200,
