@@ -6,6 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 import logging
+from typing import Optional
 
 import serial
 
@@ -55,7 +56,11 @@ ISKRA_AM550_COSEM_REGISTERS = [
     RegisterCosem("1.0.81.7.62.255", MeterDataPointTypes.ANGLE_UI_L3.value),
 
     RegisterCosem("1.1.1.8.0.255", MeterDataPointTypes.ACTIVE_ENERGY_P.value),
+    RegisterCosem("1.1.1.8.1.255", MeterDataPointTypes.ACTIVE_ENERGY_P_T1.value),
+    RegisterCosem("1.1.1.8.2.255", MeterDataPointTypes.ACTIVE_ENERGY_P_T2.value),
     RegisterCosem("1.1.2.8.0.255", MeterDataPointTypes.ACTIVE_ENERGY_N.value),
+    RegisterCosem("1.1.2.8.1.255", MeterDataPointTypes.ACTIVE_ENERGY_N_T1.value),
+    RegisterCosem("1.1.2.8.2.255", MeterDataPointTypes.ACTIVE_ENERGY_N_T2.value),
     RegisterCosem("1.1.3.8.0.255", MeterDataPointTypes.REACTIVE_ENERGY_P.value),
     RegisterCosem("1.1.4.8.0.255", MeterDataPointTypes.REACTIVE_ENERGY_N.value),
 
@@ -67,7 +72,7 @@ ISKRA_AM550_COSEM_REGISTERS = [
 
 
 class IskraAM550(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, decryption_key: str = None) -> None:
+    def __init__(self, port: str, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=115200,
