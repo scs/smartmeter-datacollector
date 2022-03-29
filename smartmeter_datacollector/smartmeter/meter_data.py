@@ -56,8 +56,8 @@ class MeterDataPointTypes(Enum):
     ACTIVE_ENERGY_P_T1 = MeterDataPointType("ACTIVE_ENERGY_P_T1", "Active Energy + Tariff 1", "Wh")
     ACTIVE_ENERGY_P_T2 = MeterDataPointType("ACTIVE_ENERGY_P_T2", "Active Energy + Tariff 2", "Wh")
     ACTIVE_ENERGY_N = MeterDataPointType("ACTIVE_ENERGY_N", "Active Energy -", "Wh")
-    ACTIVE_ENERGY_N_T1 = MeterDataPointType("ACTIVE_ENERGY_N", "Active Energy - Tariff 1", "Wh")
-    ACTIVE_ENERGY_N_T2 = MeterDataPointType("ACTIVE_ENERGY_N", "Active Energy - Tariff 2", "Wh")
+    ACTIVE_ENERGY_N_T1 = MeterDataPointType("ACTIVE_ENERGY_N_T1", "Active Energy - Tariff 1", "Wh")
+    ACTIVE_ENERGY_N_T2 = MeterDataPointType("ACTIVE_ENERGY_N_T2", "Active Energy - Tariff 2", "Wh")
 
     REACTIVE_ENERGY_P = MeterDataPointType("REACTIVE_ENERGY_P", "Reactive Energy +", "VAh")
     REACTIVE_ENERGY_N = MeterDataPointType("REACTIVE_ENERGY_N", "Reactive Energy -", "VAh")
