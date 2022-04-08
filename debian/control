@@ -22,4 +22,3 @@ Description: Smart Meter Data Collector
  * Iskraemeco AM550: Data pushed by smart meter over P1 interface (DSMR). Encoded with HDLC (IEC 62056-46) and DLMS/COSEM.
   * Unencrypted data
   * Encrypted data
-

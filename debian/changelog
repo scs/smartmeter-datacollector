@@ -1,3 +1,11 @@
+smartmeter-datacollector (1.0.2-1) unstable; urgency=low
+
+  * bugfix catching gurux converter failures
+  * update readme, add logo
+  * add tariff related meter data point types
+
+ -- Supercomputing Systems AG <info@scs.ch>  Thu, 31 Mar 2022 11:18:09 +0200
+
 smartmeter-datacollector (1.0.1-1) unstable; urgency=low
 
   * don't automatically determine Python package dependencies when building a Debian package
