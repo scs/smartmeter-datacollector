@@ -72,10 +72,10 @@ LGE450_COSEM_REGISTERS = [
 
 
 class LGE450(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str, baudrate: int = 2400, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
-            baudrate=2400,
+            baudrate=baudrate,
             data_bits=serial.EIGHTBITS,
             parity=serial.PARITY_EVEN,
             stop_bits=serial.STOPBITS_ONE,

@@ -28,6 +28,7 @@ def build_meters(config: ConfigParser) -> List[Meter]:
             if meter_type == "lge450":
                 meters.append(LGE450(
                     port=meter_config.get('port', "/dev/ttyUSB0"),
+                    baudrate=meter_config.getint('baudrate', 2400),
                     decryption_key=meter_config.get('key')
                 ))
             elif meter_type == "iskraam550":
