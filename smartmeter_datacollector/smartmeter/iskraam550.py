@@ -72,10 +72,10 @@ ISKRA_AM550_COSEM_REGISTERS = [
 
 
 class IskraAM550(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str, baudrate: int = 115200, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
-            baudrate=115200,
+            baudrate=baudrate,
             data_bits=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
             stop_bits=serial.STOPBITS_ONE,
