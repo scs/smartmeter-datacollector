@@ -18,6 +18,7 @@ DEFAULT_CONFIG = {
     'reader0': {
         'type': "lge450",
         'port': "/dev/ttyUSB0",
+        'baudrate': 2400,
         'key': "",
     },
     'sink0': {
