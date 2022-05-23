@@ -10,7 +10,16 @@ from typing import List
 import pytest
 
 from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
+from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+
+
+def prepare_parser(data: List[bytes], cosem_config: Cosem) -> HdlcDlmsParser:
+    parser = HdlcDlmsParser(cosem_config)
+    for frame in data:
+        parser.append_to_hdlc_buffer(frame)
+        parser.extract_data_from_hdlc_frames()
+    return parser
 
 
 @pytest.fixture
