@@ -10,7 +10,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
-from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister, GXDLMSPushSetup, GXDLMSClock, GXDLMSCaptureObject
+from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSPushSetup,
+                                GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
@@ -98,16 +99,22 @@ class HdlcDlmsParser:
                         # Skip first (meta-data) object
                         continue
                     self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
-                    LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
+                    LOGGER.debug(
+                        "%s %s %s: %s",
+                        obj.objectType,
+                        obj.logicalName,
+                        attr_ind,
+                        obj.getValues()[
+                            attr_ind - 1])
             elif msg_format == 2:
                 # Used by Stromnetz Graz
                 # message contains timestamp + OBIS code/value pairs
-                p =  GXDLMSPushSetup()
+                p = GXDLMSPushSetup()
                 # fill setup with definitions
                 # first element is clock
                 p.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
                 # every second element after that is the OBIS code
-                for idx in range(1,len(self._dlms_data.value),2):
+                for idx in range(1, len(self._dlms_data.value), 2):
                     assert isinstance(self._dlms_data.value[idx], bytearray)
                     assert len(self._dlms_data.value[idx]) == 6
                     # convert bytearray to list of ints, map ints to str and add a dot between each element
@@ -117,7 +124,7 @@ class HdlcDlmsParser:
                 assert len(parsed_objects) == (len(self._dlms_data.value) + 1) / 2
                 # Add values
                 object_idx = 0  # index of the pushObjectList
-                for idx in range(0,len(self._dlms_data.value),2):  # index of the message contents
+                for idx in range(0, len(self._dlms_data.value), 2):  # index of the message contents
                     if idx == 0:
                         # first the timestamp
                         assert isinstance(self._dlms_data.value[idx], bytearray)
@@ -128,13 +135,21 @@ class HdlcDlmsParser:
                     obj = parsed_objects[object_idx][0]
                     attr_ind = parsed_objects[object_idx][1]
                     self._client.updateValue(obj, attr_ind.attributeIndex, self._dlms_data.value[idx])
-                    LOGGER.debug("%d %s %s %s: %s", object_idx, obj.objectType, obj.logicalName, attr_ind.attributeIndex, obj.getValues()[attr_ind.attributeIndex - 1])
+                    LOGGER.debug(
+                        "%d %s %s %s: %s",
+                        object_idx,
+                        obj.objectType,
+                        obj.logicalName,
+                        attr_ind.attributeIndex,
+                        obj.getValues()[
+                            attr_ind.attributeIndex - 1])
                     object_idx += 1
             elif msg_format == 3:
                 # Used by Wiener Netze
                 # message contains timestamp + values, OBIS codes are only documented
-                # TODO: make the codes configurable, this specific arrangement is for Wiener Netze only according to issues 21 and 31
-                p =  GXDLMSPushSetup()
+                # TODO: make the codes configurable, this specific arrangement is for
+                # Wiener Netze only according to issues 21 and 31
+                p = GXDLMSPushSetup()
                 p.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
                 p.pushObjectList.append((GXDLMSRegister("1.0.1.8.0.255"), GXDLMSCaptureObject(2, 0)))
                 p.pushObjectList.append((GXDLMSRegister("1.0.2.8.0.255"), GXDLMSCaptureObject(2, 0)))
@@ -147,7 +162,14 @@ class HdlcDlmsParser:
                 parsed_objects = self._p.pushObjectList
                 for index, (obj, attr_ind) in enumerate(parsed_objects):
                     self._client.updateValue(obj, attr_ind.attributeIndex, self._dlms_data.value[index])
-                    LOGGER.debug("%d %s %s %s: %s", index, obj.objectType, obj.logicalName, attr_ind.attributeIndex, obj.getValues()[attr_ind.attributeIndex - 1])
+                    LOGGER.debug(
+                        "%d %s %s %s: %s",
+                        index,
+                        obj.objectType,
+                        obj.logicalName,
+                        attr_ind.attributeIndex,
+                        obj.getValues()[
+                            attr_ind.attributeIndex - 1])
             else:
                 # Unknown message format
                 assert False
