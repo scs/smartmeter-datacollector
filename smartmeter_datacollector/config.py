@@ -20,6 +20,7 @@ DEFAULT_CONFIG = {
         'port': "/dev/ttyUSB0",
         'baudrate': 2400,
         'key': "",
+        'provider': "EKZ"
     },
     'sink0': {
         'type': "logger",

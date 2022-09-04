@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
-from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister
+from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister, GXDLMSPushSetup, GXDLMSClock, GXDLMSCaptureObject
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
@@ -22,7 +22,7 @@ LOGGER = logging.getLogger("smartmeter")
 class HdlcDlmsParser:
     HDLC_BUFFER_MAX_SIZE = 5000
 
-    def __init__(self, cosem_config: Cosem, block_cipher_key: Optional[str] = None) -> None:
+    def __init__(self, cosem_config: Cosem, provider: str, block_cipher_key: Optional[str] = None) -> None:
         if block_cipher_key:
             self._client = GXDLMSSecureClient(
                 useLogicalNameReferencing=True,
@@ -37,6 +37,7 @@ class HdlcDlmsParser:
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
         self._cosem = cosem_config
+        self._provider = provider
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         if self._hdlc_buffer.getSize() > self.HDLC_BUFFER_MAX_SIZE:
@@ -81,13 +82,75 @@ class HdlcDlmsParser:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
         if isinstance(self._dlms_data.value, list):
             #pylint: disable=unsubscriptable-object
-            parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
-            for index, (obj, attr_ind) in enumerate(parsed_objects):
-                if index == 0:
-                    # Skip first (meta-data) object
-                    continue
-                self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
-                LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
+            msg_format: int = 0
+            if self._provider == "EKZ":
+                msg_format = 1
+            elif self._provider == "Stromnetz Graz":
+                msg_format = 2
+            elif self._provider == "Wiener Netze":
+                msg_format = 3
+            if msg_format == 1:
+                # Used by EKZ
+                # push list is sent in the message, parsePushObjects can be used
+                parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
+                for index, (obj, attr_ind) in enumerate(parsed_objects):
+                    if index == 0:
+                        # Skip first (meta-data) object
+                        continue
+                    self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
+                    LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
+            elif msg_format == 2:
+                # Used by Stromnetz Graz
+                # message contains timestamp + OBIS code/value pairs
+                p =  GXDLMSPushSetup()
+                # fill setup with definitions
+                # first element is clock
+                p.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
+                # every second element after that is the OBIS code
+                for idx in range(1,len(self._dlms_data.value),2):
+                    assert isinstance(self._dlms_data.value[idx], bytearray)
+                    assert len(self._dlms_data.value[idx]) == 6
+                    # convert bytearray to list of ints, map ints to str and add a dot between each element
+                    obis_code = ".".join(map(str, list(self._dlms_data.value[idx])))
+                    p.pushObjectList.append((GXDLMSRegister(obis_code), GXDLMSCaptureObject(2, 0)))
+                parsed_objects = p.pushObjectList
+                assert len(parsed_objects) == (len(self._dlms_data.value) + 1) / 2
+                # Add values
+                object_idx = 0  # index of the pushObjectList
+                for idx in range(0,len(self._dlms_data.value),2):  # index of the message contents
+                    if idx == 0:
+                        # first the timestamp
+                        assert isinstance(self._dlms_data.value[idx], bytearray)
+                        assert len(self._dlms_data.value[idx]) == 12
+                    else:
+                        # then all the integer values
+                        assert isinstance(self._dlms_data.value[idx], int)
+                    obj = parsed_objects[object_idx][0]
+                    attr_ind = parsed_objects[object_idx][1]
+                    self._client.updateValue(obj, attr_ind.attributeIndex, self._dlms_data.value[idx])
+                    LOGGER.debug("%d %s %s %s: %s", object_idx, obj.objectType, obj.logicalName, attr_ind.attributeIndex, obj.getValues()[attr_ind.attributeIndex - 1])
+                    object_idx += 1
+            elif msg_format == 3:
+                # Used by Wiener Netze
+                # message contains timestamp + values, OBIS codes are only documented
+                # TODO: make the codes configurable, this specific arrangement is for Wiener Netze only according to issues 21 and 31
+                p =  GXDLMSPushSetup()
+                p.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.1.8.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.2.8.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.3.8.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.4.8.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.1.7.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.2.7.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.3.7.0.255"), GXDLMSCaptureObject(2, 0)))
+                p.pushObjectList.append((GXDLMSRegister("1.0.4.7.0.255"), GXDLMSCaptureObject(2, 0)))
+                parsed_objects = self._p.pushObjectList
+                for index, (obj, attr_ind) in enumerate(parsed_objects):
+                    self._client.updateValue(obj, attr_ind.attributeIndex, self._dlms_data.value[index])
+                    LOGGER.debug("%d %s %s %s: %s", index, obj.objectType, obj.logicalName, attr_ind.attributeIndex, obj.getValues()[attr_ind.attributeIndex - 1])
+            else:
+                # Unknown message format
+                assert False
         self._dlms_data.clear()
         return {obj.getName(): obj for obj, _ in parsed_objects}
 

@@ -72,7 +72,7 @@ LGE450_COSEM_REGISTERS = [
 
 
 class LGE450(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, baudrate: int = 2400, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str, provider: str, baudrate: int = 2400, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
@@ -86,7 +86,7 @@ class LGE450(SerialHdlcDlmsMeter):
             register_obis=LGE450_COSEM_REGISTERS
         )
         try:
-            super().__init__(serial_config, cosem, decryption_key)
+            super().__init__(serial_config, cosem, provider, decryption_key)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for L+G E450. '%s'", ex)
             raise MeterError("Failed setting up L+G E450.") from ex

@@ -72,7 +72,7 @@ ISKRA_AM550_COSEM_REGISTERS = [
 
 
 class IskraAM550(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, baudrate: int = 115200, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str, provider: str, baudrate: int = 115200, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
@@ -88,7 +88,7 @@ class IskraAM550(SerialHdlcDlmsMeter):
         if decryption_key:
             LOGGER.warning("Using the Iskra AM550 meter with encrypted data has NOT BEEN TESTED yet!")
         try:
-            super().__init__(serial_config, cosem, decryption_key)
+            super().__init__(serial_config, cosem, provider, decryption_key)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for Iskra AM550. '%s'", ex)
             raise MeterError("Failed setting up Iskra AM550.") from ex

@@ -175,6 +175,8 @@ type = lge450
 port = /dev/ttyUSB0
 # optional encryption key
 key = 
+# electricity provider, the same meter type can return data in provider specific formats
+provider = EKZ
 
 [sink0]
 # type of the sink

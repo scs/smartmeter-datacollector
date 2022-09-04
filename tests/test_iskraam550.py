@@ -24,7 +24,7 @@ async def test_iskaam550_initialization(mocker: MockerFixture):
     test_bytes = bytes([1, 2, 3])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
-    meter = IskraAM550("/test/port")
+    meter = IskraAM550("/test/port", provider = "EKZ")
     serial_mock.start_and_listen.side_effect = meter._data_received(test_bytes)
     meter.register(observer)
     await meter.start()
@@ -41,7 +41,7 @@ async def test_iskraam550_parse_and_provide_unencrypted_data(mocker: MockerFixtu
     observer.mock_add_spec(['notify'])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
-    meter = IskraAM550("/test/port")
+    meter = IskraAM550("/test/port", provider = "EKZ")
     meter.register(observer)
 
     def data_received():
