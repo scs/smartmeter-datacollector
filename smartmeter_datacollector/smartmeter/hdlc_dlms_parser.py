@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
-from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister
+from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister, GXDLMSPushSetup, GXDLMSClock, GXDLMSCaptureObject
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
@@ -78,18 +78,43 @@ class HdlcDlmsParser:
         return True
 
     def parse_to_dlms_objects(self) -> Dict[str, GXDLMSObject]:
-        parsed_objects: List[Tuple[GXDLMSObject, int]] = []
-        if isinstance(self._dlms_data.value, list):
-            #pylint: disable=unsubscriptable-object
-            parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
-            for index, (obj, attr_ind) in enumerate(parsed_objects):
-                if index == 0:
-                    # Skip first (meta-data) object
-                    continue
-                self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
-                LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
+        if not isinstance(self._dlms_data.value, list) or not self._dlms_data.value:
+            self._dlms_data.clear()
+            LOGGER.warning("DLMS data is no list or empty list. Not parsable.")
+            return {}
+
+        # pylint: disable=unsubscriptable-object
+        if isinstance(self._dlms_data.value[0], list):
+            # message with included push-object-list as first object
+            dlms_objects = self._parse_dlms_with_push_object_list()
+        else:
+            # message without push-object-list
+            # try to extract OBIS codes if available in message
+            obis_codes = HdlcDlmsParser.extract_obis(self._dlms_data.value)
+            if obis_codes:
+                # message contains OBIS code/value pairs
+                # message format supported: timestamp + OBIS code/value pairs
+                push_setup = GXDLMSPushSetup()
+                push_setup.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
+                push_setup.pushObjectList.extend((GXDLMSRegister(obis), GXDLMSCaptureObject(2, 0))
+                                                 for obis in obis_codes)
+
+                values = HdlcDlmsParser.extract_values(self._dlms_data.value)
+                if len(values) != len(obis_codes):
+                    LOGGER.warning("Values list and OBIS code list length not equal.")
+
+                for index, (obj, attr_ind) in enumerate(push_setup.pushObjectList):
+                    self._client.updateValue(obj, attr_ind.attributeIndex, values[index])
+                    LOGGER.debug("%d %s %s %s: %s", index, obj.objectType, obj.logicalName,
+                                 attr_ind.attributeIndex, obj.getValues()[attr_ind.attributeIndex - 1])
+                dlms_objects = {obj.getName(): obj for obj, _ in push_setup.pushObjectList}
+            else:
+                # message contains no OBIS codes, only values, which is not supported.
+                LOGGER.warning("DLMS data is formatted in unknown structure and cannot be parsed.")
+                dlms_objects = {}
+
         self._dlms_data.clear()
-        return {obj.getName(): obj for obj, _ in parsed_objects}
+        return dlms_objects
 
     def convert_dlms_bundle_to_reader_data(self, dlms_objects: Dict[str, GXDLMSObject]) -> List[MeterDataPoint]:
         meter_id = self._cosem.retrieve_id(dlms_objects)
@@ -113,6 +138,14 @@ class HdlcDlmsParser:
                 data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp))
         return data_points
 
+    def _parse_dlms_with_push_object_list(self) -> Dict[str, GXDLMSObject]:
+        parsed_objects: List[Tuple[GXDLMSObject, int]] = []
+        parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
+        for index, (obj, attr_ind) in enumerate(parsed_objects[1:], start=1):
+            self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
+            LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
+        return {obj.getName(): obj for obj, _ in parsed_objects}
+
     @staticmethod
     def _extract_value_from_data_object(data_object: GXDLMSData) -> Optional[Any]:
         return data_object.getValues()[1]
@@ -120,3 +153,18 @@ class HdlcDlmsParser:
     @staticmethod
     def _extract_register_value(register: GXDLMSRegister) -> Optional[Any]:
         return register.getValues()[1]
+
+    @staticmethod
+    def extract_obis(data: List[Any]) -> List[str]:
+        obis = []
+        for obis_arr in filter(lambda d: isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d), data):
+            obis.append(".".join(format(oct, 'd') for oct in obis_arr))
+        return obis
+
+    @staticmethod
+    def extract_values(data: List[Any]) -> List[Any]:
+        return list(filter(lambda d: isinstance(d, int) or not (isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d)), data))
+
+    @staticmethod
+    def is_obis(value: bytearray) -> bool:
+        return len(value) == 6 and value[-1] == 255
