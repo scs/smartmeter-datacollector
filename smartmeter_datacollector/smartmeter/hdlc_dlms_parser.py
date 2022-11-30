@@ -10,7 +10,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
-from gurux_dlms.objects import GXDLMSData, GXDLMSObject, GXDLMSRegister, GXDLMSPushSetup, GXDLMSClock, GXDLMSCaptureObject
+from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSPushSetup,
+                                GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
@@ -163,7 +164,8 @@ class HdlcDlmsParser:
 
     @staticmethod
     def extract_values(data: List[Any]) -> List[Any]:
-        return list(filter(lambda d: isinstance(d, int) or not (isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d)), data))
+        return list(filter(lambda d: isinstance(d, int) or not (
+            isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d)), data))
 
     @staticmethod
     def is_obis(value: bytearray) -> bool:
