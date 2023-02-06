@@ -38,14 +38,14 @@ async def test_csv_sink_send_point():
 
     sink = CsvSink(cfg_parser, "sink0")
 
-    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[0].obis, 0.000, "bef test_source", datetime.utcnow()))
-    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[1].obis, 1.001, "bef test_source", datetime.utcnow()))
+    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[0].data_point_type, 0.000, "bef test_source", datetime.utcnow()))
+    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[1].data_point_type, 1.001, "bef test_source", datetime.utcnow()))
 
     await sink.start()
 
-    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[2].obis, 12.002, "test_source", datetime.utcnow()))
-    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[3].obis, 13.003, "test_source", datetime.utcnow()))
-    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[4].obis, 14.000, "test_source", datetime.utcnow()))
+    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[2].data_point_type, 12.002, "test_source", datetime.utcnow()))
+    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[3].data_point_type, 13.003, "test_source", datetime.utcnow()))
+    await sink.send(MeterDataPoint(LGE450_COSEM_REGISTERS[10].data_point_type, 14.000, "test_source", datetime.utcnow()))
 
     await asyncio.sleep(1.5)
     await sink.stop()

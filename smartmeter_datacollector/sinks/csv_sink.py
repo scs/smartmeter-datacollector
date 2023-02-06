@@ -1,7 +1,3 @@
-#
-# Copyright (C) 2022 Supercomputing Systems AG
-# This file is part of smartmeter-datacollector.
-#
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
@@ -12,6 +8,7 @@ from pathlib import Path
 import time
 from collections import deque
 import asyncio
+import logging
 
 from ..smartmeter.meter_data import MeterDataPoint
 from ..smartmeter.lge450 import LGE450_COSEM_REGISTERS
@@ -19,6 +16,7 @@ from ..smartmeter.iskraam550 import ISKRA_AM550_COSEM_REGISTERS
 from ..smartmeter.cosem import RegisterCosem
 from .data_sink import DataSink
 
+LOGGER = logging.getLogger("sink")
 
 class CsvSink(DataSink):
     """" Sink implementation for writing a daily csv file """
@@ -36,21 +34,25 @@ class CsvSink(DataSink):
         
     @staticmethod
     def get_fields(config):
-        field_names = []
-        field_ids = []
-        meter_types = set()
-        for section_name in filter(lambda sec: sec.startswith("reader"), config.sections()):
-            meter_config = config[section_name]
-            meter_types.add(meter_config.get('type'))
-        for meter_type in meter_types:
-            if meter_type == "lge450":
-                for point in LGE450_COSEM_REGISTERS:     
-                    field_names.append(point.data_point_type.identifier.replace(",", "_"))
-                    field_ids.append(point.obis)
-            if meter_type == "iskraam550":
-                for point in ISKRA_AM550_COSEM_REGISTERS:
-                    field_names.append(point.data_point_type.identifier.replace(",", "_"))
-                    field_ids.append(point.obis)
+        try:
+            field_names = []
+            field_ids = []
+            meter_types = set()
+            for section_name in filter(lambda sec: sec.startswith("reader"), config.sections()):
+                meter_config = config[section_name]
+                meter_types.add(meter_config.get('type'))
+            for meter_type in meter_types:
+                if meter_type == "lge450":
+                    for point in LGE450_COSEM_REGISTERS:     
+                        field_names.append(point.data_point_type.identifier.replace(",", "_"))
+                        field_ids.append(point.obis)
+                if meter_type == "iskraam550":
+                    for point in ISKRA_AM550_COSEM_REGISTERS:
+                        field_names.append(point.data_point_type.identifier.replace(",", "_"))
+                        field_ids.append(point.obis)
+        except:
+            LOGGER.exception("Unable red fields during sink start")
+            raise
 
         return field_names, field_ids
 
@@ -79,20 +81,28 @@ class CsvSink(DataSink):
            # TODO: aggragation per source 
            # TODO: aggragation per time frame
             while self.line_queue: 
-                data_point = self.line_queue.pop()
-                aggregated_points[data_point.type] = str(data_point.value).replace(",", "_")
+                try:
+                    data_point = self.line_queue.pop()
+                    aggregated_points[data_point.type.identifier] = str(data_point.value).replace(",", "_")
+                except Exception as e:
+                    LOGGER.exception("Cannot pop line_queue")
         
             if len(aggregated_points) > 0:
-                line_data = [ data_point.timestamp.isoformat() , data_point.source ]
-                for key in self.field_ids:
-                    if key in aggregated_points:
-                        line_data.append( str(aggregated_points[key]) )
-                    else:
-                        line_data.append("")
+                try:
+                    line_data = [ data_point.timestamp.isoformat() , data_point.source ]
+                    for key in self.fieldnames:
+                        if key in aggregated_points:
+                            line_data.append( str(aggregated_points[key]) )
+                        else:
+                            line_data.append("")
 
-                with open(os.path.join(self.directory, filename, ), 'a', newline='', encoding='utf-8') as csvfile:
-                    new_line = ",".join(line_data)
-                    csvfile.write(new_line + "\n")
+                    with open(os.path.join(self.directory, filename, ), 'a', newline='', encoding='utf-8') as csvfile:
+                        new_line = ",".join(line_data)
+                        csvfile.write(new_line + "\n")
+                except:
+                    LOGGER.exception("Failed to write line to csv file")
+                else:
+                    LOGGER.debug("Success writing line to csv file")
                         
     async def check_file_exists(self):
     
@@ -104,16 +114,24 @@ class CsvSink(DataSink):
         
         # check if file already exists
         if not os.path.exists(os.path.join(self.directory, filename)):
-            # create file and write headers
-            with open(os.path.join(self.directory, filename), 'w', newline='', encoding='utf-8') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
-                writer.writeheader()
+            try:
+                LOGGER.debug("Try to create csv file")
+                # create file and write headers
+                with open(os.path.join(self.directory, filename), 'w', newline='', encoding='utf-8') as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
+                    writer.writeheader()
+            except:
+                LOGGER.exception("Failed to create csv file")
         return filename
 
     async def file_cleanup(self):
         # delete files older than one year
-        for file in os.listdir(self.directory):
-            if file.endswith(".csv"):
-                filepath = os.path.join(self.directory, file)
-                if os.path.getmtime(filepath) < (time.time() - 365 * 24 * 60 * 60):
-                    os.remove(filepath)
+        try:
+            for file in os.listdir(self.directory):
+                if file.endswith(".csv"):
+                    filepath = os.path.join(self.directory, file)
+                    if os.path.getmtime(filepath) < (time.time() - 365 * 24 * 60 * 60):
+                        os.remove(filepath)
+        except:
+            LOGGER.exception("Failed to cleanup csv file")
+            
