@@ -204,6 +204,12 @@ type = logger
 # name of the logger
 name = DataLogger
 
+# [sink2]
+# # type of the sink
+# type = csv
+# # folder where files are saved to
+# directory = path_to_csv_files
+
 [logging]
 # log level configuration: DEBUG / INFO / WARNING / ERROR
 default = WARNING

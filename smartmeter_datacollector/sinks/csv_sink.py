@@ -126,6 +126,7 @@ class CsvSink(DataSink):
 
     async def file_cleanup(self):
         # delete files older than one year
+        # one file is about 2.7 MB and in a year almost 1 GB
         try:
             for file in os.listdir(self.directory):
                 if file.endswith(".csv"):
