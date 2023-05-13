@@ -16,6 +16,7 @@ from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
 from .meter_data import MeterDataPoint
+from .obis import OBISCode
 
 LOGGER = logging.getLogger("smartmeter")
 
@@ -97,7 +98,7 @@ class HdlcDlmsParser:
                 # message format supported: timestamp + OBIS code/value pairs
                 push_setup = GXDLMSPushSetup()
                 push_setup.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
-                push_setup.pushObjectList.extend((GXDLMSRegister(obis), GXDLMSCaptureObject(2, 0))
+                push_setup.pushObjectList.extend((GXDLMSRegister(obis.to_gurux_str()), GXDLMSCaptureObject(2, 0))
                                                  for obis in obis_codes)
 
                 values = HdlcDlmsParser.extract_values(self._dlms_data.value)
@@ -156,17 +157,16 @@ class HdlcDlmsParser:
         return register.getValues()[1]
 
     @staticmethod
-    def extract_obis(data: List[Any]) -> List[str]:
-        obis = []
-        for obis_arr in filter(lambda d: isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d), data):
-            obis.append(".".join(format(oct, 'd') for oct in obis_arr))
-        return obis
+    def extract_obis(data: List[Any]) -> List[OBISCode]:
+        extracted_obis = []
+        for obis_bytes in filter(lambda d: isinstance(d, (bytearray, bytes)), data):
+            obis = OBISCode.from_bytes(obis_bytes)
+            if obis:
+                extracted_obis.append(obis)
+        return extracted_obis
 
     @staticmethod
     def extract_values(data: List[Any]) -> List[Any]:
-        return list(filter(lambda d: isinstance(d, int) or not (
-            isinstance(d, bytearray) and HdlcDlmsParser.is_obis(d)), data))
-
-    @staticmethod
-    def is_obis(value: bytearray) -> bool:
-        return len(value) == 6 and value[-1] == 255
+        return list(filter(
+            lambda d: isinstance(d, int) or (isinstance(d, (bytes, bytearray)) and not OBISCode.is_obis(d)),
+            data))
