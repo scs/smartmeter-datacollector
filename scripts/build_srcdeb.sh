@@ -27,7 +27,7 @@ echo "..done"
 
 # build the Python source distribution package
 echo -n "Building Python source distribution package.."
-pipenv run build > /dev/null 2>&1
+pipenv run build
 echo "..done"
 
 # prepare the output directory
@@ -58,7 +58,7 @@ echo "..done"
 # build the Debian source package
 echo -n "Building the Debian package (${BUILD_TYPE}).."
 cd ${PACKAGE_DIR}/
-dpkg-buildpackage --build=${BUILD_TYPE} -rfakeroot -sa -us -uc > /dev/null 2>&1
+dpkg-buildpackage --build=${BUILD_TYPE} -rfakeroot -sa -us -uc
 echo "..done"
 
 cd ${CWD}
