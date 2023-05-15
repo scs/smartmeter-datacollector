@@ -55,13 +55,12 @@ class TestDlmsParserUnencrypted:
         parser = prepare_parser(unencrypted_valid_data_lg, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
 
-        assert isinstance(dlms_objects, dict)
-        assert len(dlms_objects) == 15
+        assert isinstance(dlms_objects, list)
+        assert len(dlms_objects) == 16
         obis_pattern = re.compile(r"(\d+\.){5}\d+")
-        for key, value in dlms_objects.items():
-            assert isinstance(key, str)
-            assert re.match(obis_pattern, key)
-            assert isinstance(value, GXDLMSObject)
+        for obj in dlms_objects:
+            assert isinstance(obj, GXDLMSObject)
+            assert re.match(obis_pattern, str(obj.logicalName))
 
     def test_parse_dlms_to_meter_data(self, unencrypted_valid_data_lg: List[bytes], cosem_config_lg: Cosem):
         parser = prepare_parser(unencrypted_valid_data_lg, cosem_config_lg)
@@ -98,10 +97,9 @@ class TestDlmsParserEncrypted:
         parser = prepare_parser(encrypted_data_no_pushlist_lg, cosem_config_lg, "F08660A6C19D2048556BF623AB0257E6")
         dlms_objects = parser.parse_to_dlms_objects()
 
-        assert isinstance(dlms_objects, dict)
+        assert isinstance(dlms_objects, list)
         assert len(dlms_objects) == 17
         obis_pattern = re.compile(r"(\d+\.){5}\d+")
-        for key, value in dlms_objects.items():
-            assert isinstance(key, str)
-            assert re.match(obis_pattern, key)
-            assert isinstance(value, GXDLMSObject)
+        for obj in dlms_objects:
+            assert isinstance(obj, GXDLMSObject)
+            assert re.match(obis_pattern, str(obj.logicalName))
