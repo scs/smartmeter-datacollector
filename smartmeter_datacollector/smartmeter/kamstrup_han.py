@@ -18,8 +18,10 @@ from .serial_reader import SerialConfig
 LOGGER = logging.getLogger("smartmeter")
 
 
-class KamstrupHan(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, baudrate: int = 2400, decryption_key: Optional[str] = None) -> None:
+class KamstrupHAN(SerialHdlcDlmsMeter):
+    BAUDRATE = 2400
+
+    def __init__(self, port: str, baudrate: int = BAUDRATE, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,

@@ -18,8 +18,8 @@ from .serial_reader import SerialConfig
 LOGGER = logging.getLogger("smartmeter")
 
 
-class IskraAM550(SerialHdlcDlmsMeter):
-    BAUDRATE = 115200
+class LGE360(SerialHdlcDlmsMeter):
+    BAUDRATE = 9600
 
     def __init__(self, port: str, baudrate: int = BAUDRATE, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
@@ -34,7 +34,7 @@ class IskraAM550(SerialHdlcDlmsMeter):
         try:
             super().__init__(serial_config, cosem, decryption_key)
         except ReaderError as ex:
-            LOGGER.fatal("Unable to setup serial reader for Iskra AM550. '%s'", ex)
-            raise MeterError("Failed setting up Iskra AM550.") from ex
+            LOGGER.fatal("Unable to setup serial reader for L+G E360. '%s'", ex)
+            raise MeterError("Failed setting up L+G E360.") from ex
 
-        LOGGER.info("Successfully set up Iskra AM550 smart meter on '%s'.", port)
+        LOGGER.info("Successfully set up L+G E360 smart meter on '%s'.", port)

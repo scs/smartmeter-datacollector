@@ -19,14 +19,16 @@ LOGGER = logging.getLogger("smartmeter")
 
 
 class LGE450(SerialHdlcDlmsMeter):
-    def __init__(self, port: str, baudrate: int = 2400, decryption_key: Optional[str] = None) -> None:
+    BAUDRATE = 2400
+
+    def __init__(self, port: str, baudrate: int = BAUDRATE, decryption_key: Optional[str] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
             data_bits=serial.EIGHTBITS,
             parity=serial.PARITY_EVEN,
             stop_bits=serial.STOPBITS_ONE,
-            termination=LGE450.HDLC_FLAG
+            termination=SerialHdlcDlmsMeter.HDLC_FLAG
         )
         cosem = Cosem(fallback_id=port)
         try:
