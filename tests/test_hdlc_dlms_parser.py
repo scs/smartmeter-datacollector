@@ -87,7 +87,7 @@ class TestDlmsParserEncrypted:
         dlms_objects = parser.parse_to_dlms_objects()
 
         assert isinstance(dlms_objects, list)
-        assert len(dlms_objects) == 17
+        assert len(dlms_objects) == 16
         obis_pattern = re.compile(r"(\d+\.){5}\d+")
         for obj in dlms_objects:
             assert isinstance(obj, GXDLMSObject)

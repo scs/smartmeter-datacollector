@@ -6,7 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
@@ -14,7 +14,7 @@ from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GX
                                 GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
-from .cosem import Cosem
+from .cosem import OBIS_DEFAULT_CLOCK, Cosem
 from .meter_data import MeterDataPoint
 from .obis import OBISCode
 
@@ -133,7 +133,7 @@ class HdlcDlmsParser:
         for index, (obj, attr_ind) in enumerate(parsed_objects[1:], start=1):
             self._client.updateValue(obj, attr_ind, self._dlms_data.value[index])
             LOGGER.debug("%s %s %s: %s", obj.objectType, obj.logicalName, attr_ind, obj.getValues()[attr_ind - 1])
-        
+
         return [obj for obj, _ in parsed_objects]
 
     def _parse_dlms_without_push_list(self) -> List[GXDLMSObject]:
@@ -151,10 +151,11 @@ class HdlcDlmsParser:
             return []
 
         push_setup = GXDLMSPushSetup()
-        if len(values) > len(obis_codes):
-            push_setup.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
-        push_setup.pushObjectList.extend((GXDLMSRegister(obis.to_gurux_str()), GXDLMSCaptureObject(2, 0))
-                                         for obis in obis_codes)
+        for obis in obis_codes:
+            if obis == OBIS_DEFAULT_CLOCK:
+                push_setup.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
+            else:
+                push_setup.pushObjectList.append((GXDLMSRegister(obis.to_gurux_str()), GXDLMSCaptureObject(2, 0)))
 
         for index, (obj, attr_ind) in enumerate(push_setup.pushObjectList):
             self._client.updateValue(obj, attr_ind.attributeIndex, values[index])
@@ -178,25 +179,14 @@ class HdlcDlmsParser:
         values = []
 
         for idx, obis_bytes in obis_it:
-            if idx == 1:
-                # first element (index 0) assumed to be message timestamp
-                values.append(data[0])
-
             if idx + 1 < len(data) and HdlcDlmsParser.is_value(data[idx + 1]):
                 obis_codes.append(OBISCode.from_bytes(obis_bytes))
                 values.append(data[idx + 1])
             else:
-                LOGGER.warning("OBIS code without following value skipped.")
+                LOGGER.debug("Skipped OBIS code without subsequent value.")
 
         return obis_codes, values
 
     @staticmethod
     def is_value(d) -> bool:
-        return isinstance(d, int) or (isinstance(d, (bytearray, bytes)) and not OBISCode.is_obis(d))
-
-    @staticmethod
-    def extract_values(data: List[Any]) -> List[Any]:
-        first_obis = next(
-            (i for i, d in enumerate(data) if isinstance(d, (bytearray, bytes)) and OBISCode.is_obis(d))
-        )
-        return data[first_obis+1::2]
+        return isinstance(d, (int, str)) or (isinstance(d, (bytearray, bytes)) and not OBISCode.is_obis(d))
