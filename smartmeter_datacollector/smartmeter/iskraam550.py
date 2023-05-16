@@ -29,8 +29,6 @@ class IskraAM550(SerialHdlcDlmsMeter):
             termination=IskraAM550.HDLC_FLAG
         )
         cosem = Cosem(fallback_id=port)
-        if decryption_key:
-            LOGGER.warning("Using the Iskra AM550 meter with encrypted data has NOT BEEN TESTED yet!")
         try:
             super().__init__(serial_config, cosem, decryption_key)
         except ReaderError as ex:
