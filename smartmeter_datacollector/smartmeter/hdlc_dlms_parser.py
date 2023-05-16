@@ -14,7 +14,7 @@ from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GX
                                 GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
-from .cosem import OBIS_DEFAULT_CLOCK, Cosem
+from .cosem import Cosem
 from .meter_data import MeterDataPoint
 from .obis import OBISCode
 
@@ -152,7 +152,7 @@ class HdlcDlmsParser:
 
         push_setup = GXDLMSPushSetup()
         for obis in obis_codes:
-            if obis == OBIS_DEFAULT_CLOCK:
+            if obis == Cosem.CLOCK_DEFAULT_OBIS:
                 push_setup.pushObjectList.append((GXDLMSClock(), GXDLMSCaptureObject(2, 0)))
             else:
                 push_setup.pushObjectList.append((GXDLMSRegister(obis.to_gurux_str()), GXDLMSCaptureObject(2, 0)))

@@ -25,14 +25,7 @@ def prepare_parser(data: List[bytes], cosem_config: Cosem, cipher_key: Optional[
 
 @pytest.fixture
 def cosem_config_lg() -> Cosem:
-    obis_registers = [
-        RegisterCosem(OBISCode(1, 0, 1, 7, 0), MeterDataPointTypes.ACTIVE_POWER_P.value),
-        RegisterCosem(OBISCode(1, 0, 2, 7, 0), MeterDataPointTypes.ACTIVE_POWER_N.value),
-    ]
-    return Cosem(
-        fallback_id="fallback_id",
-        register_obis=obis_registers
-    )
+    return Cosem(fallback_id="fallback_id")
 
 
 @pytest.fixture
