@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022 Supercomputing Systems AG
+# Copyright (C) 2023 Supercomputing Systems AG
 # This file is part of smartmeter-datacollector.
 #
 # SPDX-License-Identifier: GPL-2.0-only
@@ -18,8 +18,8 @@ from .serial_reader import SerialConfig
 LOGGER = logging.getLogger("smartmeter")
 
 
-class IskraAM550(SerialHdlcDlmsMeter):
-    BAUDRATE = 115200
+class KamstrupHAN(SerialHdlcDlmsMeter):
+    BAUDRATE = 2400
 
     def __init__(self, port: str,
                  baudrate: int = BAUDRATE,
@@ -37,7 +37,7 @@ class IskraAM550(SerialHdlcDlmsMeter):
         try:
             super().__init__(serial_config, cosem, decryption_key, use_system_time)
         except ReaderError as ex:
-            LOGGER.fatal("Unable to setup serial reader for Iskra AM550. '%s'", ex)
-            raise MeterError("Failed setting up Iskra AM550.") from ex
+            LOGGER.fatal("Unable to setup serial reader for Kamstrup HAN. '%s'", ex)
+            raise MeterError("Failed setting up Kamstrup HAN.") from ex
 
-        LOGGER.info("Successfully set up Iskra AM550 smart meter on '%s'.", port)
+        LOGGER.info("Successfully set up Kamstrup HAN smart meter on '%s'.", port)

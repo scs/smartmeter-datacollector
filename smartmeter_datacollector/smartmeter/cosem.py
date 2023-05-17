@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from gurux_dlms import GXDateTime
-from gurux_dlms.objects import GXDLMSClock, GXDLMSData
+from gurux_dlms.objects import GXDLMSClock, GXDLMSData, GXDLMSRegister
 
 from .meter_data import MeterDataPointType, MeterDataPointTypes
 from .obis import OBISCode
@@ -27,20 +27,7 @@ class RegisterCosem:
     scaling: float = 1.0
 
 
-OBIS_DEFAULT_IDS = [
-    OBISCode(0, 0, 42, 0, 0),
-    OBISCode(0, 0, 96, 1, 0),
-    OBISCode(0, 0, 96, 1, 1),
-    OBISCode(0, 0, 96, 1, 2),
-    OBISCode(0, 0, 96, 1, 3),
-    OBISCode(0, 0, 96, 1, 4),
-    OBISCode(0, 0, 96, 1, 5)
-]
-OBIS_DEFAULT_CLOCK = OBISCode(0, 0, 1, 0, 0)
-COSEM_OBJECT_DETECT_ATTEMPTS = 3
-
-
-DEFAULT_COSEM_REGISTERS = [
+DEFAULT_REGISTER_MAPPING = [
     RegisterCosem(OBISCode(1, 0, 1, 7, 0), MeterDataPointTypes.ACTIVE_POWER_P.value),
     RegisterCosem(OBISCode(1, 0, 2, 7, 0), MeterDataPointTypes.ACTIVE_POWER_N.value),
     RegisterCosem(OBISCode(1, 0, 3, 7, 0), MeterDataPointTypes.REACTIVE_POWER_P.value),
@@ -98,14 +85,24 @@ DEFAULT_COSEM_REGISTERS = [
 
 
 class Cosem:
-    def __init__(self, fallback_id: str, register_obis: List[RegisterCosem] = DEFAULT_COSEM_REGISTERS) -> None:
+    CLOCK_DEFAULT_OBIS = OBISCode(0, 0, 1, 0, 0)
+    OBJECT_DETECT_ATTEMPTS = 3
+
+    def __init__(self,
+                 fallback_id: str,
+                 id_obis_override: Optional[List[OBISCode]] = None,
+                 register_obis_extended: Optional[List[RegisterCosem]] = None) -> None:
         self._id: Optional[str] = None
         if not fallback_id:
             fallback_id = str(uuid.uuid1())
-            LOGGER.warning("Empty or no fallback ID. Setting to random UUID %s.", fallback_id)
+            LOGGER.warning("Empty fallback ID. Setting to random UUID %s.", fallback_id)
         self._fallback_id = fallback_id
-        self._register_obis = {r.obis: r for r in register_obis}
-        self._id_detect_countdown = COSEM_OBJECT_DETECT_ATTEMPTS
+        self._id_obis_override = id_obis_override if id_obis_override else []
+        registers = DEFAULT_REGISTER_MAPPING
+        if register_obis_extended:
+            registers += register_obis_extended
+        self._register_obis = {r.obis: r for r in registers}
+        self._id_detect_countdown = Cosem.OBJECT_DETECT_ATTEMPTS
 
     def retrieve_id(self, dlms_objects: Dict[OBISCode, Any]) -> str:
         if self._id:
@@ -118,13 +115,13 @@ class Cosem:
             return self._fallback_id
 
         id_obj = dlms_objects[id_obis]
-        if not isinstance(id_obj, GXDLMSData):
+        if not isinstance(id_obj, (GXDLMSData, GXDLMSRegister)):
             LOGGER.debug("Invalid ID object for OBIS code %s. Using fallback ID %s.", id_obis, self._fallback_id)
             self._trigger_id_detect_counter()
             return self._fallback_id
 
-        meter_id = id_obj.getValues()[1]
-        if not isinstance(meter_id, str) or len(meter_id) == 0:
+        meter_id = str(id_obj.getValues()[1])
+        if len(meter_id) == 0:
             LOGGER.debug("Invalid ID for OBIS code %s. Using fallback ID %s.", id_obis, self._fallback_id)
             self._trigger_id_detect_counter()
             return self._fallback_id
@@ -133,18 +130,13 @@ class Cosem:
         LOGGER.debug("ID %s found with OBIS code %s.", meter_id, id_obis)
         return meter_id
 
-    def retrieve_timestamp(self, dlms_objects: Dict[OBISCode, Any]) -> datetime:
-        clock_obj = dlms_objects.get(OBIS_DEFAULT_CLOCK, None)
+    def retrieve_time_from_dlms_registers(self, dlms_objects: Dict[OBISCode, Any]) -> Optional[datetime]:
+        clock_obj = dlms_objects.get(Cosem.CLOCK_DEFAULT_OBIS, None)
         if clock_obj and isinstance(clock_obj, GXDLMSClock):
             timestamp = self._extract_datetime(clock_obj)
             if timestamp:
                 return timestamp
-
-            LOGGER.warning("Unable to parse timestamp from %s. Using system time.", str(OBIS_DEFAULT_CLOCK))
-        else:
-            LOGGER.debug("No clock object found at %s. Using system time.", str(OBIS_DEFAULT_CLOCK))
-
-        return datetime.utcnow()
+        return None
 
     def get_register(self, obis: OBISCode) -> Optional[RegisterCosem]:
         return self._register_obis.get(obis, None)
@@ -153,15 +145,28 @@ class Cosem:
         self._id_detect_countdown -= 1
         if self._id_detect_countdown <= 0:
             LOGGER.warning("Unable to retrieve ID after %i attempts. Using fallback ID %s from now on.",
-                           COSEM_OBJECT_DETECT_ATTEMPTS, self._fallback_id)
+                           Cosem.OBJECT_DETECT_ATTEMPTS, self._fallback_id)
             self._id = self._fallback_id
 
-    @staticmethod
-    def _find_obis_of_id(dlms_objects: Dict[OBISCode, Any]) -> Optional[OBISCode]:
-        for default_obis in OBIS_DEFAULT_IDS:
-            if default_obis in dlms_objects:
-                return default_obis
+    def _find_obis_of_id(self, dlms_objects: Dict[OBISCode, Any]) -> Optional[OBISCode]:
+        # first check all ID OBIS of override list (empty by default)
+        for id_obis in self._id_obis_override:
+            if id_obis in dlms_objects:
+                return id_obis
+
+        # then check for default ID OBIS
+        for obj_obis in dlms_objects:
+            if self._is_default_id_obis(obj_obis):
+                return obj_obis
+
         return None
+
+    @staticmethod
+    def _is_default_id_obis(obis: OBISCode) -> bool:
+        return (
+            obis == OBISCode(0, 0, 42, 0, 0) or
+            (obis.a == 0 and obis.c == 96 and obis.d == 1 and obis.e >= 0 and obis.e <= 9) or
+            (obis.a == 1 and obis.c == 0 and obis.d == 0 and obis.e >= 0 and obis.e <= 9))
 
     @staticmethod
     def _extract_datetime(clock_object: GXDLMSClock) -> Optional[datetime]:

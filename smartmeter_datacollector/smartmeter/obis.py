@@ -41,7 +41,7 @@ class OBISCode:
     def from_string(cls, obis_string: str) -> 'OBISCode':
         match = cls.PATTERN.match(obis_string)
         if not match:
-            raise ValueError("Invalid OBIS string \"%s\".", obis_string)
+            raise ValueError(f"Invalid OBIS string {obis_string}.")
         groups = match.groups()
         return cls(*(int(g) for g in groups))
 

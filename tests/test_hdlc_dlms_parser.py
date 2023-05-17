@@ -57,7 +57,7 @@ class TestDlmsParserUnencrypted:
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
         assert isinstance(meter_data, list)
-        assert len(meter_data) == 2
+        assert len(meter_data) == 11
         assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in meter_data)
         assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in meter_data)
         assert all(isinstance(data.value, float) for data in meter_data)
@@ -70,7 +70,7 @@ class TestDlmsParserUnencrypted:
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
         assert isinstance(meter_data, list)
-        assert len(meter_data) == 2
+        assert len(meter_data) == 8
 
     def test_ignore_not_parsable_data_to_meter_data(self, unencrypted_invalid_data_lg: List[bytes], cosem_config_lg: Cosem):
         parser = prepare_parser(unencrypted_invalid_data_lg, cosem_config_lg)
@@ -78,7 +78,7 @@ class TestDlmsParserUnencrypted:
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
         assert isinstance(meter_data, list)
-        assert len(meter_data) == 2
+        assert len(meter_data) == 5
 
 
 class TestDlmsParserEncrypted:
@@ -87,7 +87,7 @@ class TestDlmsParserEncrypted:
         dlms_objects = parser.parse_to_dlms_objects()
 
         assert isinstance(dlms_objects, list)
-        assert len(dlms_objects) == 17
+        assert len(dlms_objects) == 16
         obis_pattern = re.compile(r"(\d+\.){5}\d+")
         for obj in dlms_objects:
             assert isinstance(obj, GXDLMSObject)

@@ -37,9 +37,12 @@ class Meter(ABC):
 class SerialHdlcDlmsMeter(Meter):
     HDLC_FLAG = b"\x7e"
 
-    def __init__(self, serial_config: SerialConfig, cosem: Cosem, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, serial_config: SerialConfig,
+                 cosem: Cosem,
+                 decryption_key: Optional[str] = None,
+                 use_system_time: bool = False) -> None:
         super().__init__()
-        self._parser = HdlcDlmsParser(cosem, decryption_key)
+        self._parser = HdlcDlmsParser(cosem, decryption_key, use_system_time)
         self._serial = SerialReader(serial_config, self._data_received)
 
     async def start(self) -> None:
@@ -54,6 +57,7 @@ class SerialHdlcDlmsMeter(Meter):
 
         self._parser.append_to_hdlc_buffer(received_data)
         if self._parser.extract_data_from_hdlc_frames():
+            message_time = self._parser.extract_message_time()
             dlms_objects = self._parser.parse_to_dlms_objects()
-            data_points = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects)
+            data_points = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects, message_time)
             self._notify_observers(data_points)
