@@ -6,9 +6,10 @@
 # See LICENSES/README.md for more information.
 #
 import logging
+from datetime import datetime
 from typing import Any, List, Optional, Tuple
 
-from gurux_dlms import GXByteBuffer, GXDLMSClient, GXReplyData
+from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
 from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSPushSetup,
                                 GXDLMSRegister)
@@ -79,6 +80,13 @@ class HdlcDlmsParser:
         self._hdlc_buffer.clear()
         return True
 
+    def extract_message_time(self) -> Optional[datetime]:
+        if not isinstance(self._dlms_data.time, GXDateTime):
+            return None
+        if isinstance(self._dlms_data.time.value, datetime):
+            return self._dlms_data.time.value
+        return None
+
     def parse_to_dlms_objects(self) -> List[GXDLMSObject]:
         if not isinstance(self._dlms_data.value, list) or not self._dlms_data.value:
             self._dlms_data.clear()
@@ -98,7 +106,8 @@ class HdlcDlmsParser:
         self._dlms_data.clear()
         return dlms_objects
 
-    def convert_dlms_bundle_to_reader_data(self, dlms_objects: List[GXDLMSObject]) -> List[MeterDataPoint]:
+    def convert_dlms_bundle_to_reader_data(self, dlms_objects: List[GXDLMSObject],
+                                           message_time: Optional[datetime] = None) -> List[MeterDataPoint]:
         obis_obj_pairs = {}
         for obj in dlms_objects:
             try:
@@ -107,7 +116,11 @@ class HdlcDlmsParser:
                 LOGGER.warning("Skipping unparsable DLMS object. (Reason: %s)", ex)
 
         meter_id = self._cosem.retrieve_id(obis_obj_pairs)
-        timestamp = self._cosem.retrieve_timestamp(obis_obj_pairs)
+
+        if message_time:
+            timestamp = message_time
+        else:
+            timestamp = self._cosem.retrieve_timestamp(obis_obj_pairs)
 
         # Extract register data
         data_points: List[MeterDataPoint] = []
