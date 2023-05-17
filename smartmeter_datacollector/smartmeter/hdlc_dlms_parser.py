@@ -25,7 +25,7 @@ LOGGER = logging.getLogger("smartmeter")
 class HdlcDlmsParser:
     HDLC_BUFFER_MAX_SIZE = 5000
 
-    def __init__(self, cosem_config: Cosem, block_cipher_key: Optional[str] = None) -> None:
+    def __init__(self, cosem: Cosem, block_cipher_key: Optional[str] = None, use_system_time: bool = False) -> None:
         if block_cipher_key:
             self._client = GXDLMSSecureClient(
                 useLogicalNameReferencing=True,
@@ -39,7 +39,10 @@ class HdlcDlmsParser:
 
         self._hdlc_buffer = GXByteBuffer()
         self._dlms_data = GXReplyData()
-        self._cosem = cosem_config
+        self._cosem = cosem
+        self._use_system_time = use_system_time
+        if use_system_time:
+            LOGGER.info("Use system UTC time instead of time in DLMS messages for this smart meter.")
 
     def append_to_hdlc_buffer(self, data: bytes) -> None:
         if self._hdlc_buffer.getSize() > self.HDLC_BUFFER_MAX_SIZE:
@@ -117,10 +120,18 @@ class HdlcDlmsParser:
 
         meter_id = self._cosem.retrieve_id(obis_obj_pairs)
 
-        if message_time:
+        timestamp = None
+        if self._use_system_time:
+            timestamp = datetime.utcnow()
+
+        if not timestamp:
+            timestamp = self._cosem.retrieve_time_from_dlms_registers(obis_obj_pairs)
+        if not timestamp:
             timestamp = message_time
-        else:
-            timestamp = self._cosem.retrieve_timestamp(obis_obj_pairs)
+        if not timestamp:
+            LOGGER.warning("Unable to get timestamp from message. Falling back to system time.")
+            self._use_system_time = True
+            timestamp = datetime.utcnow()
 
         # Extract register data
         data_points: List[MeterDataPoint] = []

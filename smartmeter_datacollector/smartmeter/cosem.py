@@ -127,18 +127,13 @@ class Cosem:
         LOGGER.debug("ID %s found with OBIS code %s.", meter_id, id_obis)
         return meter_id
 
-    def retrieve_timestamp(self, dlms_objects: Dict[OBISCode, Any]) -> datetime:
+    def retrieve_time_from_dlms_registers(self, dlms_objects: Dict[OBISCode, Any]) -> Optional[datetime]:
         clock_obj = dlms_objects.get(Cosem.CLOCK_DEFAULT_OBIS, None)
         if clock_obj and isinstance(clock_obj, GXDLMSClock):
             timestamp = self._extract_datetime(clock_obj)
             if timestamp:
                 return timestamp
-
-            LOGGER.warning("Unable to parse timestamp from %s. Using system time.", str(Cosem.CLOCK_DEFAULT_OBIS))
-        else:
-            LOGGER.debug("No clock object found at %s. Using system time.", str(Cosem.CLOCK_DEFAULT_OBIS))
-
-        return datetime.utcnow()
+        return None
 
     def get_register(self, obis: OBISCode) -> Optional[RegisterCosem]:
         return self._register_obis.get(obis, None)

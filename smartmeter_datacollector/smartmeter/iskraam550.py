@@ -21,7 +21,10 @@ LOGGER = logging.getLogger("smartmeter")
 class IskraAM550(SerialHdlcDlmsMeter):
     BAUDRATE = 115200
 
-    def __init__(self, port: str, baudrate: int = BAUDRATE, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str,
+                 baudrate: int = BAUDRATE,
+                 decryption_key: Optional[str] = None,
+                 use_system_time: bool = False) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
@@ -32,7 +35,7 @@ class IskraAM550(SerialHdlcDlmsMeter):
         )
         cosem = Cosem(fallback_id=port)
         try:
-            super().__init__(serial_config, cosem, decryption_key)
+            super().__init__(serial_config, cosem, decryption_key, use_system_time)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for Iskra AM550. '%s'", ex)
             raise MeterError("Failed setting up Iskra AM550.") from ex

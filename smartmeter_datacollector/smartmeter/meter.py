@@ -37,9 +37,12 @@ class Meter(ABC):
 class SerialHdlcDlmsMeter(Meter):
     HDLC_FLAG = b"\x7e"
 
-    def __init__(self, serial_config: SerialConfig, cosem: Cosem, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, serial_config: SerialConfig,
+                 cosem: Cosem,
+                 decryption_key: Optional[str] = None,
+                 use_system_time: bool = False) -> None:
         super().__init__()
-        self._parser = HdlcDlmsParser(cosem, decryption_key)
+        self._parser = HdlcDlmsParser(cosem, decryption_key, use_system_time)
         self._serial = SerialReader(serial_config, self._data_received)
 
     async def start(self) -> None:

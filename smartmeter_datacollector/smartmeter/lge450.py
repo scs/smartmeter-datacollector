@@ -21,7 +21,10 @@ LOGGER = logging.getLogger("smartmeter")
 class LGE450(SerialHdlcDlmsMeter):
     BAUDRATE = 2400
 
-    def __init__(self, port: str, baudrate: int = BAUDRATE, decryption_key: Optional[str] = None) -> None:
+    def __init__(self, port: str,
+                 baudrate: int = BAUDRATE,
+                 decryption_key: Optional[str] = None,
+                 use_system_time: bool = False) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
@@ -32,7 +35,7 @@ class LGE450(SerialHdlcDlmsMeter):
         )
         cosem = Cosem(fallback_id=port)
         try:
-            super().__init__(serial_config, cosem, decryption_key)
+            super().__init__(serial_config, cosem, decryption_key, use_system_time)
         except ReaderError as ex:
             LOGGER.fatal("Unable to setup serial reader for L+G E450. '%s'", ex)
             raise MeterError("Failed setting up L+G E450.") from ex
