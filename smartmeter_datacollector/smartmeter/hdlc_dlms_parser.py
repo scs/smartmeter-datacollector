@@ -212,5 +212,7 @@ class HdlcDlmsParser:
         return obis_codes, values
 
     @staticmethod
-    def is_value(d) -> bool:
-        return isinstance(d, (int, str)) or (isinstance(d, (bytearray, bytes)) and not OBISCode.is_obis(d))
+    def is_value(data: Any) -> bool:
+        return (
+            isinstance(data, (int, str)) or
+            (isinstance(data, (bytearray, bytes)) and not OBISCode.is_obis(data)))

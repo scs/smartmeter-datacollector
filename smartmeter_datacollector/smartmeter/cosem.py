@@ -90,15 +90,18 @@ class Cosem:
 
     def __init__(self,
                  fallback_id: str,
-                 id_obis_override: List[OBISCode] = [],
-                 register_obis_extended: List[RegisterCosem] = []) -> None:
+                 id_obis_override: Optional[List[OBISCode]] = None,
+                 register_obis_extended: Optional[List[RegisterCosem]] = None) -> None:
         self._id: Optional[str] = None
         if not fallback_id:
             fallback_id = str(uuid.uuid1())
             LOGGER.warning("Empty fallback ID. Setting to random UUID %s.", fallback_id)
         self._fallback_id = fallback_id
-        self._id_obis_override = id_obis_override
-        self._register_obis = {r.obis: r for r in DEFAULT_REGISTER_MAPPING + register_obis_extended}
+        self._id_obis_override = id_obis_override if id_obis_override else []
+        registers = DEFAULT_REGISTER_MAPPING
+        if register_obis_extended:
+            registers += register_obis_extended
+        self._register_obis = {r.obis: r for r in registers}
         self._id_detect_countdown = Cosem.OBJECT_DETECT_ATTEMPTS
 
     def retrieve_id(self, dlms_objects: Dict[OBISCode, Any]) -> str:
