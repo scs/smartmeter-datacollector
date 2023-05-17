@@ -162,7 +162,8 @@ class Cosem:
     def _is_default_id_obis(obis: OBISCode) -> bool:
         return (
             obis == OBISCode(0, 0, 42, 0, 0) or
-            obis.a == 0 and obis.c == 96 and obis.d == 1 and obis.e >= 0 and obis.e <= 9)
+            (obis.a == 0 and obis.c == 96 and obis.d == 1 and obis.e >= 0 and obis.e <= 9) or
+            (obis.a == 1 and obis.c == 0 and obis.d == 0 and obis.e >= 0 and obis.e <= 9))
 
     @staticmethod
     def _extract_datetime(clock_object: GXDLMSClock) -> Optional[datetime]:
