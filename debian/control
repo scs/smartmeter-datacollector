@@ -16,9 +16,7 @@ Description: Smart Meter Data Collector
  The acquired values can be forwarded to one or more data sinks like a MQTT broker or logger.
  .
  The following smart meters are supported:
- * Landis+Gyr E450: Data pushed by smart meter over CII interface (wired M-Bus). Encoded with HDLC and DLMS/COSEM.
-   * Unencrypted data
-   * Encrypted data
- * Iskraemeco AM550: Data pushed by smart meter over P1 interface (DSMR). Encoded with HDLC (IEC 62056-46) and DLMS/COSEM.
-  * Unencrypted data
-  * Encrypted data
+ * Landis+Gyr E450
+ * Landis+Gyr E360
+ * Iskraemeco AM550
+ * Kamstrup OMNIPOWER with HAN-NVE

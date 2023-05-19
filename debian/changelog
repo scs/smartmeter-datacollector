@@ -1,3 +1,19 @@
+smartmeter-datacollector (1.1.0-1) unstable; urgency=low
+
+  * add L+G E360 and Kamstrup HAN-NVE smart meter support
+  * software parses DLMS messages that do not start with a push object list
+  * improved OBIS code handling
+  * use message timestamp as fallback
+  * add system time (from OS) override option
+  * make baudrate configurable for each smart meter
+  * extend and generalize meter ID detection
+  * fix current value scaling
+  * update dependencies
+  * add Python 3.10 code checks
+
+ -- Supercomputing Systems AG <info@scs.ch>  Fri, 19 May 2023 19:18:26 +0200
+
+
 smartmeter-datacollector (1.0.2-1) unstable; urgency=low
 
   * bugfix catching gurux converter failures
