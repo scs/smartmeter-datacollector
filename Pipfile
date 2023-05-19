@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aioserial = "~=1.3.0"
-asyncio-mqtt = "~=0.10.0"
-gurux-dlms = "==1.0.107"
+aioserial = "~=1.3.1"
+asyncio-mqtt = "~=0.16.1"
+gurux-dlms = "==1.0.143"
 
 [dev-packages]
 autopep8 = "*"
@@ -15,31 +15,28 @@ isort = "*"
 licenseheaders = "*"
 pipenv-setup = "*"
 pylint = "*"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-mock = "*"
 setuptools = "*"
 stdeb = {version="*", markers="sys_platform == 'linux'"}
 twine = "*"
 wheel = "*"
-pytest = "*"
-pytest-mock = "*"
-pytest-asyncio = "*"
-
-[requires]
-python_version = "3.8"
 
 [scripts]
 build = "bash ./scripts/build.sh"
 build_check = "twine check dist/*"
-build_srcdeb = "bash ./scripts/build_srcdeb.sh"
 build_deb = "bash ./scripts/build_deb.sh"
+build_srcdeb = "bash ./scripts/build_srcdeb.sh"
 clean = "rm -rf .eggs build dist deb_dist smartmeter_datacollector.egg-info"
 debianize = "bash ./scripts/debianize.sh"
-format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
+format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
 isort = "isort ."
 isort_check = "isort --check ."
+license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
 lint = "pylint smartmeter_datacollector/"
 lint_check = "pylint smartmeter_datacollector/ --exit-zero"
-license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
 setup = "pipenv-setup sync"
 setup_check = "pipenv-setup check"
 test = "pytest"
