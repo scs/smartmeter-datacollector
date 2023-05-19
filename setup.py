@@ -33,6 +33,8 @@ setup(
     },
     author="Supercomputing Systems AG",
     author_email="info@scs.ch",
+    maintainer="Supercomputing Systems AG",
+    maintainer_email="info@scs.ch",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
@@ -40,6 +42,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Typing :: Typed",
     ],
     license="GPLv2",
@@ -49,11 +52,11 @@ setup(
     ),
     include_package_data=True,
     install_requires=[
-        "aioserial==1.3.0",
-        "asyncio-mqtt==0.10.0",
-        "gurux-dlms==1.0.107",
-        "paho-mqtt==1.5.1",
-        "pyserial==3.5",
+        'aioserial==1.3.1',
+        'asyncio-mqtt==0.16.1',
+        'gurux-dlms==1.0.143',
+        'paho-mqtt==1.6.1',
+        'pyserial==3.5'
     ],
     scripts=["bin/smartmeter-datacollector"],
     zip_safe=True,

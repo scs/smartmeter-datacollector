@@ -14,7 +14,7 @@ python setup.py \
     --no-python2-scripts=true \
     --with-dh-systemd \
     --compat=10 \
-    --build-depends="dh-systemd (>= 1.5)"
+    --build-depends="dh-python"
 
 # add Pre-Depends to debian/control for python3-pip
 sed -i 's/^\(Depends: \)/Pre-Depends: python3-pip\n\1/' debian/control
@@ -25,7 +25,7 @@ sed -i 's/${python3:Depends}/python3:any/' debian/control
 # fix the debhelper compatibility level in debian/control
 sed -i 's/>= 9/>= 10/' debian/control
 
-PIP_REQUIREMENTS=$(pipenv lock -r)
+PIP_REQUIREMENTS=$(pipenv requirements)
 
 # write the debian/postinst file
 cat <<EOT >> debian/postinst
