@@ -19,11 +19,11 @@ jobs:
         os: [ 'debian', 'raspios' ]
         include:
           - os: debian
-            dist: buster
+            dist: bullseye
             arch: amd64
             keyring_cmd: sudo apt-get install -y debian-archive-keyring
           - os: raspios
-            dist: buster
+            dist: bullseye
             arch: armhf
             keyring_cmd: wget http://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb && sudo dpkg -i raspbian-archive-keyring_20120528.2_all.deb
 

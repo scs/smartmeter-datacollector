@@ -138,7 +138,7 @@ python3 -m pip install smartmeter-datacollector-configurator
 * Distribution
   * Debian
 * Release
-  * Buster
+  * Bullseye
 * CPU architecture
   * amd64
   * armhf

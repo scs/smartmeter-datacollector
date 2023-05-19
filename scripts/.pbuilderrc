@@ -7,7 +7,7 @@ if [ "$OS" == "debian" ]; then
     COMPONENTS="main contrib non-free"
     DEBOOTSTRAPOPTS=("${DEBOOTSTRAPOPTS[@]}"
         "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg")
-    : ${DIST:="buster"}
+    : ${DIST:="bullseye"}
     : ${ARCH:="amd64"}
 elif [ "$OS" == "ubuntu" ]; then
     MIRRORSITE="http://no.archive.ubuntu.com/ubuntu/"
@@ -20,7 +20,7 @@ elif [ "$OS" == "raspios" ]; then
     PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-apt"
     DEBOOTSTRAPOPTS=("${DEBOOTSTRAPOPTS[@]}"
         "--keyring=/usr/share/keyrings/raspbian-archive-keyring.gpg")
-    : ${DIST:="buster"}
+    : ${DIST:="bullseye"}
     : ${ARCH:="armhf"}
 else
     echo "Unknown OS: $OS"
