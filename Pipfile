@@ -21,6 +21,7 @@ pytest-mock = "*"
 setuptools = "*"
 stdeb = {version="*", markers="sys_platform == 'linux'"}
 twine = "*"
+vistir = "~=0.6.1"
 wheel = "*"
 
 [scripts]
