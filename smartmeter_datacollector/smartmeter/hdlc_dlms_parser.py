@@ -6,7 +6,7 @@
 # See LICENSES/README.md for more information.
 #
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List, Optional, Tuple
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
@@ -132,6 +132,10 @@ class HdlcDlmsParser:
             LOGGER.warning("Unable to get timestamp from message. Falling back to system time.")
             self._use_system_time = True
             timestamp = datetime.utcnow()
+
+        if not timestamp.tzinfo:
+            # if timezone info not set, assume UTC
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
 
         # Extract register data
         data_points: List[MeterDataPoint] = []
