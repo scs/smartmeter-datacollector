@@ -67,9 +67,17 @@ class MeterDataPointTypes(Enum):
     REACTIVE_ENERGY_N_T2 = MeterDataPointType("REACTIVE_ENERGY_N_T2", "Reactive Energy - Tariff 2", "VAh")
 
     REACTIVE_ENERGY_Q1 = MeterDataPointType("REACTIVE_ENERGY_Q1", "Reactive Energy +Ri Q1", "VAh")
+    REACTIVE_ENERGY_Q1_T1 = MeterDataPointType("REACTIVE_ENERGY_Q1_T1", "Reactive Energy +Ri Q1 Tariff 1", "VAh")
+    REACTIVE_ENERGY_Q1_T2 = MeterDataPointType("REACTIVE_ENERGY_Q1_T2", "Reactive Energy +Ri Q1 Tariff 2", "VAh")
     REACTIVE_ENERGY_Q2 = MeterDataPointType("REACTIVE_ENERGY_Q2", "Reactive Energy +Rc Q2", "VAh")
+    REACTIVE_ENERGY_Q2_T1 = MeterDataPointType("REACTIVE_ENERGY_Q2_T1", "Reactive Energy +Rc Q2 Tariff 1", "VAh")
+    REACTIVE_ENERGY_Q2_T2 = MeterDataPointType("REACTIVE_ENERGY_Q2_T2", "Reactive Energy +Rc Q2 Tariff 2", "VAh")
     REACTIVE_ENERGY_Q3 = MeterDataPointType("REACTIVE_ENERGY_Q3", "Reactive Energy -Ri Q3", "VAh")
+    REACTIVE_ENERGY_Q3_T1 = MeterDataPointType("REACTIVE_ENERGY_Q3_T1", "Reactive Energy -Ri Q3 Tariff 1", "VAh")
+    REACTIVE_ENERGY_Q3_T2 = MeterDataPointType("REACTIVE_ENERGY_Q3_T2", "Reactive Energy -Ri Q3 Tariff 2", "VAh")
     REACTIVE_ENERGY_Q4 = MeterDataPointType("REACTIVE_ENERGY_Q4", "Reactive Energy -Rc Q4", "VAh")
+    REACTIVE_ENERGY_Q4_T1 = MeterDataPointType("REACTIVE_ENERGY_Q4_T1", "Reactive Energy -Rc Q4 Tariff 1", "VAh")
+    REACTIVE_ENERGY_Q4_T2 = MeterDataPointType("REACTIVE_ENERGY_Q4_T2", "Reactive Energy -Rc Q4 Tariff 2", "VAh")
 
     POWER_FACTOR = MeterDataPointType("POWER_FACTOR", "Power Factor", "")
     NET_FREQUENCY = MeterDataPointType("NET_FREQUENCY", "Net Frequency any Phase", "Hz")
