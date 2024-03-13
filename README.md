@@ -19,6 +19,8 @@ The following smart meters are supported (see [Wiki/Home](https://github.com/scs
 
 * Landis+Gyr E450: \
   Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM).
+* Landis+Gyr E570: \
+  Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM).
 * Landis+Gyr E360: \
   Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR).
 * Iskraemeco AM550: \
