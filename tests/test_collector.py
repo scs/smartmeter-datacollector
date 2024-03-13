@@ -22,7 +22,6 @@ def test_type() -> MeterDataPointType:
     return MeterDataPointType("TEST_TYPE", "test type", "unit")
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_collector_with_one_sink(mocker: MockerFixture, test_type: MeterDataPointType):
     coll = Collector()
@@ -39,7 +38,6 @@ async def test_collector_with_one_sink(mocker: MockerFixture, test_type: MeterDa
     sink.send.assert_awaited_once_with(data_point)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_collector_with_one_sink_multiple_data_points(mocker: MockerFixture, test_type: MeterDataPointType):
     coll = Collector()
@@ -58,7 +56,6 @@ async def test_collector_with_one_sink_multiple_data_points(mocker: MockerFixtur
     assert sink.send.await_count == 2
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_collector_with_two_sinks(mocker: MockerFixture, test_type: MeterDataPointType):
     coll = Collector()
