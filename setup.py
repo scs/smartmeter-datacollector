@@ -53,8 +53,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'aioserial==1.3.1',
-        'asyncio-mqtt==0.16.1',
-        'gurux-dlms==1.0.143',
+        'asyncio-mqtt==0.16.2',
+        'gurux-dlms==1.0.150',
         'paho-mqtt==1.6.1',
         'pyserial==3.5'
     ],
