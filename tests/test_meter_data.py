@@ -6,14 +6,14 @@
 # See LICENSES/README.md for more information.
 #
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType
 
 
 def test_meter_data_serialize():
     test_type = MeterDataPointType("TEST_TYPE", "test type", "unit")
-    data_point = MeterDataPoint(test_type, 1.0, "TestSource", datetime.utcnow())
+    data_point = MeterDataPoint(test_type, 1.0, "TestSource", datetime.now(timezone.utc))
 
     data_point_json = data_point.to_json()
 

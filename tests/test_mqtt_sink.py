@@ -8,7 +8,7 @@
 import configparser
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
@@ -42,7 +42,7 @@ async def test_mqtt_sink_send_point_when_started(mocker: MockerFixture):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
     client_mock = mocker.patch.object(sink, "_client", autospec=True)
-    data_point = MeterDataPoint(TEST_TYPE, 1.0, "test_source", datetime.utcnow())
+    data_point = MeterDataPoint(TEST_TYPE, 1.0, "test_source", datetime.now(timezone.utc))
     expected_topic = f"smartmeter/test_source/{TEST_TYPE.identifier}"
     expected_payload = json.dumps({
         "value": data_point.value,
@@ -61,7 +61,7 @@ async def test_mqtt_sink_send_reconnect_when_not_started(mocker: MockerFixture):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
     client_mock = mocker.patch.object(sink, "_client", autospec=True)
-    data_point = MeterDataPoint(TEST_TYPE, 1.0, "test_source", datetime.utcnow())
+    data_point = MeterDataPoint(TEST_TYPE, 1.0, "test_source", datetime.now(timezone.utc))
 
     client_mock.publish.side_effect = MqttCodeError(MQTT_ERR_NO_CONN)
     await sink.send(data_point)
