@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022 Supercomputing Systems AG
+# Copyright (C) 2024 Supercomputing Systems AG
 # This file is part of smartmeter-datacollector.
 #
 # SPDX-License-Identifier: GPL-2.0-only
@@ -17,7 +17,6 @@ from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
 from .utils import *
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_lge450_initialization(mocker: MockerFixture):
     observer = mocker.stub()
@@ -33,7 +32,6 @@ async def test_lge450_initialization(mocker: MockerFixture):
     observer.assert_not_called
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture,
                                                          unencrypted_valid_data_lg: List[bytes]):
@@ -70,7 +68,6 @@ async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture,
     assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18" for data in values)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_lge450_do_not_provide_invalid_data(mocker: MockerFixture,
                                                   unencrypted_invalid_data_lg: List[bytes]):
