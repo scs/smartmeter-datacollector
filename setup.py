@@ -45,7 +45,7 @@ setup(
         "Typing :: Typed",
     ],
     license="GPLv2",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     packages=find_packages(
         exclude=["contrib", "doc", "LICENSES", "scripts", "tests", "tests."]
     ),

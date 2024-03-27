@@ -18,5 +18,6 @@ Description: Smart Meter Data Collector
  The following smart meters are supported:
  * Landis+Gyr E450
  * Landis+Gyr E360
+ * Landis+Gyr E570
  * Iskraemeco AM550
  * Kamstrup OMNIPOWER with HAN-NVE
