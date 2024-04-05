@@ -65,4 +65,5 @@ async def test_iskraam550_parse_and_provide_unencrypted_data(mocker: MockerFixtu
     assert any(data.type == MeterDataPointTypes.REACTIVE_ENERGY_Q4.value for data in values)
     assert any(data.type == MeterDataPointTypes.POWER_FACTOR.value for data in values)
     assert all(data.source == "ISK1030775213859" for data in values)
-    assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "08/15/20 06:19:45" for data in values)
+    # message time comes with timezone info (+02:00)
+    assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "08/15/20 04:19:45" for data in values)
