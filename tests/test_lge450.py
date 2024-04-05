@@ -65,7 +65,7 @@ async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture,
     assert any(data.type == MeterDataPointTypes.REACTIVE_ENERGY_Q4.value for data in values)
     assert any(data.type == MeterDataPointTypes.POWER_FACTOR.value for data in values)
     assert all(data.source == "LGZ1030655933512" for data in values)
-    assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18" for data in values)
+    assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18" for data in values)
 
 
 @pytest.mark.asyncio

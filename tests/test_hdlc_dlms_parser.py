@@ -62,7 +62,8 @@ class TestDlmsParserUnencrypted:
         assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in meter_data)
         assert all(isinstance(data.value, float) for data in meter_data)
         assert all(data.source == "LGZ1030655933512" for data in meter_data)
-        assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18" for data in meter_data)
+        assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S")
+                   == "07/06/21 14:58:18" for data in meter_data)
 
     def test_parse_dlms_to_meter_data2(self, unencrypted_valid_data_lg2: List[bytes], cosem_config_lg: Cosem):
         parser = prepare_parser(unencrypted_valid_data_lg2, cosem_config_lg)
