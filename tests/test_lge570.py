@@ -17,7 +17,6 @@ from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
 from .utils import *
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_lge570_parse_and_provide_encrypted_data(mocker: MockerFixture,
                                                        encrypted_valid_data_lge570: List[bytes]):

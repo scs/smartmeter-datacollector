@@ -86,8 +86,10 @@ class HdlcDlmsParser:
     def extract_message_time(self) -> Optional[datetime]:
         if not isinstance(self._dlms_data.time, GXDateTime):
             return None
-        if isinstance(self._dlms_data.time.value, datetime):
-            return self._dlms_data.time.value
+        dt = self._dlms_data.time.value
+        if isinstance(dt, datetime):
+            # assume local time if tzinfo is None
+            return dt.astimezone(dt.tzinfo)
         return None
 
     def parse_to_dlms_objects(self) -> List[GXDLMSObject]:
@@ -133,9 +135,8 @@ class HdlcDlmsParser:
             self._use_system_time = True
             timestamp = datetime.now(timezone.utc)
 
-        if not timestamp.tzinfo:
-            # if timezone info not set, assume UTC
-            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        # convert to UTC format
+        timestamp = timestamp.astimezone(timezone.utc)
 
         # Extract register data
         data_points: List[MeterDataPoint] = []
