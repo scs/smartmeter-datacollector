@@ -146,7 +146,8 @@ class Cosem:
         if clock_obj and isinstance(clock_obj, GXDLMSClock):
             timestamp = self._extract_datetime(clock_obj)
             if timestamp:
-                return timestamp
+                # assume local time if tzinfo is None
+                return timestamp.astimezone(timestamp.tzinfo)
         return None
 
     def get_register(self, obis: OBISCode) -> Optional[RegisterCosem]:
