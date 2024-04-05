@@ -1,3 +1,10 @@
+smartmeter-datacollector (1.2.1-1) unstable; urgency=low
+
+  * fix: assume local time when time is extracted from DLMS message without tz info
+
+ -- Supercomputing Systems AG <info@scs.ch>  Fri, 05 Apr 2024 17:58:43 +0200
+
+
 smartmeter-datacollector (1.2.0-1) unstable; urgency=low
 
   * add L+G E570 smart meter
