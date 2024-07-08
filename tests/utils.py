@@ -96,3 +96,13 @@ def encrypted_data_no_pushlist_lg() -> List[bytes]:
         "7E A0 30 CE FF 03 13 86 F8 E0 C0 00 03 00 00 1F 1F FE C7 27 11 0F 74 B7 EF F4 1B 48 F7 47 B6 B6 A2 39 5B 42 BD 61 EA 18 7E D9 A0 99 8B 81 45 44 78 7E")
     data = list(map(lambda frag: bytes.fromhex(frag.replace(" ", "")), data_str))
     return data
+
+
+@pytest.fixture
+def unencrypted_extended_register_data() -> List[bytes]:
+    data_str: List[str] = []
+    data_str.append("7E A0 84 CE FF 03 13 12 8B E6 E7 00 E0 40 00 01 00 00 70 0F 00 04 15 7A 0C 07 E8 06 0B 02 10 00 00 FF 80 00 00 02 0A 01 0A 02 04 12 00 28 09 06 00 0B 19 09 00 FF 0F 02 12 00 00 02 04 12 00 28 09 06 00 0B 19 09 00 FF 0F 01 12 00 00 02 04 12 00 01 09 06 00 01 60 01 00 FF 0F 02 12 00 00 02 04 12 00 01 09 06 00 02 60 01 00 FF 0F 02 12 00 00 02 04 12 00 01 09 06 00 03 60 01 00 FF 0F 02 12 00 00 EB F5 7E")
+    data_str.append("7E A0 86 CE FF 03 13 9A 9D E0 40 00 02 00 00 75 02 04 12 00 01 09 06 00 04 60 01 00 FF 0F 02 12 00 00 02 04 12 00 04 09 06 00 01 18 02 01 FF 0F 02 12 00 00 02 04 12 00 04 09 06 00 02 18 02 01 FF 0F 02 12 00 00 02 04 12 00 04 09 06 00 03 18 02 01 FF 0F 02 12 00 00 02 04 12 00 04 09 06 00 04 18 02 01 FF 0F 02 12 00 00 09 06 00 0B 19 09 00 FF 09 08 32 34 35 32 31 36 36 32 09 01 00 09 01 00 09 01 00 C4 FD 7E")
+    data_str.append("7E A0 25 CE FF 03 13 92 6A E0 C0 00 03 00 00 14 05 00 00 77 51 05 00 00 00 00 05 00 00 00 00 05 00 00 00 00 87 59 7E")
+    data = list(map(lambda frag: bytes.fromhex(frag.replace(" ", "")), data_str))
+    return data
