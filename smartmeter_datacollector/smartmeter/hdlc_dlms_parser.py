@@ -116,7 +116,11 @@ class HdlcDlmsParser:
         obis_obj_pairs = {}
         for obj in dlms_objects:
             try:
-                obis_obj_pairs[OBISCode.from_string(str(obj.logicalName))] = obj
+                obis = OBISCode.from_string(str(obj.logicalName))
+                if obis in obis_obj_pairs:
+                    LOGGER.debug("DLMS object with similar OBIS code '%s' skipped.", obis)
+                else:
+                    obis_obj_pairs[obis] = obj
             except ValueError as ex:
                 LOGGER.warning("Skipping unparsable DLMS object. (Reason: %s)", ex)
 
