@@ -7,12 +7,12 @@
 #
 import logging
 from datetime import datetime, timezone
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 from gurux_dlms import GXByteBuffer, GXDateTime, GXDLMSClient, GXReplyData
 from gurux_dlms.enums import InterfaceType, ObjectType, Security
-from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GXDLMSObject, GXDLMSPushSetup,
-                                GXDLMSRegister)
+from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GXDLMSExtendedRegister, GXDLMSObject,
+                                GXDLMSPushSetup, GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from .cosem import Cosem
@@ -144,9 +144,10 @@ class HdlcDlmsParser:
 
         # Extract register data
         data_points: List[MeterDataPoint] = []
-        for obis, obj in filter(lambda o: o[1].getObjectType() == ObjectType.REGISTER, obis_obj_pairs.items()):
+        for obis, obj in filter(lambda o: o[1].getObjectType() in (ObjectType.REGISTER, ObjectType.EXTENDED_REGISTER),
+                                obis_obj_pairs.items()):
             reg_type = self._cosem.get_register(obis)
-            if reg_type and isinstance(obj, GXDLMSRegister):
+            if reg_type and (isinstance(obj, GXDLMSRegister) or isinstance(obj, GXDLMSExtendedRegister)):
                 raw_value = self._extract_register_value(obj)
                 if raw_value is None:
                     LOGGER.warning("No value received for %s.", obis)
@@ -201,7 +202,7 @@ class HdlcDlmsParser:
         return data_object.getValues()[1]
 
     @staticmethod
-    def _extract_register_value(register: GXDLMSRegister) -> Optional[Any]:
+    def _extract_register_value(register: Union[GXDLMSRegister, GXDLMSExtendedRegister]) -> Optional[Any]:
         return register.getValues()[1]
 
     @staticmethod
