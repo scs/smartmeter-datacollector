@@ -27,6 +27,8 @@ The following smart meters are supported (see [Wiki/Home](https://github.com/scs
   Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR).
 * Kamstrup OMNIPOWER with HAN-NVE: \
   Data pushed by smart meter over inserted [HAN-NVE module](https://www.kamstrup.com/en-en/electricity-solutions/meters-devices/modules/hannve) (wired M-Bus, HDLC, DLMS/COSEM).
+* Siemens TD-351x: \
+  Data fetched over bidirectional IR interface (IEC 62056-21, Mode C, unencrypted).
 
 Note: All smart meters integrated so far push binary data encoded with HDLC (IEC 62056-46) and DLMS/COSEM. Both unencrypted and encrypted DLMS messages are accepted by the software.
 
