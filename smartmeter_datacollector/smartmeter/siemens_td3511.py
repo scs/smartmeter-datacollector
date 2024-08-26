@@ -8,7 +8,6 @@
 import asyncio
 import logging
 import re
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Callable, List, Optional
@@ -85,7 +84,7 @@ class SiemensSerialReader(Reader):
             )
         except aioserial.SerialException as ex:
             raise ReaderError(ex) from ex
-        self._serialSettings = self._serial.get_settings()
+        self._serial_settings = self._serial.get_settings()
         self.meter_id = None
 
     async def start_and_listen(self) -> None:
@@ -103,16 +102,17 @@ class SiemensSerialReader(Reader):
 
     async def _enter_prg_mode(self):
         LOGGER.info("Try to set meter into programming mode.")
-        self._serialSettings['baudrate'] = SiemensSerialReader.BAUDRATE_INIT
-        self._serial.apply_settings(self._serialSettings)
+        self._serial_settings['baudrate'] = SiemensSerialReader.BAUDRATE_INIT
+        self._serial.apply_settings(self._serial_settings)
+        await asyncio.sleep(5.0)
         await self._serial.write_async(b"/?!\r\n")
         self.meter_id = await self._serial.readline_async(size=-1)
         LOGGER.debug("Meter response to init sequence: %s", self.meter_id.decode())
         await asyncio.sleep(0.2)
         await self._serial.write_async(bytes.fromhex("063036310D0A"))
         await asyncio.sleep(0.2)
-        self._serialSettings['baudrate'] = SiemensSerialReader.BAUDRATE_DATA
-        self._serial.apply_settings(self._serialSettings)
+        self._serial_settings['baudrate'] = SiemensSerialReader.BAUDRATE_DATA
+        self._serial.apply_settings(self._serial_settings)
         return
 
     async def _get_f001_dataset(self):
@@ -199,11 +199,9 @@ class SiemensParser():
 
     def append_to_buffer(self, received_data):
         self._buffer.append(received_data.decode())
-        return
 
     def clear_buffer(self):
         self._buffer = []
-        return
 
     def parse_data_objects(self, timestamp: datetime):
         # Extract timestamp and meter id
@@ -212,7 +210,7 @@ class SiemensParser():
             result = re.search(SiemensParser.REGEX, data)
             if result is None:
                 continue
-            obis, value, unit = result.groups()
+            obis, value, _ = result.groups()
 
             # Extract meter id (common source id for all data points)
             if obis == "0.0.0":
@@ -223,7 +221,7 @@ class SiemensParser():
                     self._meter_time = datetime.strptime(value, "%H:%M:%S").time()
                 if obis == "0.9.2":
                     self._meter_date = datetime.strptime(value, "%y-%m-%d").date()
-            except BaseException:
+            except ValueError:
                 self._meter_time = None
                 self._meter_date = None
                 LOGGER.warning("Invalid timestamp received: %s. Using system time instead.", value)
@@ -236,7 +234,7 @@ class SiemensParser():
             result = re.search(SiemensParser.REGEX, data)
             if result is None:
                 continue
-            obis, value, unit = result.groups()
+            obis, value, _ = result.groups()
 
             if value is None:
                 LOGGER.warning("No value received for %s.", obis)

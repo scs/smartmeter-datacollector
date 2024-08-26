@@ -19,8 +19,8 @@ from .smartmeter.kamstrup_han import KamstrupHAN
 from .smartmeter.lge360 import LGE360
 from .smartmeter.lge450 import LGE450
 from .smartmeter.lge570 import LGE570
-from .smartmeter.siemens_td3511 import SiemensTD3511
 from .smartmeter.meter import Meter, MeterError
+from .smartmeter.siemens_td3511 import SiemensTD3511
 
 
 def build_meters(config: ConfigParser) -> List[Meter]:
