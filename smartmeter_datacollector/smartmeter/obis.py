@@ -30,13 +30,6 @@ class OBISCode:
     def to_gurux_str(self) -> str:
         return f"{self.a}.{self.b}.{self.c}.{self.d}.{self.e}.{self.f}"
 
-    def is_same_type(self, other: 'OBISCode') -> bool:
-        """Compares only A, C, D, E parts of an OBIS code."""
-        return (self.a == other.a and
-                self.b == other.b and
-                self.c == other.c and
-                self.d == other.d)
-
     @classmethod
     def from_string(cls, obis_string: str) -> 'OBISCode':
         match = cls.PATTERN.match(obis_string)

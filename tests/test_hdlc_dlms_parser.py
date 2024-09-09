@@ -81,6 +81,19 @@ class TestDlmsParserUnencrypted:
         assert isinstance(meter_data, list)
         assert len(meter_data) == 5
 
+    def test_parse_dlms_data_with_extended_registers(self, unencrypted_extended_register_data: List[bytes]):
+        cosem = Cosem("fallbackId", register_obis_extended=[RegisterCosem(
+            # this is not the correct MeterDataPointType for this OBIS code (just for testing)
+            OBISCode(0, 1, 24, 2, 1, 255), MeterDataPointTypes.ACTIVE_POWER_N.value)])
+
+        parser = prepare_parser(unencrypted_extended_register_data, cosem)
+        dlms_objects = parser.parse_to_dlms_objects()
+        meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
+
+        assert isinstance(meter_data, list)
+        assert len(meter_data) == 1
+        assert meter_data[0].value == 30545
+
 
 class TestDlmsParserEncrypted:
     def test_hdlc_to_dlms_objects_without_pushlist(self, encrypted_data_no_pushlist_lg: List[bytes], cosem_config_lg: Cosem):
