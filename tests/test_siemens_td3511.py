@@ -36,7 +36,7 @@ async def test_siemens_td3511_initialization(mocker: MockerFixture):
 
 @pytest.fixture
 def unencrypted_valid_data_siemens() -> List[bytes]:
-    data_str: List[str] = []
+    data_str: List[bytes] = []
     data_str.append(b'0.0.0(110002267)\r\n')
     data_str.append(b'1.8.0(31550.191*kWh)\r\n')
     data_str.append(b'1.8.1(12853.433*kWh)\r\n')
@@ -99,12 +99,12 @@ async def test_siemens_td3511_parse_and_provide_unencrypted_data(mocker: MockerF
     assert any(data.type == MeterDataPointTypes.ACTIVE_ENERGY_P.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_ENERGY_N.value for data in values)
     assert all(data.source == "110002267" for data in values)
-    assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "03/21/24 20:10:29" for data in values)
+    assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "03/21/24 21:10:29" for data in values)
 
 
 @pytest.fixture
 def unencrypted_invalid_data_siemens() -> List[bytes]:
-    data_str: List[str] = []
+    data_str: List[bytes] = []
     data_str.append(b'0.0.0(110002267)\r\n')
     data_str.append(b'13.8.0(31550.191*kWh)\r\n')
     data_str.append(b'13.8.1(12853.433*kWh)\r\n')
