@@ -57,7 +57,7 @@ class SiemensTD3511(Meter):
             self._parser.append_to_buffer(received_data)
             return
 
-        data_points = self._parser.parse_data_objects(self._serial.timestamp)
+        data_points = self._parser.parse_data_objects()
         if not data_points:
             return
         self._notify_observers(data_points)
@@ -76,7 +76,6 @@ class SiemensSerialReader(Reader):
         super().__init__(callback)
         self._termination = serial_config.termination
         self._baudrate = serial_config.baudrate
-        self.timestamp = None
         try:
             self._serial = aioserial.AioSerial(
                 port=serial_config.port,
@@ -115,7 +114,6 @@ class SiemensSerialReader(Reader):
 
     async def _get_f001_dataset(self):
         # Read dataset F001
-        self.timestamp = datetime.now(timezone.utc)
         await self._serial.write_async(bytes.fromhex(SiemensSerialReader.METER_F001_REQ))
         data: bytes = await self._serial.readline_async(size=-1)
         self._callback(data)
@@ -131,7 +129,6 @@ class SiemensSerialReader(Reader):
 
     async def _get_f009_dataset(self):
         # Read dataset F009
-        self.timestamp = datetime.now(timezone.utc)
         await self._serial.write_async(bytes.fromhex(SiemensSerialReader.METER_F009_REQ))
         data: bytes = await self._serial.readline_async(size=-1)
         self._callback(data)
@@ -188,8 +185,6 @@ class SiemensParser():
 
     def __init__(self, use_system_time: bool = False) -> None:
         self._use_system_time = use_system_time
-        self._timestamp = None
-        self._meter_id = None
         self._buffer = []
         self._register_obis = {r.obis: r for r in DEFAULT_REGISTER_MAPPING}
 
@@ -199,11 +194,12 @@ class SiemensParser():
     def clear_buffer(self):
         self._buffer = []
 
-    def parse_data_objects(self, timestamp: datetime):
+    def parse_data_objects(self):
         # Extract timestamp and meter id
-        self._timestamp = timestamp
+        timestamp = datetime.now(timezone.utc)
         meter_time = None
         meter_date = None
+        meter_id = 'unknown'
         for data in self._buffer:
             result = re.search(SiemensParser.REGEX, data)
             if result is None:
@@ -212,7 +208,7 @@ class SiemensParser():
 
             # Extract meter id (common source id for all data points)
             if obis == "0.0.0":
-                self._meter_id = value
+                meter_id = value
             # Extract date and time
             try:
                 if obis == "0.9.1":
@@ -224,7 +220,7 @@ class SiemensParser():
                 meter_date = None
                 LOGGER.warning("Invalid timestamp received: %s. Using system time instead.", value)
             if meter_date is not None and meter_time is not None and not self._use_system_time:
-                self._timestamp = datetime.combine(meter_date, meter_time).astimezone(timezone.utc)
+                timestamp = datetime.combine(meter_date, meter_time).astimezone(timezone.utc)
 
         # Extract register data
         data_points: List[MeterDataPoint] = []
@@ -249,7 +245,7 @@ class SiemensParser():
                 LOGGER.warning("Invalid register value '%s'. Skipping register.", str(value))
                 continue
 
-            data_points.append(MeterDataPoint(data_point_type, scaled_value, self._meter_id, self._timestamp))
+            data_points.append(MeterDataPoint(data_point_type, scaled_value, meter_id, timestamp))
 
         self.clear_buffer()
         return data_points

@@ -125,7 +125,6 @@ async def test_siemens_td3511_do_not_provide_invalid_data(mocker: MockerFixture,
     serial_mock.TERMINATION_FLAG = b'!\r\n'
     serial_mock.timestamp=datetime.now()
     meter = SiemensTD3511("/test/port")
-    meter.timestamp=datetime.now()
     meter.register(observer)
 
     def data_received():
