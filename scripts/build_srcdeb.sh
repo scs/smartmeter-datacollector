@@ -9,6 +9,7 @@ if [[ "$#" -eq 1 ]]; then
 fi
 
 PACKAGE_NAME=smartmeter-datacollector
+PACKAGE_VERSION=$(poetry version -s)
 
 CWD=$PWD
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -27,37 +28,41 @@ echo "..done"
 
 # build the Python source distribution package
 echo -n "Building Python source distribution package.."
-pipenv run build
+poetry build --format=sdist --output=${DIST_DIR}
 echo "..done"
 
 # prepare the output directory
-mkdir -p ${OUTPUT_DIR}
+mkdir -p ${OUTPUT_DIR}/${PACKAGE_NAME}
 
 # get and extract the Python source distribution package
 echo -n "Extracting the Python source distribution package.."
-cp ${DIST_DIR}/${PACKAGE_NAME}-*.tar.gz ${OUTPUT_DIR}
-tar -xf ${OUTPUT_DIR}/${PACKAGE_NAME}-*.tar.gz -C ${OUTPUT_DIR}
+cp ${DIST_DIR}/*.tar.gz ${OUTPUT_DIR}/${PACKAGE_NAME}.tar.gz
+tar -xf ${OUTPUT_DIR}/${PACKAGE_NAME}.tar.gz -C ${OUTPUT_DIR}/${PACKAGE_NAME} --strip-components=1
 echo "..done"
 
-PACKAGE_DIR=$(find ${OUTPUT_DIR} -type d -name "${PACKAGE_NAME}-*")
+PACKAGE_DIR=${OUTPUT_DIR}/${PACKAGE_NAME}
 
-# go into the output directory
-cd ${OUTPUT_DIR}
+# go into the package directory
+cd ${PACKAGE_DIR}
 
-# rename <package name>-<version>.tar.gz to <package name>_<version>.orig.tar.gz
-echo -n "Preparing the Debian source package.."
-PACKAGE_FILENAME_FULL=$(find . -type f -name "${PACKAGE_NAME}-*.tar.gz")
-PACKAGE_FILENAME="${PACKAGE_FILENAME_FULL%.tar.gz}"
-PACKAGE_FILENAME=$(echo ${PACKAGE_FILENAME} | sed "s/${PACKAGE_NAME}-\(.*\)$/${PACKAGE_NAME}_\1/")
-mv ${PACKAGE_FILENAME_FULL} ${PACKAGE_FILENAME}.orig.tar.gz
+echo "Preparing the Debian source package.."
+echo "creating debian/ files"
+# create the debian directory
+DEBFULLNAME="Supercomputing Systems AG" \
+DEBEMAIL=info@scs.ch \
+dh_make -y --python --createorig --templates ${WORK_DIR}/debian-tmpl --packagename "smartmeter-datacollector_${PACKAGE_VERSION}"
 
-# copy the prepared "debian" directory
-cp -R ${WORK_DIR}/debian ${PACKAGE_DIR}/
+# # create Python requirements.txt which is read in postinst script
+# echo "Adding Python dependencies file 'requirements.txt' to debian/ dir"
+# poetry export -f requirements.txt > debian/requirements.txt
+
+# copy the systemd unit file to the generated debian directory
+echo "copying systemd service file to debian/ dir"
+cp ${WORK_DIR}/${PACKAGE_NAME}.service debian/python3-${PACKAGE_NAME}.service
 echo "..done"
 
 # build the Debian source package
 echo -n "Building the Debian package (${BUILD_TYPE}).."
-cd ${PACKAGE_DIR}/
 dpkg-buildpackage --build=${BUILD_TYPE} -rfakeroot -sa -us -uc
 echo "..done"
 
