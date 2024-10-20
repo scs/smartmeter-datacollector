@@ -24,6 +24,9 @@ classifiers = [
 "Pull Requests" = "https://github.com/scs/smartmeter-datacollector/pulls"
 "SCS" = "https://www.scs.ch"
 
+[tool.poetry.scripts]
+smartmeter-datacollector = 'smartmeter_datacollector.app:main'
+
 [tool.poetry.dependencies]
 python = "^3.8"
 aioserial = "~=1.3.1"
