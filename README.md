@@ -89,7 +89,7 @@ For a very easy first time usage of `smartmeter-datacollector` we provide a [Ras
 * `smartmeter-datacollector` as a systemd service
 * `smartmeter-datacollector-configurator` webinterface
 * demo
-  * [mosquiotto](https://mosquitto.org/) as a local MQTT broker to publish the measurements from `smartmeter-datacollector`
+  * [mosquitto](https://mosquitto.org/) as a local MQTT broker to publish the measurements from `smartmeter-datacollector`
   * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) to collect measurements published by `smartmeter-datacollector` over MQTT and store them in InfluxDB
   * [InfluxDB](https://www.influxdata.com/) to store the measurements
   * [Grafana](https://grafana.com/) to visualize the measurements
