@@ -22,7 +22,7 @@ echo "..done"
 # build self-contained Python zip app with shiv
 echo "Building self-contained Python zip package with shiv.."
 SHIV_PACKAGE="${PY_DIST_DIR}/${PACKAGE_NAME}_${PACKAGE_VERSION}.pyz"
-shiv -c smartmeter-datacollector -o "${SHIV_PACKAGE}" "${PY_DIST_DIR}/smartmeter_datacollector-${PACKAGE_VERSION}-"*.whl
+poetry run -- shiv -c smartmeter-datacollector -o "${SHIV_PACKAGE}" "${PY_DIST_DIR}/smartmeter_datacollector-${PACKAGE_VERSION}-"*.whl
 echo "..done"
 
 echo "SUCCESS: Shiv package has been successfully built at '${PY_DIST_DIR}/'"

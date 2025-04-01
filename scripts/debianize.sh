@@ -16,7 +16,7 @@ echo "Creating debian/ files for \"$PKGNAME\" version \"$PKGVERSION\""
 
 # (re)create the debian directory
 DEBFULLNAME="Supercomputing Systems AG" \
-DEBEMAIL=info@scs.ch \
+DEBEMAIL="info@scs.ch" \
 dh_make -y --single --createorig --templates "${WORK_DIR}/debian-tmpl" --copyright gpl2 --packagename "${PKGNAME}_${PKGVERSION}"
 
 echo "Remove all unnecessary example files"
