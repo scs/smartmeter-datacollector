@@ -3,25 +3,23 @@
 # exit on any error
 set -e
 
-echo "Delete previous debian dir & files"
-rm -rf debian
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+WORK_DIR=${SCRIPT_DIR}/..
 
+echo "Delete previous debian files"
+rm -rf "${WORK_DIR}/debian"
+
+PKGNAME=smartmeter-datacollector
 PKGVERSION=$(poetry version -s)
 
-echo "Creating debian/ files for smartmeter-datacollector version \"$PKGVERSION\""
+echo "Creating debian/ files for \"$PKGNAME\" version \"$PKGVERSION\""
 
 # (re)create the debian directory
 DEBFULLNAME="Supercomputing Systems AG" \
 DEBEMAIL=info@scs.ch \
-dh_make -y --python --createorig --templates ../debian-tmpl --packagename "smartmeter-datacollector_${PKGVERSION}"
+dh_make -y --single --createorig --templates "${WORK_DIR}/debian-tmpl" --copyright gpl2 --packagename "${PKGNAME}_${PKGVERSION}"
 
-# create Python requirements.txt which is read in postinst script
-echo "Adding Python dependencies file 'requirements.txt' to debian/ dir"
-poetry export -f requirements.txt > debian/requirements.txt
+echo "Remove all unnecessary example files"
+rm "${WORK_DIR}"/debian/{*.ex,README.*,*.docs}
 
-# copy the systemd unit file to the generated debian directory
-echo "Copying systemd service file to debian/ dir"
-SYSTEMD_UNIT_FILE=$(find . -maxdepth 1 -type f -name '*.service' | cut -c 3-)
-cp ${SYSTEMD_UNIT_FILE} debian/python3-${SYSTEMD_UNIT_FILE}
-
-echo "SUCCESS: Project has been debianized at debian/"
+echo "SUCCESS: Project has been debianized at '${WORK_DIR}/debian/'"

@@ -3,69 +3,56 @@
 # exit on any error
 set -e
 
-BUILD_TYPE=source
-if [[ "$#" -eq 1 ]]; then
-    BUILD_TYPE=$1
-fi
-
 PACKAGE_NAME=smartmeter-datacollector
 PACKAGE_VERSION=$(poetry version -s)
 
 CWD=$PWD
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-WORK_DIR=${SCRIPT_DIR}/..
+WORK_DIR="${SCRIPT_DIR}/.."
 
-OUTPUT_DIR=${WORK_DIR}/deb_dist
-DIST_DIR=${WORK_DIR}/dist
+PY_DIST_DIR="${WORK_DIR}/dist"
 
-# Delete previously built Debian distribution
+OUTPUT_DIR="${WORK_DIR}/deb_dist"
+PACKAGE_DIR="${OUTPUT_DIR}/${PACKAGE_NAME}"
+
+# delete previously built artifacts
 echo -n "Cleaning up from previous builds.."
-rm -rf ${OUTPUT_DIR} ${DIST_DIR}
-
-# remove the source Debian package from the root folder
-rm -f ${WORK_DIR}/${PACKAGE_NAME}-*.tar.gz
+rm -rf "${OUTPUT_DIR}"
 echo "..done"
 
-# build the Python source distribution package
-echo -n "Building Python source distribution package.."
-poetry build --format=sdist --output=${DIST_DIR}
-echo "..done"
+# build the Python shiv package
+( bash "${SCRIPT_DIR}/build_shiv.sh" ) || { echo "Failed to build shiv bundle. Exiting.."; exit 1; }
 
 # prepare the output directory
-mkdir -p ${OUTPUT_DIR}/${PACKAGE_NAME}
+
+mkdir -p "${PACKAGE_DIR}"
 
 # get and extract the Python source distribution package
 echo -n "Extracting the Python source distribution package.."
-cp ${DIST_DIR}/*.tar.gz ${OUTPUT_DIR}/${PACKAGE_NAME}.tar.gz
-tar -xf ${OUTPUT_DIR}/${PACKAGE_NAME}.tar.gz -C ${OUTPUT_DIR}/${PACKAGE_NAME} --strip-components=1
+cp "${PY_DIST_DIR}"/*.tar.gz "${OUTPUT_DIR}/${PACKAGE_NAME}".tar.gz
+tar -xf "${OUTPUT_DIR}/${PACKAGE_NAME}".tar.gz -C "${PACKAGE_DIR}" --strip-components=1
 echo "..done"
 
-PACKAGE_DIR=${OUTPUT_DIR}/${PACKAGE_NAME}
+cd "${PACKAGE_DIR}"
 
-# go into the package directory
-cd ${PACKAGE_DIR}
+# copy the systemd unit file to the generated debian directory
+echo "Copying & rename systemd service file to package dir"
+cp ${WORK_DIR}/${PACKAGE_NAME}.service ./python3-${PACKAGE_NAME}.service
+echo "..done"
 
 echo "Preparing the Debian source package.."
 echo "creating debian/ files"
-# create the debian directory
+# create the debian directory from templates
 DEBFULLNAME="Supercomputing Systems AG" \
 DEBEMAIL=info@scs.ch \
-dh_make -y --python --createorig --templates ${WORK_DIR}/debian-tmpl --packagename "smartmeter-datacollector_${PACKAGE_VERSION}"
-
-# # create Python requirements.txt which is read in postinst script
-# echo "Adding Python dependencies file 'requirements.txt' to debian/ dir"
-# poetry export -f requirements.txt > debian/requirements.txt
-
-# copy the systemd unit file to the generated debian directory
-echo "copying systemd service file to debian/ dir"
-cp ${WORK_DIR}/${PACKAGE_NAME}.service debian/python3-${PACKAGE_NAME}.service
-echo "..done"
+dh_make -y --single --createorig --templates "${WORK_DIR}/debian-tmpl" --copyright gpl2 --packagename "${PACKAGE_NAME}_${PACKAGE_VERSION}"
+echo "remove all unnecessary example files"
+rm "${PACKAGE_DIR}"/debian/{*.ex,README.*,*.docs}
 
 # build the Debian source package
-echo -n "Building the Debian package (${BUILD_TYPE}).."
-dpkg-buildpackage --build=${BUILD_TYPE} -rfakeroot -sa -us -uc
+echo -n "Building the Debian source package.."
+dpkg-buildpackage --build=full -rfakeroot -sa -us -uc
 echo "..done"
 
 cd ${CWD}
-
-echo "SUCCESS: Debian package (${BUILD_TYPE}) has been successfully built at ${OUTPUT_DIR}/"
+echo "SUCCESS: Debian source package has been successfully built at '${OUTPUT_DIR}'/"

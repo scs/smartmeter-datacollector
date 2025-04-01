@@ -2,14 +2,13 @@ Source: #PACKAGE#
 Section: python
 Priority: optional
 Maintainer: #USERNAME# <#EMAIL#>
-Build-Depends: #BUILD_DEPS#, pybuild-plugin-pyproject
+Build-Depends: #BUILD_DEPS#
 Standards-Version: #POLICY#
 Homepage: https://github.com/scs/smartmeter-datacollector
 Rules-Requires-Root: no
 
 Package: python3-#PACKAGE#
 Architecture: all
-Pre-Depends: python3-pip
 Depends: ${python3:Depends}, ${misc:Depends}
 Description: Smart Meter Data Collector
  .

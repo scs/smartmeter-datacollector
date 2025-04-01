@@ -25,7 +25,7 @@ classifiers = [
 "SCS" = "https://www.scs.ch"
 
 [tool.poetry.scripts]
-smartmeter-datacollector = 'smartmeter_datacollector.app:main'
+smartmeter-datacollector = 'smartmeter_datacollector.__main__:main'
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -43,6 +43,7 @@ pylint = "*"
 pytest = "*"
 pytest-asyncio = "*"
 pytest-mock = "*"
+shiv = "^1.0.8"
 
 [build-system]
 requires = ["poetry-core"]
