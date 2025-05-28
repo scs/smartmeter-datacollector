@@ -29,36 +29,31 @@ jobs:
 
     name: Build a Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Update apt cache
         run: |
           sudo apt-get update
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
-          cache: "pipenv"
-      - name: Install pipenv
+          cache: "poetry"
+      - name: Install Poetry
         run: |
-          python -m pip install --upgrade pip pipenv
-          python --version; python -m pip --version; pipenv --version
-      - name: Setup project with pipenv
-        run: |
-          pipenv --python 3.9 install --dev
+          python -m pip install poetry==1.8.3
+          python --version; python -m pip --version; poetry --version
+      - name: Setup project with Poetry
+        run: poetry install --no-interaction
       - name: Prepare to build a Debian source package
         run: |
-          sudo apt-get -y install python3-all debhelper dh-python rename
-
-      - name: Build a Debian source package
-        run: |
-          pipenv run build_srcdeb
+          sudo apt-get -y install python3-all debhelper rename
 
       - name: Cache pbuilder chroot
         id: cache-pbuilder-chroot
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-base.tgz
-          key: ${{ runner.os }}-pbuilder-${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-${{ hashFiles('**/Pipfile.lock') }}
+          key: ${{ runner.os }}-pbuilder-${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Prepare the pbuilder chroot for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
         if: steps.cache-pbuilder-${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-chroot.outputs.cache-hit != 'true'
@@ -67,23 +62,22 @@ jobs:
           ${{ matrix.keyring_cmd }}
           sudo cp scripts/.pbuilderrc /root/
           sudo mkdir -p /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/aptcache/
-          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder --create
+          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder create
 
       - name: Build the Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }} using pbuilder
         run: |
-          cd deb_dist
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder update
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder build *.dsc
           sudo rename "s/_all\./_${{ matrix.arch }}\./" /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
 
       - name: Archive the built Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-deb
           path: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
 
       - name: Archive the additional Debian package files for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-packagefiles
           path: |
@@ -91,18 +85,18 @@ jobs:
             /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.tar.*
 
       - name: Get the tag name
-        id: tag-name
+        id: tagName
         if: startsWith(github.ref, 'refs/tags')
-        uses: olegtarasov/get-tag@v2.1.2
+        uses: olegtarasov/get-tag@v2.1
 
       - name: Create a new release
         if: startsWith(github.ref, 'refs/tags')
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.16
         with:
           allowUpdates: true
           artifacts: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
           draft: true
-          name: Smart Meter Data Collector ${{ steps.tag-name.outputs.tag }}
+          name: Smart Meter Data Collector ${{ steps.tagName.outputs.tag }}
           omitBody: true
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true

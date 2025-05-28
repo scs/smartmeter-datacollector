@@ -17,57 +17,57 @@ jobs:
 
     name: Build a Python package and upload it to PyPI / Test PyPI
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
-          cache: "pipenv"
-      - name: Install pipenv
+          cache: "poetry"
+      - name: Install Poetry
         run: |
-          python -m pip install --upgrade pip pipenv
-          python --version; python -m pip --version; pipenv --version
-      - name: Setup project with pipenv
-        run: |
-          pipenv --python 3.9 install --dev
+          python -m pip install poetry==1.8.3
+          python --version; python -m pip --version; poetry --version
+      - name: Setup project with Poetry
+        run: poetry install --no-interaction
 
       - name: Build a Python package
         run: |
-          pipenv run build
+          bash scripts/build_py.sh
 
       - name: Archive the built Python package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: smartmeter-datacollector-py
           path: dist/*
 
       - name: Publish the Python package to Test PyPI
         if: github.ref == 'refs/heads/master'
-        uses: pypa/gh-action-pypi-publish@v1.8.6
+        uses: pypa/gh-action-pypi-publish@v1.12
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
-          skip_existing: true
+          repository-url: https://test.pypi.org/legacy/
+          verify-metadata: true
+          skip-existing: true
 
       - name: Publish the Python package to PyPI
         if: startsWith(github.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@v1.8.6
+        uses: pypa/gh-action-pypi-publish@v1.12
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
       - name: Get the tag name
-        id: tag-name
+        id: tagName
         if: startsWith(github.ref, 'refs/tags')
-        uses: olegtarasov/get-tag@v2.1.2
+        uses: olegtarasov/get-tag@v2.1
 
       - name: Create a new release
         if: startsWith(github.ref, 'refs/tags')
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.16
         with:
           allowUpdates: true
           artifacts: dist/*.tar.gz,dist/*.whl
           draft: true
-          name: Smart Meter Data Collector ${{ steps.tag-name.outputs.tag }}
+          name: Smart Meter Data Collector ${{ steps.tagName.outputs.tag }}
           omitBody: true
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
