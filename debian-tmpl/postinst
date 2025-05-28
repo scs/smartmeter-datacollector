@@ -5,9 +5,6 @@
 
 set -e
 
-USERNAME=smartmeter
-GROUP=dialout
-
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
 #        * <old-postinst> `abort-upgrade' <new version>
@@ -20,12 +17,9 @@ GROUP=dialout
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-install_pip_deps()
-    echo -n "Installing dependencies using pip.."
-    # install all required dependencies
-    python3 -m pip install -r debian/requirements.txt
-    echo "..done"
-
+USERNAME=smartmeter
+GROUP=dialout
+DATADIR=/var/lib/smartmeter-datacollector
 
 case "$1" in
     configure)
@@ -57,11 +51,30 @@ case "$1" in
 
     # add the new user "smartmeter" to the dialout group
     if ! groups ${USERNAME} | cut -d: -f2 | grep -qw ${GROUP}; then
+        echo -n "Adding user ${USERNAME} to group ${GROUP}.."
         adduser ${USERNAME} ${GROUP} > /dev/null 2>&1
+        echo "..done"
     fi
 
-    # install Pyhton dependencies
-    install_pip_deps
+    # create symlink to /usr/bin/smartmeter-datacollector
+    if [ ! -L /usr/bin/smartmeter-datacollector ]; then
+        ln -s /usr/share/smartmeter-datacollector.pyz /usr/bin/smartmeter-datacollector
+    fi
+
+    # create directory for pyz-cache and config file
+    if [ ! -d "${DATADIR}" ]; then
+        echo -n "Creating directory ${DATADIR}.."
+        mkdir -p "${DATADIR}"
+        chown "${USERNAME}:${USERNAME}" "${DATADIR}"
+        chmod 775 "${DATADIR}"
+        echo "..done"
+    fi
+
+    # extract the .pyz file by running it
+    python3 /usr/bin/smartmeter-datacollector --help >/dev/null || {
+        echo "Failed to extract the .pyz file" >&2
+        exit 1
+    }
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

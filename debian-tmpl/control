@@ -9,7 +9,7 @@ Rules-Requires-Root: no
 
 Package: #PACKAGE#
 Architecture: all
-Depends: python3, ${misc:Depends}
+Depends: python3 (>= 3.8), ${misc:Depends}
 Description: Smart Meter Data Collector
  .
  The smartmeter-datacollector tool is a Python3 software which allows you to continuously retrieve data from supported smart meters.
