@@ -16,7 +16,7 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
 
-    name: Running Python code checks with Python ${{ matrix.python-version }}
+    name: Code checks with Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry

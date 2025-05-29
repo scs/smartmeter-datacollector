@@ -1,4 +1,4 @@
-name: Build a Debian package
+name: Build Debian package
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
             arch: armhf
             keyring_cmd: wget http://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb && sudo dpkg -i raspbian-archive-keyring_20120528.2_all.deb
 
-    name: Build a Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
+    name: Build Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v4
       - name: Update apt cache
@@ -87,11 +87,11 @@ jobs:
       - name: Get the tag name
         id: tagName
         if: startsWith(github.ref, 'refs/tags')
-        uses: olegtarasov/get-tag@v2.1
+        uses: olegtarasov/get-tag@v2.1.4
 
       - name: Create a new release
         if: startsWith(github.ref, 'refs/tags')
-        uses: ncipollo/release-action@v1.16
+        uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           artifacts: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
