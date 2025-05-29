@@ -33,15 +33,15 @@ jobs:
       - name: Update apt cache
         run: |
           sudo apt-get update
+      - name: Install Poetry
+        run: |
+          pipx install poetry~=1.8.3
+          python --version; python -m pip --version; poetry --version
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.9
           cache: "poetry"
-      - name: Install Poetry
-        run: |
-          python -m pip install poetry==1.8.3
-          python --version; python -m pip --version; poetry --version
       - name: Setup project with Poetry
         run: poetry install --no-interaction
       - name: Prepare to build a Debian source package

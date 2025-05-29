@@ -18,15 +18,15 @@ jobs:
     name: Build a Python package and upload it to PyPI / Test PyPI
     steps:
       - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: |
+          pipx install poetry~=1.8.3
+          python --version; python -m pip --version; poetry --version
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.9
           cache: "poetry"
-      - name: Install Poetry
-        run: |
-          python -m pip install poetry==1.8.3
-          python --version; python -m pip --version; poetry --version
       - name: Setup project with Poetry
         run: poetry install --no-interaction
 
