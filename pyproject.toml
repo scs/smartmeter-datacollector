@@ -50,9 +50,11 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
+build_py = "bash ./scripts/build_py.sh"
+build_shiv = "bash ./scripts/build_shiv.sh"
 build_deb = "bash ./scripts/build_deb.sh"
-build_srcdeb = "bash ./scripts/build_srcdeb.sh"
-clean = "rm -rf .eggs build dist deb_dist smartmeter_datacollector.egg-info"
+build_srcdeb = "bash ./scripts/build_deb.sh source"
+clean = "rm -rf build dist deb_dist .pytest_cache"
 debianize = "bash ./scripts/debianize.sh"
 format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
 format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
@@ -61,8 +63,6 @@ isort_check = "isort --check ."
 license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
 lint = "pylint smartmeter_datacollector/"
 lint_check = "pylint smartmeter_datacollector/ --exit-zero"
-setup = "pipenv-setup sync"
-setup_check = "pipenv-setup check"
 test = "pytest"
 
 [tool.autopep8]

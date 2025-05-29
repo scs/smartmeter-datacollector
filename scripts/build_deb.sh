@@ -3,6 +3,12 @@
 # exit on any error
 set -e
 
+# types are: full, source, binary, any, all
+BUILD_TYPE=all
+if [[ "$#" -eq 1 ]]; then
+    BUILD_TYPE=$1
+fi
+
 PACKAGE_NAME=smartmeter-datacollector
 PACKAGE_VERSION=$(poetry version -s)
 
@@ -55,8 +61,8 @@ cp ${WORK_DIR}/${PACKAGE_NAME}.service ./debian/${PACKAGE_NAME}.service
 echo "..done"
 
 # build the Debian package
-echo "Building the Debian package.."
-dpkg-buildpackage --build=all -rfakeroot -sa -us -uc
+echo "Building the Debian package ${BUILD_TYPE}.."
+dpkg-buildpackage --build=${BUILD_TYPE} -rfakeroot -sa -us -uc
 echo "..done"
 
 cd ${CWD}
