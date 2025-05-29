@@ -46,7 +46,7 @@ jobs:
         run: poetry install --no-interaction
       - name: Prepare to build a Debian source package
         run: |
-          sudo apt-get -y install python3-all debhelper rename
+          sudo apt-get -y install python3-all debhelper dh-make rename
 
       - name: Build a Debian source package
         run: |
@@ -70,6 +70,7 @@ jobs:
 
       - name: Build the Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }} using pbuilder
         run: |
+          cd deb_dist
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder update
           sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder build *.dsc
           sudo rename "s/_all\./_${{ matrix.arch }}\./" /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
