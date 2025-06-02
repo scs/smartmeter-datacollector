@@ -46,7 +46,7 @@ jobs:
         run: poetry install --no-interaction
       - name: Prepare to build a Debian source package
         run: |
-          sudo apt-get -y install python3-all debhelper dh-make rename
+          sudo apt-get -y install debhelper dh-make rename
 
       - name: Build a Debian source package
         run: |
