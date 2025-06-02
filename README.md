@@ -10,25 +10,25 @@
 
 ---
 
-The `smartmeter-datacollector` tool is a Python3 software which allows you to continuously retrieve data from supported smart meters (listed below).
-The acquired values can be forwarded to one or more data sinks like a MQTT broker or logger.
+The `smartmeter-datacollector` tool is a Python software which allows you to continuously retrieve data from supported smart meters (listed below).
+The acquired values can be forwarded to one or more data sinks like a MQTT broker.
 
-This tool is an open source software funded by **[EKZ (Elektrizitätswerke des Kantons Zürich)](https://www.ekz.ch)** and developed by **[Supercomputing Systems AG](https://www.scs.ch)**. The goal of this voluntary initiative is to create a tool that can read, decode and decrypt data (if necessary) from the local interface of various smart meters and convert it into human-readable and simple formats. This should eliminate the complexity of decoding DLMS and similar protocols for the user. The user has the data in a format, which he can easily use in various use-cases ranging from simple visualization (see [Method 1: Raspberry Pi image with demo](#method-1-raspberry-pi-image-with-demo)) to integration into energy management algorithms or into custom home automation software. 
+This tool is an open source software funded by **[EKZ (Elektrizitätswerke des Kantons Zürich)](https://www.ekz.ch)** and developed by **[Supercomputing Systems AG](https://www.scs.ch)**. The goal of this voluntary initiative is to create a tool that can read, decode and decrypt data (if necessary) from the local interface of various smart meters and convert it into human-readable and simple formats. This should eliminate the complexity of decoding DLMS and similar protocols for the user. The user has the data in a format, which he can easily use in various use-cases ranging from simple visualization (see [Method 1: Raspberry Pi image with demo](#method-1-raspberry-pi-image-with-demo)) to integration into energy management algorithms or into custom home automation software.
 
-The following smart meters are supported (see [Wiki/Home](https://github.com/scs/smartmeter-datacollector/wiki/Home) for detailed information).
+The following smart meters are supported (see [Wiki/Home](https://github.com/scs/smartmeter-datacollector/wiki/Home) for detailed information):
 
 * Landis+Gyr E450: \
-  Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM).
+  Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM)
 * Landis+Gyr E570: \
-  Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM).
+  Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM)
 * Landis+Gyr E360: \
-  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR).
+  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR)
 * Iskraemeco AM550: \
-  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR).
+  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR)
 * Kamstrup OMNIPOWER with HAN-NVE: \
-  Data pushed by smart meter over inserted [HAN-NVE module](https://www.kamstrup.com/en-en/electricity-solutions/meters-devices/modules/hannve) (wired M-Bus, HDLC, DLMS/COSEM).
+  Data pushed by smart meter over inserted [HAN-NVE module](https://www.kamstrup.com/en-en/electricity-solutions/meters-devices/modules/hannve) (wired M-Bus, HDLC, DLMS/COSEM)
 * Siemens TD-351x: \
-  Data fetched over bidirectional IR interface (IEC 62056-21, Mode C, unencrypted).
+  Data fetched over bidirectional IR interface (IEC 62056-21, Mode C, unencrypted)
 
 Note: All smart meters integrated so far push binary data encoded with HDLC (IEC 62056-46) and DLMS/COSEM. Both unencrypted and encrypted DLMS messages are accepted by the software.
 
@@ -45,7 +45,7 @@ The following data sinks are implemented:
     * Authenticated with client certificate
 * Logger to `stdout`
 
-`smartmeter-datacollector` is fully configurable through a `.ini` configuration file. The [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) webinterface can help to create and modify the configuration.
+`smartmeter-datacollector` is fully configurable through a `.ini` configuration file. The [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can help to create and modify the configuration.
 
 ---
 
@@ -87,8 +87,8 @@ There are different methods how to use `smartmeter-datacollector`.
 
 For a very easy first time usage of `smartmeter-datacollector` we provide a [Raspberry Pi image](https://github.com/scs/smartmeter-datacollector/releases) (based on Raspberry Pi OS) which contains the following parts:
 * `smartmeter-datacollector` as a systemd service
-* `smartmeter-datacollector-configurator` webinterface
-* demo
+* `smartmeter-datacollector-configurator` web interface
+* Demo setup with:
   * [mosquitto](https://mosquitto.org/) as a local MQTT broker to publish the measurements from `smartmeter-datacollector`
   * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) to collect measurements published by `smartmeter-datacollector` over MQTT and store them in InfluxDB
   * [InfluxDB](https://www.influxdata.com/) to store the measurements
@@ -104,7 +104,7 @@ The Python3 package does not contain any infrastructure to run `smartmeter-datac
 
 ### Python Requirements
 
-* Python >= 3.7 (tested with 3.8)
+* Python >= 3.8 (tested with 3.9)
 
 ### Installation
 
@@ -114,7 +114,7 @@ Install the package either as global Python package or in a virtualenv with
 python3 -m pip install smartmeter-datacollector
 ```
 
-Similarly the [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) webinterface can be installed with
+Similarly the [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can be installed with
 
 ```bash
 python3 -m pip install smartmeter-datacollector-configurator
@@ -122,14 +122,12 @@ python3 -m pip install smartmeter-datacollector-configurator
 
 ## Method 3: Debian package
 
-`smartmeter-datacollector` is also available as a Debian (`.deb`) package from the [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs it system wide. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
+`smartmeter-datacollector` is also available as a Debian (`.deb`) package from the [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs the application bundled with its Python dependencies system wide. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
 
-### Debian Requirements
+### Requirements
 
-* Distribution
-  * Debian
-* Release
-  * Bullseye
+* Distribution: Debian based (like Debian, Ubuntu, ..)
+* Release: Bullseye
 * CPU architecture
   * amd64
   * armhf
@@ -142,7 +140,7 @@ Download the Debian package from [releases](https://github.com/scs/smartmeter-da
 sudo apt install ./python3-smartmeter-datacollector_*.deb
 ```
 
-Similarly the [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) webinterface can be installed with a Debian package from its [releases](https://github.com/scs/smartmeter-datacollector-configurator/releases) with
+Similarly the [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can be installed with a Debian package from its [releases](https://github.com/scs/smartmeter-datacollector-configurator/releases) with
 
 ```bash
 sudo apt install ./python3-smartmeter-datacollector-configurator_*.deb
@@ -160,13 +158,13 @@ See [Wiki/Configuration](https://github.com/scs/smartmeter-datacollector/wiki/Co
 
 ### smartmeter-datacollector-configurator
 
-To simplify the process of generating a valid `.ini` configuration for `smartmeter-datacollector` the companion [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) webinterface can be used. It supports
+To simplify the process of generating a valid `.ini` configuration for `smartmeter-datacollector` the companion [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can be used. It supports
 * a graphical approach to manage the configuration
 * input validation to avoid invalid configurations
 * loading / saving / discarding a configuration
 * restarting `smartmeter-datacollector` (only if installed as a Debian package)
 
-See [Wiki/smartmeter-datacollector-configurator](https://github.com/scs/smartmeter-datacollector/wiki/smartmeter-datacollector-configurator) for more details on the webinterface and the configuration possibilities.
+See [Wiki/smartmeter-datacollector-configurator](https://github.com/scs/smartmeter-datacollector/wiki/smartmeter-datacollector-configurator) for more details on the web interface and the configuration possibilities.
 
 ## Run manually
 
@@ -177,10 +175,10 @@ smartmeter-datacollector --config datacollector.ini
 ```
 
 The following command line arguments are supported:
-* `-h, --help`: Shows the help output of `smartmeter-datacollector`.
-* `-c, --config CONFIG`: Path to the `.ini` configuration file.
-* `-s,--saveconfig`: Create a default `.ini` configuration file.
-* `-d, --dev`: Enable development mode.
+* `-h, --help`: Shows the help output of `smartmeter-datacollector`
+* `-c, --config CONFIG`: Path to the `.ini` configuration file
+* `-s,--saveconfig`: Create a default `.ini` configuration file
+* `-d, --dev`: Enable development mode
 
 ### Configuration
 
@@ -191,7 +189,7 @@ The configuration file can be located anywhere and use any filename. If no `.ini
 
 ## Run as a systemd service
 
-When `smartmeter-datacollector` has been installed as a Debian package it provides a systemd .service file named `python3-smartmeter-datacollector.service`. Therefore the service can be managed using the `systemctl` command. See [Run as a systemd service](https://github.com/scs/smartmeter-datacollector/wiki/How-to-use#run-as-a-systemd-service) for possible commands.
+When `smartmeter-datacollector` has been installed as a Debian package it provides a systemd .service file named `smartmeter-datacollector.service`. Therefore the service can be managed using the `systemctl` command. See [Run as a systemd service](https://github.com/scs/smartmeter-datacollector/wiki/How-to-use#run-as-a-systemd-service) for possible commands.
 
 
 # How to develop
@@ -201,11 +199,11 @@ Help from the community for the `smartmeter-datacollector` project is always wel
 ## Development Requirements
 
 * Python >= 3.8, <= 3.10
-* [`pipenv`](https://pipenv.pypa.io/en/latest/)
+* [`poetry`](https://python-poetry.org/)
 * Optional software packages (Debian bullseye/ Ubuntu 22.04)
-  * python3-all
   * debhelper
-  * dh-python
+  * dh-make
+  * rename
 
 ## Installation
 
@@ -214,13 +212,15 @@ Help from the community for the `smartmeter-datacollector` project is always wel
 To install the listed minimal requirements run the following command:
 
 ```
-sudo apt install git python3 pipenv
+sudo apt install git python3
 ```
+
+Also install `poetry` according to [Poetry - Installation](https://python-poetry.org/docs/#installation).
 
 To install the optional requirements also run the following command:
 
 ```
-sudo apt install python3-all debhelper dh-python
+sudo apt install debhelper dh-make rename
 ```
 
 ## Checkout the code
@@ -233,33 +233,33 @@ git clone https://github.com/scs/smartmeter-datacollector.git
 
 ## Setup Development Environment
 
-`smartmeter-datacollector` uses [`pipenv`](https://pipenv.pypa.io/en/latest/) to manage its dependencies and setup a virtual environment. Run the following command to setup the initial development environment:
+`smartmeter-datacollector` uses [`poetry`](https://python-poetry.org/) to manage its dependencies and setup a virtual environment. Run the following command to setup the initial development environment:
 
 ```
-pipenv install --dev
+poetry install
 ```
 
 This will install all runtime and development dependencies for `smartmeter-datacollector` in a new virtual environment. Now you are ready to start working on `smartmeter-datacollector`.
 
 ## Custom Commands / Workflows
 
-`smartmeter-datacollector` offers a few custom `pipenv run` commands to simplify certain development workflows:
-* `build_check` uses `twine` to check if the built Python package will be accepted by `PiPI`.
-* `build_deb` builds a Debian package for the current development platform.
+`smartmeter-datacollector` offers a few custom `poetry run poe` commands to simplify certain development workflows:
+* `build_py` builds a Python package which can be uploaded to [`PyPI`](https://pypi.org/project/smartmeter-datacollector/)
+* `build_shiv` builds a self-contained zipapp (`.pyz`) including dependencies (but without interpreter) using [`shiv`](https://shiv.readthedocs.io)
+* `build_deb` builds a Debian package for the current development platform
 * `build_srcdeb` builds a Debian source package which can be used to build a Debian (binary) package for any platform (e.g. using [`pbuilder`](https://pbuilder-docs.readthedocs.io/en/latest/usage.html))
-* `build` builds a Python package which can be uploaded to [`PyPI`](https://pypi.org/project/smartmeter-datacollector/) using `twine`.
-* `debianize` creates a `debian/` directory used to build Debian source / binary packages.
-* `format_check` checks if the code follows the [`autopep8`](https://pypi.org/project/autopep8/) code formatting rules.
-* `format` automatically adjusts the code to follow the `autopep8` code formatting rules.
-* `isort_check` checks if the order of the import statements is correct using [`isort`](https://pycqa.github.io/isort/).
-* `isort` automatically re-orders the import statements using `isort`.
-* `license` makes sure every Python (`*.py`) file contains the proper license header.
-* `lint_check` checks if the code follows the [`pylint`](https://pypi.org/project/pylint/) rules defined in `pyproject.toml`.
-* `lint` automatically adjust the code to follow the `pylint` rules defined in `pyproject.toml`.
-* `setup_check` checks whether the dependencies defined in `Pipfile` / `Pipfile.lock` are in sync with `setup.py`.
-* `setup` synchronizes the dependencies defined in `Pipfile` / `Pipfile.lock` with `setup.py`.
+* `clean` removes build output from the working directory
+* `debianize` creates a `debian/` directory used to build Debian source / binary packages
+* `format` automatically adjusts the code to follow the [`autopep8`](https://pypi.org/project/autopep8/) code formatting rules
+* `format_check` checks if the code follows the `autopep8` code formatting rules
+* `isort` automatically re-orders the import statements using `isort`
+* `isort_check` checks if the order of the import statements is correct using [`isort`](https://pycqa.github.io/isort/)
+* `license` makes sure every Python (`*.py`) file contains the proper license header
+* `lint` automatically adjust the code to follow the [`pylint`](https://pypi.org/project/pylint/) rules defined in `pyproject.toml`
+* `lint_check` checks if the code follows the `pylint` rules defined in `pyproject.toml`
+* `test` runs all unit tests using `pytest`
 
-Make sure to run `format_check` / `format`, `isort_check` / `isort`, `lint_check` / `lint`, `license`, `setup_check` / `setup` before committing changes to the repository to avoid unnecessary development cycles. `smartmeter-datacollector` uses [GitHub Actions](https://github.com/scs/smartmeter-datacollector/actions) to check if these rules apply.
+Make sure to run `format_check` / `format`, `isort_check` / `isort`, `lint_check` / `lint`, `license` before committing changes to the repository to avoid unnecessary development cycles. `smartmeter-datacollector` uses [GitHub Actions](https://github.com/scs/smartmeter-datacollector/actions) to check if these rules apply.
 
 # Acknowledgements
 `smartmeter-datacollector` and its companion project [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) have been developed by **[Supercomputing Systems AG](https://www.scs.ch)** on behalf of and funded by **[EKZ](https://www.ekz.ch/)**.
