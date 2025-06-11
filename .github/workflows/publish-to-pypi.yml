@@ -47,7 +47,9 @@ jobs:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository-url: https://test.pypi.org/legacy/
           verify-metadata: true
+          verbose: true
           skip-existing: true
+          attestations: false
 
       - name: Publish the Python package to PyPI
         if: startsWith(github.ref, 'refs/tags')
