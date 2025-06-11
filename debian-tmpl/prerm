@@ -16,8 +16,7 @@ set -e
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-USERNAME=smartmeter
-PYZCACHE=/var/lib/smartmeter-datacollector/.pyzcache
+PYZCACHE=/var/lib/smartmeter-datacollector/.datacollector_cache
 
 case "$1" in
     remove|upgrade|deconfigure)
