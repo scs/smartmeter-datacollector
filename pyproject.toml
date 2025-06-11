@@ -1,6 +1,69 @@
+[tool.poetry]
+name = "smartmeter-datacollector"
+version = "1.2.1"
+description = "Smart Meter Data Collector"
+authors = ["Supercomputing Systems AG <info@scs.ch>"]
+maintainers = ["Supercomputing Systems AG <info@scs.ch>"]
+license = "GPL-2.0-only"
+readme = "README.md"
+homepage = "https://github.com/scs/smartmeter-datacollector"
+repository = "https://github.com/scs/smartmeter-datacollector"
+documentation = "https://github.com/scs/smartmeter-datacollector/wiki"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Typing :: Typed",
+]
+
+[tool.poetry.urls]
+"Bug Reports" = "https://github.com/scs/smartmeter-datacollector/issues"
+"Pull Requests" = "https://github.com/scs/smartmeter-datacollector/pulls"
+"SCS" = "https://www.scs.ch"
+
+[tool.poetry.scripts]
+smartmeter-datacollector = 'smartmeter_datacollector.__main__:main'
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aioserial = "~=1.3.1"
+asyncio-mqtt = "~=0.16.2"
+gurux-dlms = "==1.0.150"
+paho-mqtt = "~=1.6.1"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "*"
+isort = "*"
+licenseheaders = "*"
+poethepoet = "*"
+pylint = "*"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-mock = "*"
+shiv = "^1.0.8"
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+build_py = "bash ./scripts/build_py.sh"
+build_shiv = "bash ./scripts/build_shiv.sh"
+build_deb = "bash ./scripts/build_deb.sh"
+build_srcdeb = "bash ./scripts/build_deb.sh source"
+clean = "rm -rf build dist deb_dist .pytest_cache"
+debianize = "bash ./scripts/debianize.sh"
+format = "autopep8 --in-place  -r --aggressive smartmeter_datacollector/"
+format_check = "autopep8 --diff -r --aggressive smartmeter_datacollector/"
+isort = "isort ."
+isort_check = "isort --check ."
+license = "licenseheaders -t .copyright.tmpl --ext py --current-year --owner 'Supercomputing Systems AG' --projname 'smartmeter-datacollector'"
+lint = "pylint smartmeter_datacollector/"
+lint_check = "pylint smartmeter_datacollector/ --exit-zero"
+test = "pytest"
 
 [tool.autopep8]
 max_line_length = 120

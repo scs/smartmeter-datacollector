@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: smartmeter-datacollector
+Upstream-Contact: #USERNAME# <#EMAIL#>
+Source: https://github.com/scs/smartmeter-datacollector
+
+Files: *
+Copyright: 2024 Supercomputing Systems AG <info@scs.ch>
+License: GPL-2.0-only
+
+Files: debian/*
+Copyright: 2024 Supercomputing Systems AG <info@scs.ch>
+License: GPL-2.0-only
+
+License: see ../LICENSE

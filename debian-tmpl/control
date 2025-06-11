@@ -1,0 +1,16 @@
+Source: #PACKAGE#
+Section: python
+Priority: optional
+Maintainer: #USERNAME# <#EMAIL#>
+Build-Depends: #BUILD_DEPS#
+Standards-Version: #POLICY#
+Homepage: https://github.com/scs/smartmeter-datacollector
+Rules-Requires-Root: no
+
+Package: #PACKAGE#
+Architecture: all
+Depends: python3 (>= 3.8), ${misc:Depends}
+Description: Smart Meter Data Collector
+ .
+ The smartmeter-datacollector tool is a Python3 software which allows you to continuously retrieve data from supported smart meters.
+ The acquired values can be forwarded to one or more data sinks like a MQTT broker or logger.
