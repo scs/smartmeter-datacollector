@@ -17,8 +17,8 @@ from asyncio_mqtt.client import ProtocolVersion
 from asyncio_mqtt.error import MqttCodeError, MqttError
 from paho.mqtt.client import MQTT_ERR_NO_CONN
 
-from ..smartmeter.meter_data import MeterDataPoint
-from .data_sink import DataSink
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.sinks.data_sink import DataSink
 
 LOGGER = logging.getLogger("sink")
 

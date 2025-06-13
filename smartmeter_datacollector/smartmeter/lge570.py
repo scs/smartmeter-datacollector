@@ -10,10 +10,10 @@ from typing import Optional
 
 import serial
 
-from .cosem import Cosem
-from .meter import MeterError, SerialHdlcDlmsMeter
-from .reader import ReaderError
-from .serial_reader import SerialConfig
+from smartmeter_datacollector.smartmeter.cosem import Cosem
+from smartmeter_datacollector.smartmeter.meter import MeterError, SerialHdlcDlmsMeter
+from smartmeter_datacollector.smartmeter.reader import ReaderError
+from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig
 
 LOGGER = logging.getLogger("smartmeter")
 

@@ -7,8 +7,8 @@
 #
 import logging
 
-from ..smartmeter.meter_data import MeterDataPoint
-from .data_sink import DataSink
+from smartmeter_datacollector.sinks.data_sink import DataSink
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
 
 
 class LoggerSink(DataSink):

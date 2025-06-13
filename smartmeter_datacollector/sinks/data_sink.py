@@ -7,7 +7,7 @@
 #
 from abc import ABC, abstractmethod
 
-from ..smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
 
 
 class DataSink(ABC):

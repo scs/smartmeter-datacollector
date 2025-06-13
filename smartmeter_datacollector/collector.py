@@ -10,8 +10,8 @@ import logging
 from asyncio import QueueFull
 from typing import List
 
-from .sinks.data_sink import DataSink
-from .smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.sinks.data_sink import DataSink
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
 
 LOGGER = logging.getLogger("collector")
 

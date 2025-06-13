@@ -11,7 +11,7 @@ import logging
 from asyncio import CancelledError
 from configparser import ConfigParser
 
-from . import config, factory
+from smartmeter_datacollector import config, factory
 
 logging.basicConfig(level=logging.WARNING)
 
