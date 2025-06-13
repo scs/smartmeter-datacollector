@@ -693,5 +693,5 @@ markers = {main = "python_version < \"3.10\"", dev = "python_version < \"3.11\""
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.8,<4.0"
-content-hash = "75847b3f1eaf13aa20ff20c68e5aa3e470a76105d62352cccdf7f602fdf1a50d"
+python-versions = ">=3.9,<4.0"
+content-hash = "de3baad28844e038ca46149ff7c49ad6ec69424f43b3972abe8df4f3960d5e37"
