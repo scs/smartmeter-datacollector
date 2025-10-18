@@ -13,19 +13,19 @@ permissions:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         os: ["debian", "raspios"]
         include:
           - os: debian
-            dist: bullseye
+            dist: bookworm
             arch: amd64
             keyring_cmd: sudo apt-get install -y debian-archive-keyring
           - os: raspios
-            dist: bullseye
-            arch: armhf
-            keyring_cmd: wget http://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb && sudo dpkg -i raspbian-archive-keyring_20120528.2_all.deb
+            dist: bookworm
+            arch: arm64
+            keyring_cmd: wget https://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-archive-keyring/raspberrypi-archive-keyring_2021.1.1+rpt1_all.deb && sudo dpkg -i raspberrypi-archive-keyring_2021.1.1+rpt1_all.deb
 
     name: Build Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
     steps:
@@ -40,13 +40,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
           cache: "poetry"
       - name: Setup project with Poetry
         run: poetry install --no-interaction
       - name: Prepare to build a Debian source package
         run: |
-          sudo apt-get -y install debhelper dh-make rename
+          sudo apt-get -y install build-essential debhelper dh-make rename
 
       - name: Build a Debian source package
         run: |
