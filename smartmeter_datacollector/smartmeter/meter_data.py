@@ -96,8 +96,6 @@ class MeterDataPointTypes(Enum):
     NET_FREQUENCY = MeterDataPointType("NET_FREQUENCY", "Net Frequency any Phase", "Hz")
 
 
-
-
 @dataclass
 class MeterDataPoint:
     type: MeterDataPointType
