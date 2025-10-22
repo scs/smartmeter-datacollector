@@ -1,5 +1,4 @@
 FROM python:3.14-slim-bookworm
-#FROM python:3.14
 
 RUN mkdir /app 
 COPY smartmeter_datacollector/ /app/smartmeter_datacollector/
