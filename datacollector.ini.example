@@ -1,0 +1,29 @@
+[reader0]
+type = kamstrup_han
+port = /dev/ttyUSB0
+key = supersecretHexKey
+
+[sink0]
+type = mqtt
+host = mqtt.localdomain
+port = 1883
+tls = False
+ca_file_path = 
+check_hostname = False
+username = 
+password = 
+#client_cert_path = 
+#client_key_path = 
+
+[sink1]
+# type of the sink
+type = logger
+# name of the logger
+name = DataLogger    
+
+[logging]
+# log level configuration: 
+default = DEBUG
+smartmeter = DEBUG
+collector = DEBUG
+sink = DEBUG
