@@ -195,10 +195,39 @@ When `smartmeter-datacollector` has been installed as a Debian package it provid
 
 `smartmeter-datacollector` can be run with docker compose and a docker image, built from sources.
 
-1. Provide a valid .ini configuration file (see example [datacollector.ini.example](datacollector.ini.example)
-2. set `DATACOLLECTOR_INI` to the path of the config file in the [.env](.env) configuration
-3. set `SERIAL_DEVICE` to the system device in the [.env](.env) configuration
+- Provide a valid .ini configuration file (see example below)
+- in a newly created `.env` file set:
+  - `DATACOLLECTOR_INI`: this file gets mounted into the docker container and is used by the service
+  - `SERIAL_DEVICE`: the serial connection to the smartmeter
 4. Run `docker compose up`
+
+### Example files
+
+#### `.env`
+
+```
+DATACOLLECTOR_INI=./datacollector.ini
+SERIAL_DEVICE=/dev/serial/by-id/device
+```
+
+#### `datacollector.ini`
+
+```
+[reader0]
+type = kamstrup_han
+port = /dev/ttyUSB0
+key = supersecretHexKey
+
+[sink0]
+type = mqtt
+host = mqtt.localdomain
+port = 1883
+tls = False
+ca_file_path = 
+check_hostname = False
+username = 
+password = 
+```
 
 # How to develop
 
