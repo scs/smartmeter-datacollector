@@ -4,6 +4,6 @@ services:
     container_name: smartmeter
     restart: unless-stopped
     devices:
-      - ${SMARTMETER_DATACOLLECTOR_INI}:/dev/ttyUSB0
+      - ${SMARTMETER_SERIAL_DEVICE}:/dev/ttyUSB0
     volumes:
-      - ${SMARTMETER_SERIAL_DEVICE}:/app/datacollector.ini:rw
+      - ${SMARTMETER_DATACOLLECTOR_INI}:/app/datacollector.ini:rw
