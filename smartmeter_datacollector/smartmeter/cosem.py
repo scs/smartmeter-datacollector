@@ -45,7 +45,7 @@ DEFAULT_REGISTER_MAPPING = [
 
     RegisterCosem(OBISCode(1, 0, 31, 7, 0), MeterDataPointTypes.CURRENT_L1.value, 0.01),
     RegisterCosem(OBISCode(1, 0, 32, 7, 0), MeterDataPointTypes.VOLTAGE_L1.value),
-    RegisterCosem(OBISCode(1, 0, 33, 7, 0), MeterDataPointTypes.POWER_FACTOR_L1),
+    RegisterCosem(OBISCode(1, 0, 33, 7, 0), MeterDataPointTypes.POWER_FACTOR_L1.value, 0.001),
 
     RegisterCosem(OBISCode(1, 0, 41, 7, 0), MeterDataPointTypes.ACTIVE_POWER_P_L2.value),
     RegisterCosem(OBISCode(1, 0, 41, 8, 0), MeterDataPointTypes.ACTIVE_ENERGY_P_L2.value),
@@ -56,7 +56,7 @@ DEFAULT_REGISTER_MAPPING = [
 
     RegisterCosem(OBISCode(1, 0, 51, 7, 0), MeterDataPointTypes.CURRENT_L2.value, 0.01),
     RegisterCosem(OBISCode(1, 0, 52, 7, 0), MeterDataPointTypes.VOLTAGE_L2.value),
-    RegisterCosem(OBISCode(1, 0, 53, 7, 0), MeterDataPointTypes.POWER_FACTOR_L2),
+    RegisterCosem(OBISCode(1, 0, 53, 7, 0), MeterDataPointTypes.POWER_FACTOR_L2.value, 0.001),
 
     RegisterCosem(OBISCode(1, 0, 61, 7, 0), MeterDataPointTypes.ACTIVE_POWER_P_L3.value),
     RegisterCosem(OBISCode(1, 0, 61, 8, 0), MeterDataPointTypes.ACTIVE_ENERGY_P_L3.value),
@@ -67,7 +67,7 @@ DEFAULT_REGISTER_MAPPING = [
 
     RegisterCosem(OBISCode(1, 0, 71, 7, 0), MeterDataPointTypes.CURRENT_L3.value, 0.01),
     RegisterCosem(OBISCode(1, 0, 72, 7, 0), MeterDataPointTypes.VOLTAGE_L3.value),
-    RegisterCosem(OBISCode(1, 0, 73, 7, 0), MeterDataPointTypes.POWER_FACTOR_L3),
+    RegisterCosem(OBISCode(1, 0, 73, 7, 0), MeterDataPointTypes.POWER_FACTOR_L3.value, 0.001),
 
     RegisterCosem(OBISCode(1, 0, 81, 7, 40), MeterDataPointTypes.ANGLE_UI_L1.value),
     RegisterCosem(OBISCode(1, 0, 81, 7, 51), MeterDataPointTypes.ANGLE_UI_L2.value),
