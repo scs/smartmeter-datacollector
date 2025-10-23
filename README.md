@@ -197,8 +197,8 @@ When `smartmeter-datacollector` has been installed as a Debian package it provid
 
 - Provide a valid .ini configuration file (see example below)
 - in a newly created `.env` file set:
-  - `DATACOLLECTOR_INI`: this file gets mounted into the docker container and is used by the service
-  - `SERIAL_DEVICE`: the serial connection to the smartmeter
+  - `SMARTMETER_DATACOLLECTOR_INI`: this file gets mounted into the docker container and is used by the service
+  - `SMARTMETER_SERIAL_DEVICE`: the serial connection to the smartmeter
 4. Run `docker compose up`
 
 ### Example files
