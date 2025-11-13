@@ -8,10 +8,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from .cosem import Cosem
-from .hdlc_dlms_parser import HdlcDlmsParser
-from .meter_data import MeterDataPoint
-from .serial_reader import SerialConfig, SerialReader
+from smartmeter_datacollector.smartmeter.cosem import Cosem
+from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig, SerialReader
 
 
 class MeterError(Exception):

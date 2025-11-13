@@ -15,10 +15,10 @@ from typing import Callable, List, Optional
 import aioserial
 import serial
 
-from .meter import Meter, MeterError
-from .meter_data import MeterDataPoint, MeterDataPointType, MeterDataPointTypes
-from .reader import Reader, ReaderError
-from .serial_reader import SerialConfig
+from smartmeter_datacollector.smartmeter.meter import Meter, MeterError
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType, MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.reader import Reader, ReaderError
+from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig
 
 LOGGER = logging.getLogger("smartmeter")
 

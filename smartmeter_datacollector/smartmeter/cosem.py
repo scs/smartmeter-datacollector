@@ -14,8 +14,8 @@ from typing import Any, Dict, List, Optional
 from gurux_dlms import GXDateTime
 from gurux_dlms.objects import GXDLMSClock, GXDLMSData, GXDLMSRegister
 
-from .meter_data import MeterDataPointType, MeterDataPointTypes
-from .obis import OBISCode
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointType, MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 LOGGER = logging.getLogger("smartmeter")
 

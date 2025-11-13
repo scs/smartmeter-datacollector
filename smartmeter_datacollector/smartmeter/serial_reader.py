@@ -10,7 +10,7 @@ from typing import Callable
 
 import aioserial
 
-from .reader import Reader, ReaderError
+from smartmeter_datacollector.smartmeter.reader import Reader, ReaderError
 
 
 @dataclass

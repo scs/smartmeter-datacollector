@@ -15,9 +15,9 @@ from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GX
                                 GXDLMSPushSetup, GXDLMSRegister)
 from gurux_dlms.secure import GXDLMSSecureClient
 
-from .cosem import Cosem
-from .meter_data import MeterDataPoint
-from .obis import OBISCode
+from smartmeter_datacollector.smartmeter.cosem import Cosem
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 LOGGER = logging.getLogger("smartmeter")
 

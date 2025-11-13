@@ -9,18 +9,18 @@ import logging
 from configparser import ConfigParser
 from typing import List
 
-from .collector import Collector
-from .config import InvalidConfigError
-from .sinks.data_sink import DataSink
-from .sinks.logger_sink import LoggerSink
-from .sinks.mqtt_sink import MqttConfig, MqttDataSink
-from .smartmeter.iskraam550 import IskraAM550
-from .smartmeter.kamstrup_han import KamstrupHAN
-from .smartmeter.lge360 import LGE360
-from .smartmeter.lge450 import LGE450
-from .smartmeter.lge570 import LGE570
-from .smartmeter.meter import Meter, MeterError
-from .smartmeter.siemens_td3511 import SiemensTD3511
+from smartmeter_datacollector.collector import Collector
+from smartmeter_datacollector.config import InvalidConfigError
+from smartmeter_datacollector.sinks.data_sink import DataSink
+from smartmeter_datacollector.sinks.logger_sink import LoggerSink
+from smartmeter_datacollector.sinks.mqtt_sink import MqttConfig, MqttDataSink
+from smartmeter_datacollector.smartmeter.iskraam550 import IskraAM550
+from smartmeter_datacollector.smartmeter.kamstrup_han import KamstrupHAN
+from smartmeter_datacollector.smartmeter.lge360 import LGE360
+from smartmeter_datacollector.smartmeter.lge450 import LGE450
+from smartmeter_datacollector.smartmeter.lge570 import LGE570
+from smartmeter_datacollector.smartmeter.meter import Meter, MeterError
+from smartmeter_datacollector.smartmeter.siemens_td3511 import SiemensTD3511
 
 
 def build_meters(config: ConfigParser) -> List[Meter]:
