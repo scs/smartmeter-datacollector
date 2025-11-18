@@ -14,20 +14,8 @@ permissions:
 jobs:
   build-deb:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        os: ["debian", "raspios"]
-        include:
-          - os: debian
-            dist: bookworm
-            arch: amd64
-            keyring_cmd: sudo apt-get install -y debian-archive-keyring
-          - os: raspios
-            dist: bookworm
-            arch: arm64
-            keyring_cmd: wget https://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-archive-keyring/raspberrypi-archive-keyring_2021.1.1+rpt1_all.deb && sudo dpkg -i raspberrypi-archive-keyring_2021.1.1+rpt1_all.deb
 
-    name: Build Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
+    name: Build Debian package
     steps:
       - uses: actions/checkout@v4
       - name: Update apt cache
@@ -48,46 +36,24 @@ jobs:
         run: |
           sudo apt-get -y install build-essential debhelper dh-make rename
 
-      - name: Build a Debian source package
+      - name: Build a Debian package
         run: |
-          poetry run poe build_srcdeb
+          poetry run poe build_deb
 
-      - name: Cache pbuilder chroot
-        id: cache-pbuilder-chroot
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-base.tgz
-          key: ${{ runner.os }}-pbuilder-${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Prepare the pbuilder chroot for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
-        if: steps.cache-pbuilder-${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-chroot.outputs.cache-hit != 'true'
-        run: |
-          sudo apt-get install -y pbuilder qemu-user-static
-          ${{ matrix.keyring_cmd }}
-          sudo cp scripts/.pbuilderrc /root/
-          sudo mkdir -p /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/aptcache/
-          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder create
-
-      - name: Build the Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }} using pbuilder
-        run: |
-          cd deb_dist
-          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder update
-          sudo OS=${{ matrix.os }} DIST=${{ matrix.dist }} ARCH=${{ matrix.arch }} pbuilder build *.dsc
-          sudo rename "s/_all\./_${{ matrix.arch }}\./" /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
-
-      - name: Archive the built Debian package for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
+      - name: Archive the built Debian package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-deb
-          path: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
+          name: smartmeter-datacollector-deb
+          path: deb_dist/*.deb
 
-      - name: Archive the additional Debian package files for ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}
+      - name: Archive the additional Debian package files
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}-packagefiles
+          name: smartmeter-datacollector-packagefiles
           path: |
-            /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.dsc
-            /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.tar.*
+            deb_dist/*.buildinfo
+            deb_dist/*.changes
+            deb_dist/*.tar.*
 
       - name: Get the tag name
         id: tagName
@@ -99,7 +65,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: /var/cache/pbuilder/${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.arch }}/result/*.deb
+          artifacts: deb_dist/*.deb
           draft: true
           name: Smart Meter Data Collector ${{ steps.tagName.outputs.tag }}
           omitBody: true
