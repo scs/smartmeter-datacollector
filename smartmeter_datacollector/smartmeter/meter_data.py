@@ -53,6 +53,15 @@ class MeterDataPointTypes(Enum):
     ANGLE_UI_L3 = MeterDataPointType("ANGLE_UI_L3", "Angle U-I L3", "rad")
 
     ACTIVE_ENERGY_P = MeterDataPointType("ACTIVE_ENERGY_P", "Active Energy +", "Wh")
+
+    ACTIVE_ENERGY_P_L1 = MeterDataPointType("ACTIVE_ENERGY_P_L1", "Active Energy L1 +", "Wh")
+    ACTIVE_ENERGY_P_L2 = MeterDataPointType("ACTIVE_ENERGY_P_L2", "Active Energy L2 +", "Wh")
+    ACTIVE_ENERGY_P_L3 = MeterDataPointType("ACTIVE_ENERGY_P_L3", "Active Energy L3 +", "Wh")
+
+    ACTIVE_ENERGY_N_L1 = MeterDataPointType("ACTIVE_ENERGY_N_L1", "Active Energy L1 -", "Wh")
+    ACTIVE_ENERGY_N_L2 = MeterDataPointType("ACTIVE_ENERGY_N_L2", "Active Energy L2 -", "Wh")
+    ACTIVE_ENERGY_N_L3 = MeterDataPointType("ACTIVE_ENERGY_N_L3", "Active Energy L3 -", "Wh")
+
     ACTIVE_ENERGY_P_T1 = MeterDataPointType("ACTIVE_ENERGY_P_T1", "Active Energy + Tariff 1", "Wh")
     ACTIVE_ENERGY_P_T2 = MeterDataPointType("ACTIVE_ENERGY_P_T2", "Active Energy + Tariff 2", "Wh")
     ACTIVE_ENERGY_N = MeterDataPointType("ACTIVE_ENERGY_N", "Active Energy -", "Wh")
@@ -80,6 +89,10 @@ class MeterDataPointTypes(Enum):
     REACTIVE_ENERGY_Q4_T2 = MeterDataPointType("REACTIVE_ENERGY_Q4_T2", "Reactive Energy -Rc Q4 Tariff 2", "VAh")
 
     POWER_FACTOR = MeterDataPointType("POWER_FACTOR", "Power Factor", "")
+    POWER_FACTOR_L1 = MeterDataPointType("POWER_FACTOR_L1", "Power Factor L1", "")
+    POWER_FACTOR_L2 = MeterDataPointType("POWER_FACTOR_L2", "Power Factor L2", "")
+    POWER_FACTOR_L3 = MeterDataPointType("POWER_FACTOR_L3", "Power Factor L3", "")
+
     NET_FREQUENCY = MeterDataPointType("NET_FREQUENCY", "Net Frequency any Phase", "Hz")
 
 
