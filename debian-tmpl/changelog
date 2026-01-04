@@ -1,3 +1,15 @@
+smartmeter-datacollector (1.3.0-1) unstable; urgency=low
+
+  * add parsing extended DLMS registers
+  * add support for SiemensTD3511 smartmeter (using IEC62056-21, Mode C)
+  * add additional meter data points for individual phases
+  * migrate to Poetry since it is capable of handling multiple Python versions in project
+  * rework deb packaging using .pyz bundle instead of pip workaround
+  * upgrade all dependencies
+  * set Python 3.11 as default version (debian bookworm); however supporting Python [3.10,3.14]
+
+ -- Supercomputing Systems AG <info@scs.ch>  Sun, 04 Jan 2026 14:27:39 +0100
+
 smartmeter-datacollector (1.2.1-1) unstable; urgency=low
 
   * fix: assume local time when time is extracted from DLMS message without tz info
