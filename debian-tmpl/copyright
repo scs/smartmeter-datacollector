@@ -4,11 +4,11 @@ Upstream-Contact: #USERNAME# <#EMAIL#>
 Source: https://github.com/scs/smartmeter-datacollector
 
 Files: *
-Copyright: 2024 Supercomputing Systems AG <info@scs.ch>
+Copyright: #YEAR# #USERNAME# <#EMAIL#>
 License: GPL-2.0-only
 
 Files: debian/*
-Copyright: 2024 Supercomputing Systems AG <info@scs.ch>
+Copyright: #YEAR# #USERNAME# <#EMAIL#>
 License: GPL-2.0-only
 
 License: see ../LICENSE
