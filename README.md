@@ -104,33 +104,31 @@ The Python3 package does not contain any infrastructure to run `smartmeter-datac
 
 ### Python Requirements
 
-* Python >= 3.8 (tested with 3.9)
+* Python >= 3.10 (tested with 3.11)
 
 ### Installation
 
-Install the package either as global Python package or in a virtualenv with
+Install the package in a virtualenv manually or via using [pipx](https://github.com/pypa/pipx)
 
 ```bash
-python3 -m pip install smartmeter-datacollector
+pipx install smartmeter-datacollector
 ```
 
 Similarly the [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can be installed with
 
 ```bash
-python3 -m pip install smartmeter-datacollector-configurator
+pipx install smartmeter-datacollector-configurator
 ```
 
 ## Method 3: Debian package
 
-`smartmeter-datacollector` is also available as a Debian (`.deb`) package from the [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs the application bundled with its Python dependencies system wide. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
+`smartmeter-datacollector` is also available as a Debian (`.deb`) package from the [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs the application bundled with its Python dependencies in a zipapp / `.pyz` file. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
 
 ### Requirements
 
 * Distribution: Debian based (like Debian, Ubuntu, ..)
-* Release: Bullseye
-* CPU architecture
-  * amd64
-  * armhf
+* Release: bookworm/12 (trixie/13)
+* CPU architecture: independent
 
 ### Installation
 
@@ -198,7 +196,7 @@ Help from the community for the `smartmeter-datacollector` project is always wel
 
 ## Development Requirements
 
-* Python >= 3.8, <= 3.10
+* Python >= 3.10, <= 3.14
 * [`poetry`](https://python-poetry.org/)
 * Optional software packages (Debian bullseye/ Ubuntu 22.04)
   * debhelper
