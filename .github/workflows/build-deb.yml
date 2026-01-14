@@ -22,17 +22,17 @@ jobs:
         run: |
           sudo apt-get update
       - name: Install Poetry
-        run: |
-          pipx install poetry~=2.1.3
-          python --version; python -m pip --version; poetry --version
+        run: pipx install poetry~=2.1.3
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
           cache: "poetry"
       - name: Setup project with Poetry
-        run: poetry install --no-interaction
-      - name: Prepare to build a Debian source package
+        run: |
+          python --version; python -m pip --version; poetry --version
+          poetry install --no-interaction
+      - name: Prepare to build a Debian package
         run: |
           sudo apt-get -y install build-essential debhelper dh-make rename
 
