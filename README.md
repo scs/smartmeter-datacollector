@@ -198,7 +198,7 @@ Help from the community for the `smartmeter-datacollector` project is always wel
 
 * Python >= 3.10, <= 3.14
 * [`poetry`](https://python-poetry.org/)
-* Optional software packages (Debian bullseye/ Ubuntu 22.04)
+* Optional software packages
   * debhelper
   * dh-make
   * rename
