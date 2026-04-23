@@ -17,7 +17,7 @@ class OBISCode:
     PATTERN: ClassVar[re.Pattern] = re.compile(REGEX)
 
     # pylint: disable=invalid-name
-    a: int
+    a: int = field(compare=False)
     b: int = field(compare=False)
     c: int
     d: int

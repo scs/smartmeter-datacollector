@@ -58,7 +58,7 @@ def test_only_compare_relevant_parts():
     obis = OBISCode(1, 0, 1, 7, 0, 255)
     assert obis == OBISCode(1, 1, 1, 7, 0, 255)
     assert obis == OBISCode(1, 0, 1, 7, 0, 128)
-    assert obis != OBISCode(0, 0, 1, 7, 0, 255)
+    assert obis == OBISCode(0, 0, 1, 7, 0, 255)
     assert obis != OBISCode(1, 0, 2, 7, 0, 255)
     assert obis != OBISCode(1, 0, 1, 16, 0, 255)
     assert obis != OBISCode(1, 0, 1, 7, 1, 255)
@@ -66,7 +66,7 @@ def test_only_compare_relevant_parts():
 
 def test_hash_of_obis():
     obis = OBISCode(1, 0, 1, 7, 0, 255)
-    obis_diff = OBISCode(2, 0, 1, 7, 0, 255)
+    obis_diff = OBISCode(1, 0, 2, 7, 0, 255)
     obis_same = OBISCode(1, 2, 1, 7, 0, 255)
 
     assert hash(obis) == hash(obis_same)
