@@ -39,6 +39,7 @@ async def test_mqtt_sink_send_datapoint(mocked_mqtt_client):
     expected_payload = json.dumps({
         "value": data_point.value,
         "timestamp": int(data_point.timestamp.timestamp()),
+        "obis": TEST_OBIS.to_short_str(),
     })
 
     await sink.send(data_point)

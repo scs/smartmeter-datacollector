@@ -189,5 +189,6 @@ class MqttDataSink(DataSink):
             {
                 "value": data_point.value,
                 "timestamp": int(data_point.timestamp.timestamp()),
+                "obis": data_point.obis.to_short_str(),
             }
         )
