@@ -32,6 +32,18 @@ def test_create_from_IEC_62056_string():
     assert obis.f == 255
 
 
+def test_create_from_short_string():
+    obis_string = "1.7.0"
+    obis = OBISCode.from_short_string(obis_string)
+    assert obis
+    assert obis.a == 1
+    assert obis.b == 0
+    assert obis.c == 1
+    assert obis.d == 7
+    assert obis.e == 0
+    assert obis.f == 255
+
+
 def test_create_from_bytes():
     obis_bytes = bytes.fromhex("01 01 01 08 02 FF")
     obis = OBISCode.from_bytes(obis_bytes)
@@ -54,7 +66,12 @@ def test_to_gurux_string():
     assert obis.to_gurux_str() == "1.0.1.7.0.255"
 
 
-def test_only_compare_relevant_parts():
+def test_to_short_string():
+    obis = OBISCode(1, 0, 1, 7, 0, 255)
+    assert obis.to_short_str() == "1.7.0"
+
+
+def test_only_compare_relevant_octets():
     obis = OBISCode(1, 0, 1, 7, 0, 255)
     assert obis == OBISCode(1, 1, 1, 7, 0, 255)
     assert obis == OBISCode(1, 0, 1, 7, 0, 128)
