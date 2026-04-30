@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
-import sys
 from typing import List
 
 import pytest
@@ -13,8 +12,6 @@ from pytest_mock.plugin import MockerFixture
 
 from smartmeter_datacollector.smartmeter.iskraam550 import IskraAM550
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
-
-from .utils import *
 
 
 @pytest.mark.asyncio
@@ -24,12 +21,12 @@ async def test_iskaam550_initialization(mocker: MockerFixture):
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = IskraAM550("/test/port")
-    serial_mock.start_and_listen.side_effect = meter._data_received(test_bytes)
+    serial_mock.start_and_listen.side_effect = lambda: meter._data_received(test_bytes)
     meter.register(observer)
     await meter.start()
 
     serial_mock.start_and_listen.assert_awaited_once()
-    observer.assert_not_called
+    observer.assert_not_called()
 
 
 @pytest.mark.asyncio

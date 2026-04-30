@@ -5,15 +5,16 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
-import random
 import re
+from typing import List
 
 from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
-from smartmeter_datacollector.smartmeter.cosem import Cosem
+from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
-
-from .utils import *
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.obis import OBISCode
+from tests.conftest import prepare_parser
 
 
 class TestHdlcParserUnencrypted:

@@ -15,6 +15,7 @@ from pytest_mock import MockerFixture
 from smartmeter_datacollector.collector import Collector
 from smartmeter_datacollector.sinks.data_sink import DataSink
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 
 @pytest.fixture
@@ -26,7 +27,8 @@ def test_type() -> MeterDataPointType:
 async def test_collector_with_one_sink(mocker: MockerFixture, test_type: MeterDataPointType):
     coll = Collector()
     sink = mocker.AsyncMock(DataSink)
-    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
+    obis = OBISCode(0, 1, 2, 3, 4, 5)
+    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc), obis)
 
     coll.register_sink(sink)
     coll.notify([data_point])
@@ -44,8 +46,8 @@ async def test_collector_with_one_sink_multiple_data_points(mocker: MockerFixtur
     sink = mocker.AsyncMock(DataSink)
 
     coll.register_sink(sink)
-    point0 = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
-    point1 = MeterDataPoint(test_type, 1.0, "test_source", datetime.now(timezone.utc))
+    point0 = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc), OBISCode(0, 1, 2, 3, 4, 5))
+    point1 = MeterDataPoint(test_type, 1.0, "test_source", datetime.now(timezone.utc), OBISCode(0, 1, 3, 4, 5, 6))
     coll.notify([point0, point1])
     routine = coll.process_queue()
 
@@ -62,7 +64,7 @@ async def test_collector_with_two_sinks(mocker: MockerFixture, test_type: MeterD
     sink0 = mocker.AsyncMock(DataSink)
     sink1 = mocker.AsyncMock(DataSink)
 
-    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc), OBISCode(0, 1, 2, 3, 4, 5))
 
     coll.register_sink(sink0)
     coll.register_sink(sink1)

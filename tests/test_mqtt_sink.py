@@ -17,8 +17,10 @@ from paho.mqtt.client import MQTT_ERR_NO_CONN
 
 from smartmeter_datacollector.sinks.mqtt_sink import MqttConfig, MqttDataSink
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 TEST_DATA_POINT_TYPE = MeterDataPointType("TEST_TYPE", "test type", "unit")
+TEST_OBIS = OBISCode(0, 1, 2, 3, 4, 5)
 
 
 @pytest.fixture(autouse=True)
@@ -32,7 +34,7 @@ async def test_mqtt_sink_send_datapoint(mocked_mqtt_client):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
 
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
     expected_topic = f"smartmeter/test_source/{TEST_DATA_POINT_TYPE.identifier}"
     expected_payload = json.dumps({
         "value": data_point.value,
@@ -48,7 +50,7 @@ async def test_mqtt_sink_send_datapoint(mocked_mqtt_client):
 async def test_mqtt_sink_retry_sending_datapoint(mocked_mqtt_client: mock.MagicMock):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
 
     # Simulate publish raising MqttCodeError the first time, then succeeding
     mocked_mqtt_client.publish.side_effect = [MqttCodeError(MQTT_ERR_NO_CONN), None]
@@ -63,7 +65,7 @@ async def test_mqtt_sink_retry_sending_datapoint(mocked_mqtt_client: mock.MagicM
 async def test_mqtt_sink_only_retry_sending_3_times(mocked_mqtt_client: mock.MagicMock):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
 
     mocked_mqtt_client.publish.side_effect = [MqttCodeError(MQTT_ERR_NO_CONN)]*4
 

@@ -15,8 +15,6 @@ from pytest_mock.plugin import MockerFixture
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
 from smartmeter_datacollector.smartmeter.siemens_td3511 import SiemensTD3511
 
-from .utils import *
-
 
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
@@ -26,12 +24,12 @@ async def test_siemens_td3511_initialization(mocker: MockerFixture):
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.siemens_td3511.SiemensSerialReader",
                                autospec=True).return_value
     meter = SiemensTD3511("/test/port")
-    serial_mock.start_and_listen.side_effect = meter._data_received(test_bytes)
+    serial_mock.start_and_listen.side_effect = lambda: meter._data_received(test_bytes)
     meter.register(observer)
     await meter.start()
 
     serial_mock.start_and_listen.assert_awaited_once()
-    observer.assert_not_called
+    observer.assert_not_called()
 
 
 @pytest.fixture
@@ -71,13 +69,13 @@ def unencrypted_valid_data_siemens() -> List[bytes]:
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_siemens_td3511_parse_and_provide_unencrypted_data(mocker: MockerFixture,
-                                                         unencrypted_valid_data_siemens: List[bytes]):
+                                                                 unencrypted_valid_data_siemens: List[bytes]):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.siemens_td3511.SiemensSerialReader",
                                autospec=True).return_value
     serial_mock.TERMINATION_FLAG = b'!\r\n'
-    serial_mock.timestamp=datetime.now()
+    serial_mock.timestamp = datetime.now()
     meter = SiemensTD3511("/test/port")
     meter.register(observer)
 
@@ -114,16 +112,17 @@ def unencrypted_invalid_data_siemens() -> List[bytes]:
     data_str.append(b'!\r\n')
     return data_str
 
+
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="Python3.7 does not support AsyncMock.")
 @pytest.mark.asyncio
 async def test_siemens_td3511_do_not_provide_invalid_data(mocker: MockerFixture,
-                                                  unencrypted_invalid_data_siemens: List[bytes]):
+                                                          unencrypted_invalid_data_siemens: List[bytes]):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.siemens_td3511.SiemensSerialReader",
                                autospec=True).return_value
     serial_mock.TERMINATION_FLAG = b'!\r\n'
-    serial_mock.timestamp=datetime.now()
+    serial_mock.timestamp = datetime.now()
     meter = SiemensTD3511("/test/port")
     meter.register(observer)
 
@@ -135,4 +134,4 @@ async def test_siemens_td3511_do_not_provide_invalid_data(mocker: MockerFixture,
     await meter.start()
 
     serial_mock.start_and_listen.assert_awaited_once()
-    observer.notify.assert_not_called
+    observer.notify.assert_not_called()
