@@ -16,7 +16,8 @@ import aioserial
 import serial
 
 from smartmeter_datacollector.smartmeter.meter import Meter, MeterError
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType, MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.meter_data import (MeterDataBundle, MeterDataPoint, MeterDataPointType,
+                                                            MeterDataPointTypes)
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 from smartmeter_datacollector.smartmeter.reader import Reader, ReaderError
 from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig
@@ -256,7 +257,7 @@ class SiemensParser():
                 LOGGER.warning("Invalid OBIS code '%s'. Skipping register.", obis)
                 continue
 
-            data_points.append(MeterDataPoint(data_point_type, scaled_value, meter_id, timestamp, obis_obj))
+            data_points.append(MeterDataPoint(data_point_type, scaled_value, obis_obj))
 
         self.clear_buffer()
-        return data_points
+        return MeterDataBundle(meter_id, timestamp, data_points)

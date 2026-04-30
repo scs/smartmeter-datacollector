@@ -11,7 +11,7 @@ from asyncio import QueueFull
 from typing import List
 
 from smartmeter_datacollector.sinks.data_sink import DataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle
 
 LOGGER = logging.getLogger("collector")
 
@@ -25,16 +25,15 @@ class Collector:
         assert isinstance(sink, DataSink)
         self._data_sinks.append(sink)
 
-    def notify(self, reader_data_points: List[MeterDataPoint]) -> None:
-        for point in reader_data_points:
-            try:
-                self._queue.put_nowait(point)
-            except QueueFull:
-                LOGGER.warning("Queue is full. Current data points are dropped.")
-                return
+    def notify(self, reader_data_bundle: MeterDataBundle) -> None:
+        try:
+            self._queue.put_nowait(reader_data_bundle)
+        except QueueFull:
+            LOGGER.warning("Queue is full. Current data points are dropped.")
+            return
 
     async def process_queue(self) -> None:
         while True:
-            data_point: MeterDataPoint = await self._queue.get()
+            data_bundle: MeterDataBundle = await self._queue.get()
             for sink in self._data_sinks:
-                await sink.send(data_point)
+                await sink.send(data_bundle)

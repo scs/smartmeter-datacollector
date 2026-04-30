@@ -16,7 +16,7 @@ from typing import Optional
 from aiomqtt import Client, MqttCodeError, MqttError
 
 from smartmeter_datacollector.sinks.data_sink import DataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPoint
 
 LOGGER = logging.getLogger("sink")
 
@@ -139,11 +139,11 @@ class MqttDataSink(DataSink):
         self._client_task = None
         LOGGER.info("Disconnected from MQTT broker")
 
-    async def send(self, data_point: MeterDataPoint) -> None:
-        topic = MqttDataSink.get_topic_name_for_datapoint(data_point)
-        dp_json = self.data_point_to_mqtt_json(data_point)
-
-        await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
+    async def send(self, data_bundle: MeterDataBundle) -> None:
+        for data_point in data_bundle.data_points:
+            topic = MqttDataSink.get_topic_name_for_datapoint(data_point, data_bundle.source)
+            dp_json = self.data_point_to_mqtt_json(data_point, int(data_bundle.timestamp.timestamp()))
+            await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
 
     async def _connection_handler(self) -> None:
         while True:
@@ -180,15 +180,15 @@ class MqttDataSink(DataSink):
                      topic, retries + 1)
 
     @staticmethod
-    def get_topic_name_for_datapoint(data_point: MeterDataPoint) -> str:
-        return f"smartmeter/{data_point.source}/{data_point.type.identifier}"
+    def get_topic_name_for_datapoint(data_point: MeterDataPoint, source: str) -> str:
+        return f"smartmeter/{source}/{data_point.type.identifier}"
 
     @staticmethod
-    def data_point_to_mqtt_json(data_point: MeterDataPoint) -> str:
+    def data_point_to_mqtt_json(data_point: MeterDataPoint, timestamp: int) -> str:
         return json.dumps(
             {
                 "value": data_point.value,
-                "timestamp": int(data_point.timestamp.timestamp()),
+                "timestamp": timestamp,
                 "obis": data_point.obis.to_short_str(),
             }
         )

@@ -7,7 +7,7 @@
 #
 from abc import ABC, abstractmethod
 
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle
 
 
 class DataSink(ABC):
@@ -20,5 +20,5 @@ class DataSink(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def send(self, data_point: MeterDataPoint) -> None:
+    async def send(self, data_bundle: MeterDataBundle) -> None:
         raise NotImplementedError()

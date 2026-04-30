@@ -6,11 +6,11 @@
 # See LICENSES/README.md for more information.
 #
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Optional
 
 from smartmeter_datacollector.smartmeter.cosem import Cosem
 from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle
 from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig, SerialReader
 
 
@@ -29,7 +29,7 @@ class Meter(ABC):
     async def start(self) -> None:
         raise NotImplementedError()
 
-    def _notify_observers(self, data_points: List[MeterDataPoint]) -> None:
+    def _notify_observers(self, data_points: MeterDataBundle) -> None:
         for observer in self._observers:
             observer.notify(data_points)
 
@@ -61,5 +61,5 @@ class SerialHdlcDlmsMeter(Meter):
             if not dlms_objects:
                 return
             message_time = self._parser.extract_message_time()
-            data_points = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects, message_time)
-            self._notify_observers(data_points)
+            data_bundle = self._parser.convert_dlms_bundle_to_reader_data(dlms_objects, message_time)
+            self._notify_observers(data_bundle)
