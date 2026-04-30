@@ -16,6 +16,7 @@ REGEX_SHORT = r"^(\d{1,3})\W(\d{1,3})\W(\d{1,3})$"
 @dataclass(frozen=True)
 class OBISCode:
     PATTERN: ClassVar[re.Pattern] = re.compile(REGEX)
+    PATTERN_SHORT: ClassVar[re.Pattern] = re.compile(REGEX_SHORT)
 
     # pylint: disable=invalid-name
     a: int = field(compare=False)
@@ -44,7 +45,7 @@ class OBISCode:
 
     @classmethod
     def from_short_string(cls, obis_short_string: str) -> 'OBISCode':
-        match = re.match(REGEX_SHORT, obis_short_string)
+        match = cls.PATTERN_SHORT.match(obis_short_string)
         if not match:
             raise ValueError(f"Invalid short OBIS string {obis_short_string}.")
         groups = match.groups()

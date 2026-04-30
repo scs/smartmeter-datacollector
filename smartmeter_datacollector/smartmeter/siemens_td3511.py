@@ -182,7 +182,7 @@ DEFAULT_REGISTER_MAPPING = [
 
 
 class SiemensParser():
-    REGEX = r"(.{3,20})\(([\d\-\.:]{3,20})[*\)](.{0,10}[^\)\r\n])?"
+    REGEX = re.compile(r"(.{3,20})\(([\d\-\.:]{3,20})[*\)](.{0,10}[^\)\r\n])?")
     REGEX_OBIS_2_OCT = re.compile(r"^\d{1,3}\W\d{1,3}$")
 
     def __init__(self, use_system_time: bool = False) -> None:
