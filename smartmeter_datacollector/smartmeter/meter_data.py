@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
+from smartmeter_datacollector.smartmeter.obis import OBISCode
+
 
 @dataclass
 class MeterDataPointType:
@@ -102,11 +104,14 @@ class MeterDataPoint:
     value: float
     source: str
     timestamp: datetime
+    obis: OBISCode
 
     def __str__(self) -> str:
-        return f"{self.source} - {self.timestamp.isoformat()} - {self.type.name}: {self.value} {self.type.unit}"
+        return (f"{self.source} - {self.timestamp.isoformat()} - {self.type.name} ({self.obis}): "
+                f"{self.value} {self.type.unit}")
 
-    def to_json(self) -> str:
+    def to_json(self, short_obis: bool = False) -> str:
         dict_repr = dataclasses.asdict(self)
         dict_repr['timestamp'] = self.timestamp.isoformat()
+        dict_repr['obis'] = str(self.obis) if not short_obis else self.obis.to_short_str()
         return json.dumps(dict_repr)

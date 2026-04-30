@@ -113,7 +113,7 @@ class HdlcDlmsParser:
 
     def convert_dlms_bundle_to_reader_data(self, dlms_objects: List[GXDLMSObject],
                                            message_time: Optional[datetime] = None) -> List[MeterDataPoint]:
-        obis_obj_pairs = {}
+        obis_obj_pairs: dict[OBISCode, GXDLMSObject] = {}
         for obj in dlms_objects:
             try:
                 obis = OBISCode.from_string(str(obj.logicalName))
@@ -158,7 +158,7 @@ class HdlcDlmsParser:
                 except (TypeError, ValueError, OverflowError):
                     LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
                     continue
-                data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp))
+                data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp, obis))
         return data_points
 
     def _parse_dlms_with_push_object_list(self) -> List[GXDLMSObject]:
