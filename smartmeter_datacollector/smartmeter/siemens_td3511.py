@@ -10,13 +10,14 @@ import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Callable, List, Optional
+from typing import Callable, List
 
 import aioserial
 import serial
 
 from smartmeter_datacollector.smartmeter.meter import Meter, MeterError
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType, MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 from smartmeter_datacollector.smartmeter.reader import Reader, ReaderError
 from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig
 
@@ -182,6 +183,7 @@ DEFAULT_REGISTER_MAPPING = [
 
 class SiemensParser():
     REGEX = r"(.{3,20})\(([\d\-\.:]{3,20})[*\)](.{0,10}[^\)\r\n])?"
+    REGEX_OBIS_2_OCT = re.compile(r"^\d{1,3}\W\d{1,3}$")
 
     def __init__(self, use_system_time: bool = False) -> None:
         self._use_system_time = use_system_time
@@ -245,7 +247,16 @@ class SiemensParser():
                 LOGGER.warning("Invalid register value '%s'. Skipping register.", str(value))
                 continue
 
-            data_points.append(MeterDataPoint(data_point_type, scaled_value, meter_id, timestamp))
+            if self.REGEX_OBIS_2_OCT.match(obis):
+                obis = f"{obis}.0"
+
+            try:
+                obis_obj = OBISCode.from_short_string(obis)
+            except ValueError:
+                LOGGER.warning("Invalid OBIS code '%s'. Skipping register.", obis)
+                continue
+
+            data_points.append(MeterDataPoint(data_point_type, scaled_value, meter_id, timestamp, obis_obj))
 
         self.clear_buffer()
         return data_points

@@ -96,6 +96,9 @@ async def test_siemens_td3511_parse_and_provide_unencrypted_data(mocker: MockerF
     assert any(data.type == MeterDataPointTypes.REACTIVE_POWER_N.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_ENERGY_P.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_ENERGY_N.value for data in values)
+    assert any(data.type == MeterDataPointTypes.NET_FREQUENCY.value for data in values)
+    assert any(data.type == MeterDataPointTypes.CURRENT_L1.value for data in values)
+    assert any(data.type == MeterDataPointTypes.VOLTAGE_L1.value for data in values)
     assert all(data.source == "110002267" for data in values)
     assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "03/21/24 21:10:29" for data in values)
 
