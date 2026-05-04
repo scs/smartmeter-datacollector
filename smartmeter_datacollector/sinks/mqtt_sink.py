@@ -192,3 +192,23 @@ class MqttDataSink(DataSink):
                 "obis": data_point.obis.to_short_str(),
             }
         )
+
+
+class MqttSinkRlDsp(MqttDataSink):
+    def __init__(self, config: MqttConfig) -> None:
+        super().__init__(config)
+        self._group = "building"
+
+    async def send(self, data_bundle: MeterDataBundle) -> None:
+        topic = self.build_topic_name(data_bundle)
+        payload = self.to_mqtt_payload(data_bundle)
+        await self._publish_with_retries(topic, payload, retries=self.RETRIES)
+
+    def build_topic_name(self, data_bundle: MeterDataBundle) -> str:
+        return f"dt/{self._group}/{data_bundle.source}/ds"
+
+    @staticmethod
+    def to_mqtt_payload(data_bundle: MeterDataBundle) -> str:
+        meter: dict[str, str | float] = {"ts": data_bundle.timestamp.isoformat()}
+        meter.update({dp.obis.to_short_str(): dp.value for dp in data_bundle.data_points})
+        return json.dumps({"meter": meter})
