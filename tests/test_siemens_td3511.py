@@ -12,7 +12,7 @@ from typing import List
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
 from smartmeter_datacollector.smartmeter.siemens_td3511 import SiemensTD3511
 
 
@@ -88,8 +88,9 @@ async def test_siemens_td3511_parse_and_provide_unencrypted_data(mocker: MockerF
 
     serial_mock.start_and_listen.assert_awaited_once()
     observer.notify.assert_called_once()
-    values = observer.notify.call_args.args[0]
-    assert isinstance(values, list)
+    data_bundle = observer.notify.call_args.args[0]
+    assert isinstance(data_bundle, MeterDataBundle)
+    values = data_bundle.data_points
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in values)
     assert any(data.type == MeterDataPointTypes.REACTIVE_POWER_P.value for data in values)
@@ -99,8 +100,8 @@ async def test_siemens_td3511_parse_and_provide_unencrypted_data(mocker: MockerF
     assert any(data.type == MeterDataPointTypes.NET_FREQUENCY.value for data in values)
     assert any(data.type == MeterDataPointTypes.CURRENT_L1.value for data in values)
     assert any(data.type == MeterDataPointTypes.VOLTAGE_L1.value for data in values)
-    assert all(data.source == "110002267" for data in values)
-    assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "03/21/24 21:10:29" for data in values)
+    assert data_bundle.source == "110002267"
+    assert data_bundle.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "03/21/24 21:10:29"
 
 
 @pytest.fixture
@@ -137,4 +138,8 @@ async def test_siemens_td3511_do_not_provide_invalid_data(mocker: MockerFixture,
     await meter.start()
 
     serial_mock.start_and_listen.assert_awaited_once()
-    observer.notify.assert_not_called()
+    observer.notify.assert_called_once()
+    data_bundle = observer.notify.call_args.args[0]
+    assert isinstance(data_bundle, MeterDataBundle)
+    assert data_bundle.source == "110002267"
+    assert data_bundle.data_points == []

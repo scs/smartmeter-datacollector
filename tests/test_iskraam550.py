@@ -11,7 +11,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from smartmeter_datacollector.smartmeter.iskraam550 import IskraAM550
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
 
 
 @pytest.mark.asyncio
@@ -48,8 +48,9 @@ async def test_iskraam550_parse_and_provide_unencrypted_data(mocker: MockerFixtu
 
     serial_mock.start_and_listen.assert_awaited_once()
     observer.notify.assert_called_once()
-    values = observer.notify.call_args.args[0]
-    assert isinstance(values, list)
+    data_bundle = observer.notify.call_args.args[0]
+    assert isinstance(data_bundle, MeterDataBundle)
+    values = data_bundle.data_points
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in values)
     assert any(data.type == MeterDataPointTypes.REACTIVE_POWER_P.value for data in values)
@@ -61,6 +62,6 @@ async def test_iskraam550_parse_and_provide_unencrypted_data(mocker: MockerFixtu
     assert any(data.type == MeterDataPointTypes.REACTIVE_ENERGY_Q3.value for data in values)
     assert any(data.type == MeterDataPointTypes.REACTIVE_ENERGY_Q4.value for data in values)
     assert any(data.type == MeterDataPointTypes.POWER_FACTOR.value for data in values)
-    assert all(data.source == "ISK1030775213859" for data in values)
+    assert data_bundle.source == "ISK1030775213859"
     # message time comes with timezone info (+02:00)
-    assert all(data.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "08/15/20 04:19:45" for data in values)
+    assert data_bundle.timestamp.strftime(r"%m/%d/%y %H:%M:%S") == "08/15/20 04:19:45"

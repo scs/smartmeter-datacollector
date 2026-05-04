@@ -12,7 +12,7 @@ from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
 from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 from tests.conftest import prepare_parser
 
@@ -57,30 +57,29 @@ class TestDlmsParserUnencrypted:
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
-        assert isinstance(meter_data, list)
-        assert len(meter_data) == 11
-        assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in meter_data)
-        assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in meter_data)
-        assert all(isinstance(data.value, float) for data in meter_data)
-        assert all(data.source == "LGZ1030655933512" for data in meter_data)
-        assert all(data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S")
-                   == "07/06/21 14:58:18" for data in meter_data)
+        assert isinstance(meter_data, MeterDataBundle)
+        assert len(meter_data.data_points) == 11
+        assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in meter_data.data_points)
+        assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in meter_data.data_points)
+        assert all(isinstance(data.value, float) for data in meter_data.data_points)
+        assert meter_data.source == "LGZ1030655933512"
+        assert meter_data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18"
 
     def test_parse_dlms_to_meter_data2(self, unencrypted_valid_data_lg2: List[bytes], cosem_config_lg: Cosem):
         parser = prepare_parser(unencrypted_valid_data_lg2, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
-        assert isinstance(meter_data, list)
-        assert len(meter_data) == 8
+        assert isinstance(meter_data, MeterDataBundle)
+        assert len(meter_data.data_points) == 8
 
     def test_ignore_not_parsable_data_to_meter_data(self, unencrypted_invalid_data_lg: List[bytes], cosem_config_lg: Cosem):
         parser = prepare_parser(unencrypted_invalid_data_lg, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
-        assert isinstance(meter_data, list)
-        assert len(meter_data) == 5
+        assert isinstance(meter_data, MeterDataBundle)
+        assert len(meter_data.data_points) == 5
 
     def test_parse_dlms_data_with_extended_registers(self, unencrypted_extended_register_data: List[bytes]):
         cosem = Cosem("fallbackId", register_obis_extended=[RegisterCosem(
@@ -91,9 +90,9 @@ class TestDlmsParserUnencrypted:
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
 
-        assert isinstance(meter_data, list)
-        assert len(meter_data) == 1
-        assert meter_data[0].value == 30545
+        assert isinstance(meter_data, MeterDataBundle)
+        assert len(meter_data.data_points) == 1
+        assert meter_data.data_points[0].value == 30545
 
 
 class TestDlmsParserEncrypted:

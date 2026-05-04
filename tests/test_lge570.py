@@ -11,7 +11,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from smartmeter_datacollector.smartmeter.lge570 import LGE570
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
 
 
 @pytest.mark.asyncio
@@ -33,8 +33,9 @@ async def test_lge570_parse_and_provide_encrypted_data(mocker: MockerFixture,
 
     serial_mock.start_and_listen.assert_awaited_once()
     observer.notify.assert_called_once()
-    values = observer.notify.call_args.args[0]
-    assert isinstance(values, list)
+    data_bundle = observer.notify.call_args.args[0]
+    assert isinstance(data_bundle, MeterDataBundle)
+    values = data_bundle.data_points
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_P.value for data in values)
     assert any(data.type == MeterDataPointTypes.ACTIVE_POWER_N.value for data in values)
     assert any(data.type == MeterDataPointTypes.REACTIVE_POWER_P.value for data in values)
@@ -49,4 +50,4 @@ async def test_lge570_parse_and_provide_encrypted_data(mocker: MockerFixture,
     assert any(data.type == MeterDataPointTypes.CURRENT_L2.value for data in values)
     assert any(data.type == MeterDataPointTypes.CURRENT_L3.value for data in values)
     assert any(data.type == MeterDataPointTypes.POWER_FACTOR.value for data in values)
-    assert all(data.source == "LGZ1030769231253" for data in values)
+    assert data_bundle.source == "LGZ1030769231253"

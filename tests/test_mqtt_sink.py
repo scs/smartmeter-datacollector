@@ -16,7 +16,7 @@ from aiomqtt import MqttCodeError
 from paho.mqtt.client import MQTT_ERR_NO_CONN
 
 from smartmeter_datacollector.sinks.mqtt_sink import MqttConfig, MqttDataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPoint, MeterDataPointType
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 TEST_DATA_POINT_TYPE = MeterDataPointType("TEST_TYPE", "test type", "unit")
@@ -34,15 +34,17 @@ async def test_mqtt_sink_send_datapoint(mocked_mqtt_client):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
 
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
+    timestamp = datetime.now(timezone.utc)
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, TEST_OBIS)
+    data_bundle = MeterDataBundle("test_source", timestamp, [data_point])
     expected_topic = f"smartmeter/test_source/{TEST_DATA_POINT_TYPE.identifier}"
     expected_payload = json.dumps({
         "value": data_point.value,
-        "timestamp": int(data_point.timestamp.timestamp()),
+        "timestamp": int(timestamp.timestamp()),
         "obis": TEST_OBIS.to_short_str(),
     })
 
-    await sink.send(data_point)
+    await sink.send(data_bundle)
 
     mocked_mqtt_client.publish.assert_awaited_with(expected_topic, expected_payload)
 
@@ -51,13 +53,14 @@ async def test_mqtt_sink_send_datapoint(mocked_mqtt_client):
 async def test_mqtt_sink_retry_sending_datapoint(mocked_mqtt_client: mock.MagicMock):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, TEST_OBIS)
+    data_bundle = MeterDataBundle("test_source", datetime.now(timezone.utc), [data_point])
 
     # Simulate publish raising MqttCodeError the first time, then succeeding
     mocked_mqtt_client.publish.side_effect = [MqttCodeError(MQTT_ERR_NO_CONN), None]
 
     with mock.patch("smartmeter_datacollector.sinks.mqtt_sink.asyncio.sleep"):
-        await sink.send(data_point)
+        await sink.send(data_bundle)
 
     assert mocked_mqtt_client.publish.await_count == 2
 
@@ -66,12 +69,13 @@ async def test_mqtt_sink_retry_sending_datapoint(mocked_mqtt_client: mock.MagicM
 async def test_mqtt_sink_only_retry_sending_3_times(mocked_mqtt_client: mock.MagicMock):
     config = MqttConfig("localhost")
     sink = MqttDataSink(config)
-    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, "test_source", datetime.now(timezone.utc), TEST_OBIS)
+    data_point = MeterDataPoint(TEST_DATA_POINT_TYPE, 1.0, TEST_OBIS)
+    data_bundle = MeterDataBundle("test_source", datetime.now(timezone.utc), [data_point])
 
     mocked_mqtt_client.publish.side_effect = [MqttCodeError(MQTT_ERR_NO_CONN)]*4
 
     with mock.patch("smartmeter_datacollector.sinks.mqtt_sink.asyncio.sleep"):
-        await sink.send(data_point)
+        await sink.send(data_bundle)
 
     assert mocked_mqtt_client.publish.await_count == 3
 
