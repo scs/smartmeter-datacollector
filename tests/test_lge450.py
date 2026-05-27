@@ -5,13 +5,13 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
-from typing import List
-
 import pytest
 from pytest_mock.plugin import MockerFixture
 
 from smartmeter_datacollector.smartmeter.lge450 import LGE450
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
+from tests.conftest import split_hex_data_to_frames
+from tests.testdata.lg_e450 import UNENCRYPTED_VALID_DATA
 
 
 @pytest.mark.asyncio
@@ -30,17 +30,17 @@ async def test_lge450_initialization(mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture,
-                                                         unencrypted_valid_data_lg: List[bytes]):
+async def test_lge450_parse_and_provide_unencrypted_data(mocker: MockerFixture):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = LGE450("/test/port")
     meter.register(observer)
+    frames = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA)
 
     def data_received():
-        for frame in unencrypted_valid_data_lg:
+        for frame in frames:
             meter._data_received(frame)
     serial_mock.start_and_listen.side_effect = data_received
 

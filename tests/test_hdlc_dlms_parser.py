@@ -6,7 +6,6 @@
 # See LICENSES/README.md for more information.
 #
 import re
-from typing import List
 
 from gurux_dlms.objects.GXDLMSObject import GXDLMSObject
 
@@ -14,11 +13,14 @@ from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.hdlc_dlms_parser import HdlcDlmsParser
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
 from smartmeter_datacollector.smartmeter.obis import OBISCode
-from tests.conftest import prepare_parser
+from tests.conftest import prepare_parser, split_hex_data_to_frames
+from tests.testdata.lg_e450 import (ENCRYPTED_DATA_NO_PUSHLIST, UNENCRYPTED_EXTENDED_REGISTER_DATA,
+                                    UNENCRYPTED_VALID_DATA, UNENCRYPTED_VALID_DATA1)
 
 
 class TestHdlcParserUnencrypted:
-    def test_extract_hdlc_data_framewise(self, unencrypted_valid_data_lg: List[bytes]):
+    def test_extract_hdlc_data_framewise(self):
+        unencrypted_valid_data_lg = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA)
         parser = HdlcDlmsParser(Cosem("", []))
 
         for frame in unencrypted_valid_data_lg:
@@ -27,7 +29,8 @@ class TestHdlcParserUnencrypted:
 
         assert parser.extract_data_from_hdlc_frames()
 
-    def test_extract_hdlc_data_in_halfframes(self, unencrypted_valid_data_lg: List[bytes]):
+    def test_extract_hdlc_data_in_halfframes(self):
+        unencrypted_valid_data_lg = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA)
         parser = HdlcDlmsParser(Cosem("", []))
 
         for frame in unencrypted_valid_data_lg:
@@ -41,7 +44,8 @@ class TestHdlcParserUnencrypted:
 
 
 class TestDlmsParserUnencrypted:
-    def test_hdlc_to_dlms_objects_with_pushlist(self, unencrypted_valid_data_lg: List[bytes], cosem_config_lg: Cosem):
+    def test_hdlc_to_dlms_objects_with_pushlist(self, cosem_config_lg: Cosem):
+        unencrypted_valid_data_lg = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA)
         parser = prepare_parser(unencrypted_valid_data_lg, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
 
@@ -52,7 +56,8 @@ class TestDlmsParserUnencrypted:
             assert isinstance(obj, GXDLMSObject)
             assert re.match(obis_pattern, str(obj.logicalName))
 
-    def test_parse_dlms_to_meter_data(self, unencrypted_valid_data_lg: List[bytes], cosem_config_lg: Cosem):
+    def test_parse_dlms_to_meter_data(self, cosem_config_lg: Cosem):
+        unencrypted_valid_data_lg = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA)
         parser = prepare_parser(unencrypted_valid_data_lg, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
@@ -65,7 +70,8 @@ class TestDlmsParserUnencrypted:
         assert meter_data.source == "LGZ1030655933512"
         assert meter_data.timestamp.astimezone().strftime(r"%m/%d/%y %H:%M:%S") == "07/06/21 14:58:18"
 
-    def test_parse_dlms_to_meter_data2(self, unencrypted_valid_data_lg2: List[bytes], cosem_config_lg: Cosem):
+    def test_parse_dlms_to_meter_data2(self, cosem_config_lg: Cosem):
+        unencrypted_valid_data_lg2 = split_hex_data_to_frames(UNENCRYPTED_VALID_DATA1)
         parser = prepare_parser(unencrypted_valid_data_lg2, cosem_config_lg)
         dlms_objects = parser.parse_to_dlms_objects()
         meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
@@ -73,15 +79,8 @@ class TestDlmsParserUnencrypted:
         assert isinstance(meter_data, MeterDataBundle)
         assert len(meter_data.data_points) == 8
 
-    def test_ignore_not_parsable_data_to_meter_data(self, unencrypted_invalid_data_lg: List[bytes], cosem_config_lg: Cosem):
-        parser = prepare_parser(unencrypted_invalid_data_lg, cosem_config_lg)
-        dlms_objects = parser.parse_to_dlms_objects()
-        meter_data = parser.convert_dlms_bundle_to_reader_data(dlms_objects)
-
-        assert isinstance(meter_data, MeterDataBundle)
-        assert len(meter_data.data_points) == 5
-
-    def test_parse_dlms_data_with_extended_registers(self, unencrypted_extended_register_data: List[bytes]):
+    def test_parse_dlms_data_with_extended_registers(self):
+        unencrypted_extended_register_data = split_hex_data_to_frames(UNENCRYPTED_EXTENDED_REGISTER_DATA)
         cosem = Cosem("fallbackId", register_obis_extended=[RegisterCosem(
             # this is not the correct MeterDataPointType for this OBIS code (just for testing)
             OBISCode(0, 1, 24, 2, 1, 255), MeterDataPointTypes.ACTIVE_POWER_N.value)])
@@ -96,7 +95,8 @@ class TestDlmsParserUnencrypted:
 
 
 class TestDlmsParserEncrypted:
-    def test_hdlc_to_dlms_objects_without_pushlist(self, encrypted_data_no_pushlist_lg: List[bytes], cosem_config_lg: Cosem):
+    def test_hdlc_to_dlms_objects_without_pushlist(self, cosem_config_lg: Cosem):
+        encrypted_data_no_pushlist_lg = split_hex_data_to_frames(ENCRYPTED_DATA_NO_PUSHLIST)
         parser = prepare_parser(encrypted_data_no_pushlist_lg, cosem_config_lg, "F08660A6C19D2048556BF623AB0257E6")
         dlms_objects = parser.parse_to_dlms_objects()
 

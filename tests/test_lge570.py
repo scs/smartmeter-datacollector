@@ -5,27 +5,27 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
-from typing import List
-
 import pytest
 from pytest_mock.plugin import MockerFixture
 
 from smartmeter_datacollector.smartmeter.lge570 import LGE570
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPointTypes
+from tests.conftest import split_hex_data_to_frames
+from tests.testdata.lg_e570 import ENCRYPTED_VALID_DATA
 
 
 @pytest.mark.asyncio
-async def test_lge570_parse_and_provide_encrypted_data(mocker: MockerFixture,
-                                                       encrypted_valid_data_lge570: List[bytes]):
+async def test_lge570_parse_and_provide_encrypted_data(mocker: MockerFixture):
     observer = mocker.stub("collector_mock")
     observer.mock_add_spec(['notify'])
     serial_mock = mocker.patch("smartmeter_datacollector.smartmeter.meter.SerialReader",
                                autospec=True).return_value
     meter = LGE570("/test/port", decryption_key="101112131415161718191A1B1C1D1E1F")
     meter.register(observer)
+    frames = split_hex_data_to_frames(ENCRYPTED_VALID_DATA)
 
     def data_received():
-        for frame in encrypted_valid_data_lge570:
+        for frame in frames:
             meter._data_received(frame)
     serial_mock.start_and_listen.side_effect = data_received
 
