@@ -272,3 +272,31 @@ def test_mqtt_sink_rldsp_build_topic_name():
     topic = sink.build_topic_name(data_bundle)
 
     assert topic == "dt/building/my_meter/ds"
+
+
+def test_mqtt_config_topic_group_valid():
+    cfg_parser = configparser.ConfigParser()
+    cfg_parser.read_dict({
+        "sink": {
+            'type': "mqtt",
+            'host': "localhost",
+            'topic_group': "  ZEV  ",
+        }
+    })
+    cfg = MqttConfig.from_sink_config(cfg_parser["sink"])
+
+    assert cfg.topic_group == "ZEV"
+
+
+def test_mqtt_config_topic_group_invalid_uses_default():
+    cfg_parser = configparser.ConfigParser()
+    cfg_parser.read_dict({
+        "sink": {
+            'type': "mqtt",
+            'host': "localhost",
+            'topic_group': "invalid-group!",
+        }
+    })
+    cfg = MqttConfig.from_sink_config(cfg_parser["sink"])
+
+    assert cfg.topic_group == "building"

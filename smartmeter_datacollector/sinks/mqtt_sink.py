@@ -33,6 +33,7 @@ class MqttConfig:
     check_hostname: bool = True
     client_cert_path: Optional[str] = None
     client_key_path: Optional[str] = None
+    topic_group: str = "building"
 
     def with_tls(
         self, ca_cert_path: Optional[str] = None, check_hostname: bool = True
@@ -72,6 +73,9 @@ class MqttConfig:
         client_key_path = config.get("client_key_path")
         if client_cert_path is not None and client_key_path is not None:
             mqtt_cfg.with_client_cert_auth(str(client_cert_path), str(client_key_path))
+        topic_group = config.get("topic_group")
+        if topic_group and topic_group.strip().isalnum():
+            mqtt_cfg.topic_group = topic_group.strip()
         return mqtt_cfg
 
 
@@ -197,7 +201,8 @@ class MqttDataSink(DataSink):
 class MqttSinkRlDsp(MqttDataSink):
     def __init__(self, config: MqttConfig) -> None:
         super().__init__(config)
-        self._group = "building"
+
+        self._group = config.topic_group
 
     async def send(self, data_bundle: MeterDataBundle) -> None:
         topic = self.build_topic_name(data_bundle)
