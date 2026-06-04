@@ -47,10 +47,10 @@ async def test_lge360_vse_standard(mocker: MockerFixture):
     assert point_value(MeterDataPointTypes.ACTIVE_ENERGY_N) == 4547
     assert point_value(MeterDataPointTypes.REACTIVE_ENERGY_P) == 27256
     assert point_value(MeterDataPointTypes.REACTIVE_ENERGY_N) == 4432
-    assert point_value(MeterDataPointTypes.VOLTAGE_L1) == 235.7
+    assert point_value(MeterDataPointTypes.VOLTAGE_L1) == pytest.approx(235.7)
     assert point_value(MeterDataPointTypes.VOLTAGE_L2) == 0
     assert point_value(MeterDataPointTypes.VOLTAGE_L3) == 0
-    assert point_value(MeterDataPointTypes.CURRENT_L1) == 0.06
+    assert point_value(MeterDataPointTypes.CURRENT_L1) == pytest.approx(0.06)
     assert point_value(MeterDataPointTypes.CURRENT_L2) == 0
     assert point_value(MeterDataPointTypes.CURRENT_L3) == 0
     assert data_bundle.source == "LGZ1030163598905"

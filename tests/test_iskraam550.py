@@ -100,10 +100,10 @@ async def test_iskraam550_parse_data_with_vse_standard(mocker: MockerFixture):
     assert point_value(MeterDataPointTypes.ACTIVE_ENERGY_N) == 8987
     assert point_value(MeterDataPointTypes.REACTIVE_ENERGY_P) == 12784
     assert point_value(MeterDataPointTypes.REACTIVE_ENERGY_N) == 5654
-    assert point_value(MeterDataPointTypes.VOLTAGE_L1) == 234.7
+    assert point_value(MeterDataPointTypes.VOLTAGE_L1) == pytest.approx(234.7)
     assert point_value(MeterDataPointTypes.VOLTAGE_L2) == 0
     assert point_value(MeterDataPointTypes.VOLTAGE_L3) == 0
-    assert point_value(MeterDataPointTypes.CURRENT_L1) == 0.12
+    assert point_value(MeterDataPointTypes.CURRENT_L1) == pytest.approx(0.12)
     assert point_value(MeterDataPointTypes.CURRENT_L2) == 0
     assert point_value(MeterDataPointTypes.CURRENT_L3) == 0
     assert data_bundle.source == "ISK1030783821282"
