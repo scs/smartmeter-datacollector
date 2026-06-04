@@ -128,4 +128,4 @@ async def test_lge450_vse_standard(mocker: MockerFixture):
     assert point_value(MeterDataPointTypes.CURRENT_L2) == 0.08
     assert point_value(MeterDataPointTypes.CURRENT_L3) == 0.00
     assert data_bundle.source == "LGZ1030653520967"
-    assert data_bundle.timestamp.strftime(r"%d.%m.%Y %H:%M:%S") == "04.05.2026 09:39:21"
+    assert data_bundle.timestamp.astimezone().strftime(r"%d.%m.%Y %H:%M:%S") == "04.05.2026 11:39:21"
