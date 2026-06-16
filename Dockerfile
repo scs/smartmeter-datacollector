@@ -1,7 +1,7 @@
 ####################
 # Builder
 ####################
-FROM python:3.11-alpine AS builder
+FROM python:3.13-alpine AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -26,7 +26,7 @@ RUN poetry build --format=wheel --no-ansi --output="./dist"
 ####################
 # Runtime
 ####################
-FROM python:3.11-alpine AS runtime
+FROM python:3.13-alpine AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
