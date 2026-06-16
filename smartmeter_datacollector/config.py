@@ -27,7 +27,7 @@ DEFAULT_CONFIG = {
     },
     'sink1': {
         'type': "mqtt",
-        'host': "localhost",
+        'host': "127.0.0.1",
         'port': 1883,
         'tls': False,
         'ca_file_path': "",
