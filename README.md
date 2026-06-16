@@ -106,7 +106,7 @@ The Python3 package does not contain any infrastructure to run `smartmeter-datac
 
 ### Python Requirements
 
-* Python >= 3.10 (tested with 3.11)
+* Python >= 3.10 (tested with 3.13)
 
 ### Installation
 
