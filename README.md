@@ -191,6 +191,43 @@ The configuration file can be located anywhere and use any filename. If no `.ini
 
 When `smartmeter-datacollector` has been installed as a Debian package it provides a systemd .service file named `smartmeter-datacollector.service`. Therefore the service can be managed using the `systemctl` command. See [Run as a systemd service](https://github.com/scs/smartmeter-datacollector/wiki/How-to-use#run-as-a-systemd-service) for possible commands.
 
+## Run as a Docker image with docker compose
+
+`smartmeter-datacollector` can be run with docker compose and a docker image, built from sources.
+
+- Provide a valid .ini configuration file (see example below)
+- in a newly created `.env` file set:
+  - `SMARTMETER_DATACOLLECTOR_INI`: this file gets mounted into the docker container and is used by the service
+  - `SMARTMETER_SERIAL_DEVICE`: the serial connection to the smartmeter
+4. Run `docker compose up`
+
+### Example files
+
+#### `.env`
+
+```
+DATACOLLECTOR_INI=./datacollector.ini
+SERIAL_DEVICE=/dev/serial/by-id/device
+```
+
+#### `datacollector.ini`
+
+```
+[reader0]
+type = kamstrup_han
+port = /dev/ttyUSB0
+key = supersecretHexKey
+
+[sink0]
+type = mqtt
+host = mqtt.localdomain
+port = 1883
+tls = False
+ca_file_path = 
+check_hostname = False
+username = 
+password = 
+```
 
 # How to develop
 
