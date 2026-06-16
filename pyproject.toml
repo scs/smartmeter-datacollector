@@ -1,6 +1,6 @@
 [project]
 name = "smartmeter-datacollector"
-version = "1.3.0"
+version = "2.0.0"
 description = "Smart Meter Data Collector"
 authors = [{ name = "Supercomputing Systems AG", email = "info@scs.ch" }]
 maintainers = [{ name = "Supercomputing Systems AG", email = "info@scs.ch" }]

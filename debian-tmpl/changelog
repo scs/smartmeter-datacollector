@@ -1,3 +1,18 @@
+smartmeter-datacollector (2.0.0-1) unstable; urgency=low
+
+  * add MqttRlDspSink based on VSE industry document RL-DSP with a modified MQTT topic and payload structure
+  * add topic_group configuration field for MQTT sinks
+  * restructure MeterDataPoint lists into MeterDataBundle
+  * add OBIS code to MeterDataPoint and include it in the MQTT JSON output
+  * use register extension parameter to override default registers
+  * fix voltage scaling for Iskra AM550 and L+G E360 meters
+  * fix L+G E570 current value scaling
+  * fix extracting message time before parsing and clearing DLMS data
+  * set Python 3.13 as default version (debian trixie)
+  * upgrade all dependencies
+
+ -- Supercomputing Systems AG <info@scs.ch>  Sun, 16 Jun 2026 14:28:00 +0200
+
 smartmeter-datacollector (1.3.0-1) unstable; urgency=low
 
   * add parsing extended DLMS registers
