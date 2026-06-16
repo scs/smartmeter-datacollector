@@ -6,7 +6,6 @@
 # See LICENSES/README.md for more information.
 #
 import asyncio
-import sys
 from datetime import datetime, timezone
 
 import pytest
@@ -14,7 +13,8 @@ from pytest_mock import MockerFixture
 
 from smartmeter_datacollector.collector import Collector
 from smartmeter_datacollector.sinks.data_sink import DataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint, MeterDataPointType
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPoint, MeterDataPointType
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 
 @pytest.fixture
@@ -26,16 +26,17 @@ def test_type() -> MeterDataPointType:
 async def test_collector_with_one_sink(mocker: MockerFixture, test_type: MeterDataPointType):
     coll = Collector()
     sink = mocker.AsyncMock(DataSink)
-    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(test_type, 0.0, OBISCode(0, 1, 2, 3, 4, 5))
+    data_bundle = MeterDataBundle("test_source", datetime.now(timezone.utc), [data_point])
 
     coll.register_sink(sink)
-    coll.notify([data_point])
+    coll.notify(data_bundle)
     routine = coll.process_queue()
 
     with pytest.raises(asyncio.TimeoutError):
         await asyncio.wait_for(routine, 0.1)
 
-    sink.send.assert_awaited_once_with(data_point)
+    sink.send.assert_awaited_once_with(data_bundle)
 
 
 @pytest.mark.asyncio
@@ -44,16 +45,16 @@ async def test_collector_with_one_sink_multiple_data_points(mocker: MockerFixtur
     sink = mocker.AsyncMock(DataSink)
 
     coll.register_sink(sink)
-    point0 = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
-    point1 = MeterDataPoint(test_type, 1.0, "test_source", datetime.now(timezone.utc))
-    coll.notify([point0, point1])
+    point0 = MeterDataPoint(test_type, 0.0, OBISCode(0, 1, 2, 3, 4, 5))
+    point1 = MeterDataPoint(test_type, 1.0, OBISCode(0, 1, 3, 4, 5, 6))
+    data_bundle = MeterDataBundle("test_source", datetime.now(timezone.utc), [point0, point1])
+    coll.notify(data_bundle)
     routine = coll.process_queue()
 
     with pytest.raises(asyncio.TimeoutError):
         await asyncio.wait_for(routine, 0.1)
 
-    sink.send.assert_awaited_with(point1)
-    assert sink.send.await_count == 2
+    sink.send.assert_awaited_once_with(data_bundle)
 
 
 @pytest.mark.asyncio
@@ -62,15 +63,16 @@ async def test_collector_with_two_sinks(mocker: MockerFixture, test_type: MeterD
     sink0 = mocker.AsyncMock(DataSink)
     sink1 = mocker.AsyncMock(DataSink)
 
-    data_point = MeterDataPoint(test_type, 0.0, "test_source", datetime.now(timezone.utc))
+    data_point = MeterDataPoint(test_type, 0.0, OBISCode(0, 1, 2, 3, 4, 5))
+    data_bundle = MeterDataBundle("test_source", datetime.now(timezone.utc), [data_point])
 
     coll.register_sink(sink0)
     coll.register_sink(sink1)
-    coll.notify([data_point])
+    coll.notify(data_bundle)
     routine = coll.process_queue()
 
     with pytest.raises(asyncio.TimeoutError):
         await asyncio.wait_for(routine, 0.1)
 
-    sink0.send.assert_awaited_once_with(data_point)
-    sink1.send.assert_awaited_once_with(data_point)
+    sink0.send.assert_awaited_once_with(data_bundle)
+    sink1.send.assert_awaited_once_with(data_bundle)

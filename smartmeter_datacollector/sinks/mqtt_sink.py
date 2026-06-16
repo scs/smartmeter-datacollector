@@ -16,7 +16,7 @@ from typing import Optional
 from aiomqtt import Client, MqttCodeError, MqttError
 
 from smartmeter_datacollector.sinks.data_sink import DataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPoint
 
 LOGGER = logging.getLogger("sink")
 
@@ -33,6 +33,7 @@ class MqttConfig:
     check_hostname: bool = True
     client_cert_path: Optional[str] = None
     client_key_path: Optional[str] = None
+    topic_group: str = "building"
 
     def with_tls(
         self, ca_cert_path: Optional[str] = None, check_hostname: bool = True
@@ -72,6 +73,9 @@ class MqttConfig:
         client_key_path = config.get("client_key_path")
         if client_cert_path is not None and client_key_path is not None:
             mqtt_cfg.with_client_cert_auth(str(client_cert_path), str(client_key_path))
+        topic_group = config.get("topic_group")
+        if topic_group and topic_group.strip().isalnum():
+            mqtt_cfg.topic_group = topic_group.strip()
         return mqtt_cfg
 
 
@@ -139,11 +143,11 @@ class MqttDataSink(DataSink):
         self._client_task = None
         LOGGER.info("Disconnected from MQTT broker")
 
-    async def send(self, data_point: MeterDataPoint) -> None:
-        topic = MqttDataSink.get_topic_name_for_datapoint(data_point)
-        dp_json = self.data_point_to_mqtt_json(data_point)
-
-        await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
+    async def send(self, data_bundle: MeterDataBundle) -> None:
+        for data_point in data_bundle.data_points:
+            topic = MqttDataSink.get_topic_name_for_datapoint(data_point, data_bundle.source)
+            dp_json = self.data_point_to_mqtt_json(data_point, int(data_bundle.timestamp.timestamp()))
+            await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
 
     async def _connection_handler(self) -> None:
         while True:
@@ -180,14 +184,36 @@ class MqttDataSink(DataSink):
                      topic, retries + 1)
 
     @staticmethod
-    def get_topic_name_for_datapoint(data_point: MeterDataPoint) -> str:
-        return f"smartmeter/{data_point.source}/{data_point.type.identifier}"
+    def get_topic_name_for_datapoint(data_point: MeterDataPoint, source: str) -> str:
+        return f"smartmeter/{source}/{data_point.type.identifier}"
 
     @staticmethod
-    def data_point_to_mqtt_json(data_point: MeterDataPoint) -> str:
+    def data_point_to_mqtt_json(data_point: MeterDataPoint, timestamp: int) -> str:
         return json.dumps(
             {
                 "value": data_point.value,
-                "timestamp": int(data_point.timestamp.timestamp()),
+                "timestamp": timestamp,
+                "obis": data_point.obis.to_short_str(),
             }
         )
+
+
+class MqttSinkRlDsp(MqttDataSink):
+    def __init__(self, config: MqttConfig) -> None:
+        super().__init__(config)
+
+        self._group = config.topic_group
+
+    async def send(self, data_bundle: MeterDataBundle) -> None:
+        topic = self.build_topic_name(data_bundle)
+        payload = self.to_mqtt_payload(data_bundle)
+        await self._publish_with_retries(topic, payload, retries=self.RETRIES)
+
+    def build_topic_name(self, data_bundle: MeterDataBundle) -> str:
+        return f"dt/{self._group}/{data_bundle.source}/ds"
+
+    @staticmethod
+    def to_mqtt_payload(data_bundle: MeterDataBundle) -> str:
+        meter: dict[str, str | float] = {"ts": data_bundle.timestamp.isoformat()}
+        meter.update({dp.obis.to_short_str(): dp.value for dp in data_bundle.data_points})
+        return json.dumps({"meter": meter})

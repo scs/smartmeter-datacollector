@@ -10,14 +10,16 @@ from dataclasses import dataclass, field
 from typing import ClassVar, Union
 
 REGEX = r"^(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})$"
+REGEX_SHORT = r"^(\d{1,3})\W(\d{1,3})\W(\d{1,3})$"
 
 
 @dataclass(frozen=True)
 class OBISCode:
     PATTERN: ClassVar[re.Pattern] = re.compile(REGEX)
+    PATTERN_SHORT: ClassVar[re.Pattern] = re.compile(REGEX_SHORT)
 
     # pylint: disable=invalid-name
-    a: int
+    a: int = field(compare=False)
     b: int = field(compare=False)
     c: int
     d: int
@@ -26,6 +28,9 @@ class OBISCode:
 
     def __str__(self) -> str:
         return f"{self.a}-{self.b}:{self.c}.{self.d}.{self.e}*{self.f}"
+
+    def to_short_str(self) -> str:
+        return f"{self.c}.{self.d}.{self.e}"
 
     def to_gurux_str(self) -> str:
         return f"{self.a}.{self.b}.{self.c}.{self.d}.{self.e}.{self.f}"
@@ -37,6 +42,14 @@ class OBISCode:
             raise ValueError(f"Invalid OBIS string {obis_string}.")
         groups = match.groups()
         return cls(*(int(g) for g in groups))
+
+    @classmethod
+    def from_short_string(cls, obis_short_string: str) -> 'OBISCode':
+        match = cls.PATTERN_SHORT.match(obis_short_string)
+        if not match:
+            raise ValueError(f"Invalid short OBIS string {obis_short_string}.")
+        groups = match.groups()
+        return cls(a=1, b=0, c=int(groups[0]), d=int(groups[1]), e=int(groups[2]))
 
     @classmethod
     def from_bytes(cls, obis_bytes: Union[bytes, bytearray]) -> 'OBISCode':

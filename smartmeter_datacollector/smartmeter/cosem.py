@@ -27,7 +27,7 @@ class RegisterCosem:
     scaling: float = 1.0
 
 
-DEFAULT_REGISTER_MAPPING = [
+DEFAULT_REGISTER_MAP = [
     RegisterCosem(OBISCode(1, 0, 1, 7, 0), MeterDataPointTypes.ACTIVE_POWER_P.value),
     RegisterCosem(OBISCode(1, 0, 2, 7, 0), MeterDataPointTypes.ACTIVE_POWER_N.value),
     RegisterCosem(OBISCode(1, 0, 3, 7, 0), MeterDataPointTypes.REACTIVE_POWER_P.value),
@@ -118,10 +118,9 @@ class Cosem:
             LOGGER.warning("Empty fallback ID. Setting to random UUID %s.", fallback_id)
         self._fallback_id = fallback_id
         self._id_obis_override = id_obis_override if id_obis_override else []
-        registers = DEFAULT_REGISTER_MAPPING
+        self._register_obis = {r.obis: r for r in DEFAULT_REGISTER_MAP}
         if register_obis_extended:
-            registers += register_obis_extended
-        self._register_obis = {r.obis: r for r in registers}
+            self._register_obis.update({r.obis: r for r in register_obis_extended})
         self._id_detect_countdown = Cosem.OBJECT_DETECT_ATTEMPTS
 
     def retrieve_id(self, dlms_objects: Dict[OBISCode, Any]) -> str:

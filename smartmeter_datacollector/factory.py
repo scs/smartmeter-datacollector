@@ -13,7 +13,7 @@ from smartmeter_datacollector.collector import Collector
 from smartmeter_datacollector.config import InvalidConfigError
 from smartmeter_datacollector.sinks.data_sink import DataSink
 from smartmeter_datacollector.sinks.logger_sink import LoggerSink
-from smartmeter_datacollector.sinks.mqtt_sink import MqttConfig, MqttDataSink
+from smartmeter_datacollector.sinks.mqtt_sink import MqttConfig, MqttDataSink, MqttSinkRlDsp
 from smartmeter_datacollector.smartmeter.iskraam550 import IskraAM550
 from smartmeter_datacollector.smartmeter.kamstrup_han import KamstrupHAN
 from smartmeter_datacollector.smartmeter.lge360 import LGE360
@@ -91,6 +91,9 @@ def build_sinks(config: ConfigParser) -> List[DataSink]:
         elif sink_type == "mqtt":
             mqtt_config = MqttConfig.from_sink_config(sink_config)
             sinks.append(MqttDataSink(mqtt_config))
+        elif sink_type == "mqttrldsp":
+            mqtt_config = MqttConfig.from_sink_config(sink_config)
+            sinks.append(MqttSinkRlDsp(mqtt_config))
         else:
             raise InvalidConfigError(f"'type' is invalid or missing: {sink_type}")
     return sinks

@@ -16,7 +16,7 @@ from gurux_dlms.objects import (GXDLMSCaptureObject, GXDLMSClock, GXDLMSData, GX
 from gurux_dlms.secure import GXDLMSSecureClient
 
 from smartmeter_datacollector.smartmeter.cosem import Cosem
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle, MeterDataPoint
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 LOGGER = logging.getLogger("smartmeter")
@@ -112,8 +112,8 @@ class HdlcDlmsParser:
         return dlms_objects
 
     def convert_dlms_bundle_to_reader_data(self, dlms_objects: List[GXDLMSObject],
-                                           message_time: Optional[datetime] = None) -> List[MeterDataPoint]:
-        obis_obj_pairs = {}
+                                           message_time: Optional[datetime] = None) -> MeterDataBundle:
+        obis_obj_pairs: dict[OBISCode, GXDLMSObject] = {}
         for obj in dlms_objects:
             try:
                 obis = OBISCode.from_string(str(obj.logicalName))
@@ -158,8 +158,8 @@ class HdlcDlmsParser:
                 except (TypeError, ValueError, OverflowError):
                     LOGGER.warning("Invalid register value '%s'. Skipping register.", str(raw_value))
                     continue
-                data_points.append(MeterDataPoint(data_point_type, value, meter_id, timestamp))
-        return data_points
+                data_points.append(MeterDataPoint(data_point_type, value, obis))
+        return MeterDataBundle(meter_id, timestamp, data_points)
 
     def _parse_dlms_with_push_object_list(self) -> List[GXDLMSObject]:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []

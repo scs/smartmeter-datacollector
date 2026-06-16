@@ -8,7 +8,7 @@
 import logging
 
 from smartmeter_datacollector.sinks.data_sink import DataSink
-from smartmeter_datacollector.smartmeter.meter_data import MeterDataPoint
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataBundle
 
 
 class LoggerSink(DataSink):
@@ -22,5 +22,5 @@ class LoggerSink(DataSink):
     async def stop(self) -> None:
         pass
 
-    async def send(self, data_point: MeterDataPoint) -> None:
-        self._logger.info(str(data_point))
+    async def send(self, data_bundle: MeterDataBundle) -> None:
+        self._logger.info(str(data_bundle))

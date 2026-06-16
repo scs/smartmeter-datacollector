@@ -10,8 +10,10 @@ from typing import Optional
 
 import serial
 
-from smartmeter_datacollector.smartmeter.cosem import Cosem
+from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.meter import MeterError, SerialHdlcDlmsMeter
+from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
+from smartmeter_datacollector.smartmeter.obis import OBISCode
 from smartmeter_datacollector.smartmeter.reader import ReaderError
 from smartmeter_datacollector.smartmeter.serial_reader import SerialConfig
 
@@ -33,7 +35,12 @@ class LGE570(SerialHdlcDlmsMeter):
             stop_bits=serial.STOPBITS_ONE,
             termination=SerialHdlcDlmsMeter.HDLC_FLAG
         )
-        cosem = Cosem(fallback_id=port)
+        current_registers = [
+            RegisterCosem(OBISCode(1, 0, 31, 7, 0), MeterDataPointTypes.CURRENT_L1.value, 1.0),
+            RegisterCosem(OBISCode(1, 0, 51, 7, 0), MeterDataPointTypes.CURRENT_L2.value, 1.0),
+            RegisterCosem(OBISCode(1, 0, 71, 7, 0), MeterDataPointTypes.CURRENT_L3.value, 1.0),
+        ]
+        cosem = Cosem(fallback_id=port, register_obis_extended=current_registers)
         try:
             super().__init__(serial_config, cosem, decryption_key, use_system_time)
         except ReaderError as ex:
