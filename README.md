@@ -22,15 +22,15 @@ The following smart meters are supported (see [Wiki/Home](https://github.com/scs
 * Landis+Gyr E570: \
   Data pushed by smart meter over CII interface (wired M-Bus, HDLC, DLMS/COSEM)
 * Landis+Gyr E360: \
-  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR)
+  Data pushed by smart meter over P1 interface (P1, HDLC, DLMS/COSEM only, no DSMR)
 * Iskraemeco AM550: \
-  Data pushed by smart meter over P1 interface (HDLC, DLMS/COSEM only, no DSMR)
+  Data pushed by smart meter over P1 interface (P1, HDLC, DLMS/COSEM only, no DSMR)
 * Kamstrup OMNIPOWER with HAN-NVE: \
   Data pushed by smart meter over inserted [HAN-NVE module](https://www.kamstrup.com/en-en/electricity-solutions/meters-devices/modules/hannve) (wired M-Bus, HDLC, DLMS/COSEM)
 * Siemens TD-351x: \
   Data fetched over bidirectional IR interface (IEC 62056-21, Mode C, unencrypted)
 
-Note: All smart meters integrated so far push binary data encoded with HDLC (IEC 62056-46) and DLMS/COSEM. Both unencrypted and encrypted DLMS messages are accepted by the software.
+Note: All smart meters integrated so far push binary data encoded with HDLC (IEC 62056-46) and DLMS/COSEM. Both unencrypted and encrypted DLMS messages are accepted by the software. The P1-DSMR ASCII-based protocol is not supported.
 
 The following data sinks are implemented:
 * MQTT (v3.1.1):
@@ -43,6 +43,8 @@ The following data sinks are implemented:
     * Unauthenticated
     * Authenticated with username / password
     * Authenticated with client certificate
+* MQTT RL-DSP: \
+like MQTT sink but with topic- and payload-format specified in VSE RL-DSP CH2024 document
 * Logger to `stdout`
 
 `smartmeter-datacollector` is fully configurable through a `.ini` configuration file. The [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can help to create and modify the configuration.
@@ -122,12 +124,12 @@ pipx install smartmeter-datacollector-configurator
 
 ## Method 3: Debian package
 
-`smartmeter-datacollector` is also available as a Debian (`.deb`) package from the [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs the application bundled with its Python dependencies in a zipapp / `.pyz` file. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
+`smartmeter-datacollector` is also available as a Debian (`.deb`) package from [releases](https://github.com/scs/smartmeter-datacollector/releases) which installs the application bundled with its Python dependencies in a zipapp / `.pyz` file. The Debian package includes a systemd service file which enables `smartmeter-datacollector` to automatically start after booting the system.
 
 ### Requirements
 
 * Distribution: Debian based (like Debian, Ubuntu, ..)
-* Release: bookworm/12 (trixie/13)
+* Release: >= bookworm/12
 * CPU architecture: independent
 
 ### Installation
