@@ -99,7 +99,7 @@ class HdlcDlmsParser:
             return []
 
         # pylint: disable=unsubscriptable-object
-        if isinstance(self._dlms_data.value[0], list):
+        if self._has_push_object_list(self._dlms_data.value):
             # message with included push-object-list as first object
             dlms_objects = self._parse_dlms_with_push_object_list()
         else:
@@ -161,6 +161,24 @@ class HdlcDlmsParser:
                 data_points.append(MeterDataPoint(data_point_type, value, obis))
         return MeterDataBundle(meter_id, timestamp, data_points)
 
+    @staticmethod
+    def _has_push_object_list(data: List[Any]) -> bool:
+        """Check whether the first element of the message is a push-object-list.
+
+        A push-object-list is an array of capture-object structures
+        ``[class_id, logical_name, attribute_index, data_index]``, so its own first element is
+        itself a structure.
+
+        Some meters (e.g. the Iskra AM550) send no push-object-list and instead wrap *every*
+        data item in a structure of its own -- ``[obis, value]`` or
+        ``[obis, value, [scaler, unit]]``. There the first element is a list as well, so testing
+        only ``isinstance(data[0], list)`` mistakes such a message for one carrying a
+        push-object-list. Parsing then fails with ``ValueError: Invalid OBIS Code.`` because the
+        OBIS octet-string is handed to gurux where a capture object is expected.
+        """
+        first = data[0]
+        return isinstance(first, list) and bool(first) and isinstance(first[0], list)
+
     def _parse_dlms_with_push_object_list(self) -> List[GXDLMSObject]:
         parsed_objects: List[Tuple[GXDLMSObject, int]] = []
         parsed_objects = self._client.parsePushObjects(self._dlms_data.value[0])
@@ -207,6 +225,10 @@ class HdlcDlmsParser:
 
     @staticmethod
     def extract_obis_and_values(data: List[Any]) -> Tuple[List[OBISCode], List[Any]]:
+        grouped = HdlcDlmsParser._extract_grouped_obis_and_values(data)
+        if grouped is not None:
+            return grouped
+
         obis_it = filter(lambda d: isinstance(d[1], (bytearray, bytes)) and OBISCode.is_obis(d[1]), enumerate(data))
 
         obis_codes = []
@@ -219,6 +241,39 @@ class HdlcDlmsParser:
             else:
                 LOGGER.debug("Skipped OBIS code without subsequent value.")
 
+        return obis_codes, values
+
+    @staticmethod
+    def _extract_grouped_obis_and_values(data: List[Any]) -> Optional[Tuple[List[OBISCode], List[Any]]]:
+        """Extract OBIS codes and values from a message that groups each pair in a structure.
+
+        Supported message format (Iskra AM550 and similar)::
+
+            - [obis code 1, value 1]
+            - [obis code 2, value 2, [scaler, unit]]
+            - ...
+
+        The optional third element is the register's scaler/unit. It is deliberately ignored:
+        scaling is applied from the COSEM register configuration (see ``cosem.py``), exactly as
+        for messages carrying a push-object-list, so honouring it here would scale twice.
+
+        Returns None when the message is not in this format, so the caller can fall back to the
+        flat ``obis, value, obis, value, ...`` layout.
+        """
+        pairs = [item for item in data
+                 if isinstance(item, list) and item
+                 and isinstance(item[0], (bytearray, bytes)) and OBISCode.is_obis(item[0])]
+        if not pairs:
+            return None
+
+        obis_codes = []
+        values = []
+        for item in pairs:
+            if len(item) > 1 and HdlcDlmsParser.is_value(item[1]):
+                obis_codes.append(OBISCode.from_bytes(item[0]))
+                values.append(item[1])
+            else:
+                LOGGER.debug("Skipped OBIS code without a value.")
         return obis_codes, values
 
     @staticmethod
