@@ -10,6 +10,7 @@ from typing import Optional
 
 import serial
 
+from smartmeter_datacollector.smartmeter.adjustments import MeterAdjustments
 from smartmeter_datacollector.smartmeter.cosem import Cosem, RegisterCosem
 from smartmeter_datacollector.smartmeter.meter import MeterError, SerialHdlcDlmsMeter
 from smartmeter_datacollector.smartmeter.meter_data import MeterDataPointTypes
@@ -26,7 +27,8 @@ class LGE360(SerialHdlcDlmsMeter):
     def __init__(self, port: str,
                  baudrate: int = BAUDRATE,
                  decryption_key: Optional[str] = None,
-                 use_system_time: bool = False) -> None:
+                 use_system_time: bool = False,
+                 adjustments: Optional[MeterAdjustments] = None) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
@@ -40,7 +42,7 @@ class LGE360(SerialHdlcDlmsMeter):
             RegisterCosem(OBISCode(1, 0, 52, 7, 0), MeterDataPointTypes.VOLTAGE_L2.value, 0.1),
             RegisterCosem(OBISCode(1, 0, 72, 7, 0), MeterDataPointTypes.VOLTAGE_L3.value, 0.1),
         ]
-        cosem = Cosem(fallback_id=port, register_obis_extended=voltage_registers)
+        cosem = Cosem(fallback_id=port, register_obis_extended=voltage_registers, adjustments=adjustments)
         try:
             super().__init__(serial_config, cosem, decryption_key, use_system_time)
         except ReaderError as ex:

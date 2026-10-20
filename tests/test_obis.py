@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # See LICENSES/README.md for more information.
 #
+import pytest
+
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 
 
@@ -34,7 +36,7 @@ def test_create_from_IEC_62056_string():
 
 def test_create_from_short_string():
     obis_string = "1.7.0"
-    obis = OBISCode.from_short_string(obis_string)
+    obis = OBISCode.from_string(obis_string)
     assert obis
     assert obis.a == 1
     assert obis.b == 0
@@ -42,6 +44,24 @@ def test_create_from_short_string():
     assert obis.d == 7
     assert obis.e == 0
     assert obis.f == 255
+
+
+def test_create_from_string_all_forms():
+    assert OBISCode.from_string("3.7.0") == OBISCode(1, 0, 3, 7, 0)
+    assert OBISCode.from_string("14.7") == OBISCode(1, 0, 14, 7, 0)
+    assert OBISCode.from_string("1.0.3.7.0") == OBISCode(1, 0, 3, 7, 0)
+    assert OBISCode.from_string("1.0.3.7.0.255") == OBISCode(1, 0, 3, 7, 0)
+
+
+def test_create_from_short_string_two_octets():
+    obis = OBISCode.from_string("14.7")
+    assert (obis.a, obis.b, obis.c, obis.d, obis.e, obis.f) == (1, 0, 14, 7, 0, 255)
+
+
+@pytest.mark.parametrize("bad", ["", "1", "1.2.3.4", "1.2.3.4.5.6.7", "not.an.obis"])
+def test_invalid_strings(bad):
+    with pytest.raises(ValueError):
+        OBISCode.from_string(bad)
 
 
 def test_create_from_bytes():
