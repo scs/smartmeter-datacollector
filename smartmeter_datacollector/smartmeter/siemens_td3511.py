@@ -147,7 +147,7 @@ class SiemensSerialReader(Reader):
         return
 
 
-@dataclass
+@dataclass(frozen=True)
 class RegisterDataPoint:
     obis: str
     data_point_type: MeterDataPointType

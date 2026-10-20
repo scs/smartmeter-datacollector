@@ -21,7 +21,7 @@ from smartmeter_datacollector.smartmeter.obis import OBISCode
 LOGGER = logging.getLogger("smartmeter")
 
 
-@dataclass
+@dataclass(frozen=True)
 class RegisterCosem:
     obis: OBISCode
     data_point_type: MeterDataPointType
