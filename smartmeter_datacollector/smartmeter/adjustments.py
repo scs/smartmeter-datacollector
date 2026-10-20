@@ -153,7 +153,7 @@ class UnitConfig:
     # Target unit keyed by a specific OBIS code (overrides ``per_unit``).
     per_obis: Dict[OBISCode, str] = field(default_factory=dict)
 
-    def get_target(self, obis: OBISCode, builtin_unit: str) -> Optional[str]:
+    def get_target_unit(self, obis: OBISCode, builtin_unit: str) -> Optional[str]:
         """Return the configured target unit for a register, or ``None``."""
         if obis in self.per_obis:
             return self.per_obis[obis]
@@ -182,7 +182,7 @@ class MeterAdjustments:
         """
         scaling = builtin_scaling * self.scaling.get_factor(obis)
         unit = builtin_unit
-        target = self.units.get_target(obis, builtin_unit)
+        target = self.units.get_target_unit(obis, builtin_unit)
         if target and target != builtin_unit:
             try:
                 scaling *= convert_factor(builtin_unit, target)
@@ -199,46 +199,46 @@ class MeterAdjustments:
         for raw_key, raw_value in section.items():
             key = raw_key.strip().lower()
             if key == SCALE_GLOBAL_KEY:
-                factor = _parse_factor(key, raw_value)
+                factor = MeterAdjustments._parse_factor(key, raw_value)
                 if factor is not None:
                     scaling.factor = factor
             elif key.startswith(SCALE_PREFIX):
-                _parse_scale_per_obis(key[len(SCALE_PREFIX):], key, raw_value, scaling)
+                MeterAdjustments._parse_scale_per_obis(key[len(SCALE_PREFIX):], key, raw_value, scaling)
             elif key.startswith(UNIT_PREFIX):
-                _parse_unit(key[len(UNIT_PREFIX):], raw_value, units)
+                MeterAdjustments._parse_unit(key[len(UNIT_PREFIX):], raw_value, units)
         return cls(scaling=scaling, units=units)
 
-
-def _parse_scale_per_obis(selector: str, key: str, raw_value: str, scaling: ScalingConfig) -> None:
-    factor = _parse_factor(key, raw_value)
-    if factor is None:
-        return
-    try:
-        scaling.per_obis[parse_obis(selector)] = factor
-    except ValueError:
-        LOGGER.warning("Ignoring scaling for invalid OBIS '%s'.", selector)
-
-
-def _parse_unit(selector: str, raw_value: str, units: UnitConfig) -> None:
-    target = raw_value.strip()
-    if not target:
-        return
-    if _OBIS_KEY_PATTERN.match(selector):
+    @staticmethod
+    def _parse_scale_per_obis(selector: str, key: str, raw_value: str, scaling: ScalingConfig) -> None:
+        factor = MeterAdjustments._parse_factor(key, raw_value)
+        if factor is None:
+            return
         try:
-            units.per_obis[parse_obis(selector)] = target
+            scaling.per_obis[parse_obis(selector)] = factor
         except ValueError:
-            LOGGER.warning("Ignoring unit override for invalid OBIS '%s'.", selector)
-        return
-    builtin = _BUILTIN_UNIT_BY_NORM.get(selector.upper())
-    if builtin is None:
-        LOGGER.warning("Ignoring unit override for unknown unit class '%s'.", selector)
-        return
-    units.per_unit[builtin] = target
+            LOGGER.warning("Ignoring scaling for invalid OBIS '%s'.", selector)
 
+    @staticmethod
+    def _parse_unit(selector: str, raw_value: str, units: UnitConfig) -> None:
+        target = raw_value.strip()
+        if not target:
+            return
+        if _OBIS_KEY_PATTERN.match(selector):
+            try:
+                units.per_obis[parse_obis(selector)] = target
+            except ValueError:
+                LOGGER.warning("Ignoring unit override for invalid OBIS '%s'.", selector)
+            return
+        builtin = _BUILTIN_UNIT_BY_NORM.get(selector.upper())
+        if builtin is None:
+            LOGGER.warning("Ignoring unit override for unknown unit class '%s'.", selector)
+            return
+        units.per_unit[builtin] = target
 
-def _parse_factor(key: str, raw_value: str) -> Optional[float]:
-    try:
-        return float(raw_value)
-    except (TypeError, ValueError):
-        LOGGER.warning("Ignoring invalid scaling factor '%s' for '%s'.", raw_value, key)
-        return None
+    @staticmethod
+    def _parse_factor(key: str, raw_value: str) -> Optional[float]:
+        try:
+            return float(raw_value)
+        except (TypeError, ValueError):
+            LOGGER.warning("Ignoring invalid scaling factor '%s' for '%s'.", raw_value, key)
+            return None

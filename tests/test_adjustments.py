@@ -82,15 +82,15 @@ def test_invalid_scale_and_obis_skipped():
 
 def test_unit_per_class():
     adj = MeterAdjustments.from_config(_section(**{"unit.W": "kW"}))
-    assert adj.units.get_target(OBISCode(1, 0, 1, 7, 0), "W") == "kW"
+    assert adj.units.get_target_unit(OBISCode(1, 0, 1, 7, 0), "W") == "kW"
     # unrelated builtin unit is untouched
-    assert adj.units.get_target(OBISCode(1, 0, 32, 7, 0), "V") is None
+    assert adj.units.get_target_unit(OBISCode(1, 0, 32, 7, 0), "V") is None
 
 
 def test_unit_per_obis_overrides_class():
     adj = MeterAdjustments.from_config(_section(**{"unit.W": "kW", "unit.1.0.1.7.0": "MW"}))
-    assert adj.units.get_target(OBISCode(1, 0, 1, 7, 0), "W") == "MW"
-    assert adj.units.get_target(OBISCode(1, 0, 21, 7, 0), "W") == "kW"
+    assert adj.units.get_target_unit(OBISCode(1, 0, 1, 7, 0), "W") == "MW"
+    assert adj.units.get_target_unit(OBISCode(1, 0, 21, 7, 0), "W") == "kW"
 
 
 def test_unit_unknown_class_skipped():

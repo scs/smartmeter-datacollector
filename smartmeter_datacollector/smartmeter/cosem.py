@@ -27,18 +27,18 @@ class RegisterCosem:
     data_point_type: MeterDataPointType
     scaling: float = 1.0
 
+    @staticmethod
+    def clone_adjust(reg: 'RegisterCosem', adjustments: MeterAdjustments) -> 'RegisterCosem':
+        """Return a copy of ``reg`` with user-configured scaling / unit applied.
 
-def _adjust_register(reg: RegisterCosem, adjustments: MeterAdjustments) -> RegisterCosem:
-    """Return a copy of ``reg`` with user-configured scaling / unit applied.
-
-    New instances are created so the shared module-level DEFAULT_REGISTER_MAP
-    (and the shared MeterDataPointType enum values) are never mutated.
-    """
-    scaling, unit = adjustments.resolve(reg.obis, reg.scaling, reg.data_point_type.unit)
-    data_point_type = reg.data_point_type
-    if unit != data_point_type.unit:
-        data_point_type = replace(data_point_type, unit=unit)
-    return replace(reg, scaling=scaling, data_point_type=data_point_type)
+        New instances are created so the shared module-level DEFAULT_REGISTER_MAP
+        (and the shared MeterDataPointType enum values) are never mutated.
+        """
+        scaling, unit = adjustments.resolve(reg.obis, reg.scaling, reg.data_point_type.unit)
+        data_point_type = reg.data_point_type
+        if unit != data_point_type.unit:
+            data_point_type = replace(data_point_type, unit=unit)
+        return replace(reg, scaling=scaling, data_point_type=data_point_type)
 
 
 DEFAULT_REGISTER_MAP = [
@@ -138,7 +138,7 @@ class Cosem:
             self._register_obis.update({r.obis: r for r in register_obis_extended})
         if adjustments and not adjustments.is_noop():
             self._register_obis = {
-                obis: _adjust_register(reg, adjustments)
+                obis: RegisterCosem.clone_adjust(reg, adjustments)
                 for obis, reg in self._register_obis.items()
             }
         self._id_detect_countdown = Cosem.OBJECT_DETECT_ATTEMPTS
