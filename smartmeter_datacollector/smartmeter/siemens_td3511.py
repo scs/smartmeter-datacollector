@@ -15,7 +15,7 @@ from typing import Callable, List, Optional
 import aioserial
 import serial
 
-from smartmeter_datacollector.smartmeter.adjustments import MeterAdjustments, parse_obis
+from smartmeter_datacollector.smartmeter.adjustments import MeterAdjustments
 from smartmeter_datacollector.smartmeter.meter import Meter, MeterError
 from smartmeter_datacollector.smartmeter.meter_data import (MeterDataBundle, MeterDataPoint, MeterDataPointType,
                                                             MeterDataPointTypes)
@@ -156,7 +156,7 @@ class RegisterDataPoint:
 
 def _adjust_register(reg: RegisterDataPoint, adjustments: MeterAdjustments) -> RegisterDataPoint:
     """Return a copy of ``reg`` with user-configured scaling / unit applied."""
-    scaling, unit = adjustments.resolve(parse_obis(reg.obis), reg.scaling, reg.data_point_type.unit)
+    scaling, unit = adjustments.resolve(OBISCode.from_string(reg.obis), reg.scaling, reg.data_point_type.unit)
     data_point_type = reg.data_point_type
     if unit != data_point_type.unit:
         data_point_type = replace(data_point_type, unit=unit)
@@ -195,7 +195,6 @@ DEFAULT_REGISTER_MAPPING = [
 
 class SiemensParser():
     REGEX = re.compile(r"(.{3,20})\(([\d\-\.:]{3,20})[*\)](.{0,10}[^\)\r\n])?")
-    REGEX_OBIS_2_OCT = re.compile(r"^\d{1,3}\W\d{1,3}$")
 
     def __init__(self, use_system_time: bool = False,
                  adjustments: Optional[MeterAdjustments] = None) -> None:
@@ -268,11 +267,8 @@ class SiemensParser():
                 LOGGER.warning("Invalid register value '%s'. Skipping register.", str(value))
                 continue
 
-            if self.REGEX_OBIS_2_OCT.match(obis):
-                obis = f"{obis}.0"
-
             try:
-                obis_obj = OBISCode.from_short_string(obis)
+                obis_obj = OBISCode.from_string(obis)
             except ValueError:
                 LOGGER.warning("Invalid OBIS code '%s'. Skipping register.", obis)
                 continue

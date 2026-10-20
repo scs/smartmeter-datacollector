@@ -9,7 +9,7 @@ from configparser import ConfigParser
 
 import pytest
 
-from smartmeter_datacollector.smartmeter.adjustments import MeterAdjustments, convert_factor, parse_obis
+from smartmeter_datacollector.smartmeter.adjustments import MeterAdjustments, convert_factor
 from smartmeter_datacollector.smartmeter.cosem import Cosem
 from smartmeter_datacollector.smartmeter.obis import OBISCode
 from smartmeter_datacollector.smartmeter.siemens_td3511 import SiemensParser
@@ -19,21 +19,6 @@ def _section(**values):
     parser = ConfigParser()
     parser.read_dict({"reader0": {"type": "lge450", **values}})
     return parser["reader0"]
-
-
-# --- OBIS parsing ----------------------------------------------------------
-
-def test_parse_obis_forms():
-    assert parse_obis("3.7.0") == OBISCode(1, 0, 3, 7, 0)
-    assert parse_obis("14.7") == OBISCode(1, 0, 14, 7, 0)
-    assert parse_obis("1.0.3.7.0") == OBISCode(1, 0, 3, 7, 0)
-    assert parse_obis("1.0.3.7.0.255") == OBISCode(1, 0, 3, 7, 0)
-
-
-def test_parse_obis_invalid():
-    for bad in ("", "1", "not.an.obis"):
-        with pytest.raises(ValueError):
-            parse_obis(bad)
 
 
 # --- unit conversion -------------------------------------------------------

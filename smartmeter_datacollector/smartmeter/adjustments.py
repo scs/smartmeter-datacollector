@@ -31,7 +31,6 @@ and the emitted unit is the configured target unit (or the built-in unit if
 none is configured).
 """
 import logging
-import re
 from dataclasses import dataclass, field
 from typing import Dict, Mapping, Optional, Tuple
 
@@ -79,26 +78,6 @@ _BUILTIN_UNIT_BY_NORM: Dict[str, str] = {
     "V": "V",
     "A": "A",
 }
-
-_OBIS_KEY_PATTERN = re.compile(r"^\d[\d\W]*\d$")
-
-
-def parse_obis(obis_string: str) -> OBISCode:
-    """Parse an OBIS code from a config string.
-
-    Accepts the short form ``c.d.e`` (3 groups), the two-octet form ``c.d``
-    (``e`` defaults to 0), the five-octet form ``a.b.c.d.e`` and the full
-    ``a.b.c.d.e.f``. Any non-word character may be used as a separator.
-    ``OBISCode`` equality only considers ``c``, ``d`` and ``e``.
-    """
-    groups = [int(g) for g in re.split(r"\W+", obis_string.strip()) if g != ""]
-    if len(groups) == 2:
-        return OBISCode(a=1, b=0, c=groups[0], d=groups[1], e=0)
-    if len(groups) == 3:
-        return OBISCode(a=1, b=0, c=groups[0], d=groups[1], e=groups[2])
-    if len(groups) in (5, 6):
-        return OBISCode(*groups)
-    raise ValueError(f"Invalid OBIS string '{obis_string}'.")
 
 
 def _split_unit(unit: str) -> Tuple[float, str]:
@@ -214,7 +193,7 @@ class MeterAdjustments:
         if factor is None:
             return
         try:
-            scaling.per_obis[parse_obis(selector)] = factor
+            scaling.per_obis[OBISCode.from_string(selector)] = factor
         except ValueError:
             LOGGER.warning("Ignoring scaling for invalid OBIS '%s'.", selector)
 
@@ -223,9 +202,9 @@ class MeterAdjustments:
         target = raw_value.strip()
         if not target:
             return
-        if _OBIS_KEY_PATTERN.match(selector):
+        if selector[:1].isdigit():  # unit class names never start with a digit
             try:
-                units.per_obis[parse_obis(selector)] = target
+                units.per_obis[OBISCode.from_string(selector)] = target
             except ValueError:
                 LOGGER.warning("Ignoring unit override for invalid OBIS '%s'.", selector)
             return
