@@ -24,5 +24,11 @@ htmlcov/
 debian-tmpl/
 scripts/
 
+# Local config and secrets
+.env
+*.ini
+Dockerfile
+docker-compose.yml
+
 # OS artifacts
 .DS_Store

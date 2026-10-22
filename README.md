@@ -68,6 +68,7 @@ like MQTT sink but with topic- and payload-format specified in VSE RL-DSP CH2024
     - [Configuration](#configuration-1)
   - [Run as a systemd service](#run-as-a-systemd-service)
     - [Configuration](#configuration-2)
+  - [Run as a Docker image with docker compose](#run-as-a-docker-image-with-docker-compose)
 - [How to develop](#how-to-develop)
   - [Development Requirements](#development-requirements)
   - [Installation](#installation-2)
@@ -195,11 +196,12 @@ When `smartmeter-datacollector` has been installed as a Debian package it provid
 
 `smartmeter-datacollector` can be run with docker compose and a docker image, built from sources.
 
-- Provide a valid .ini configuration file (see example below)
-- in a newly created `.env` file set:
-  - `SMARTMETER_DATACOLLECTOR_INI`: this file gets mounted into the docker container and is used by the service
-  - `SMARTMETER_SERIAL_DEVICE`: the serial connection to the smartmeter
-4. Run `docker compose up`
+1. Provide a valid .ini configuration file (see example below)
+2. In a newly created `.env` file set:
+   - `DATACOLLECTOR_INI`: path to an existing `.ini` file, mounted into the container and used by the service
+   - `SMARTMETER_SERIAL_DEVICE`: the serial connection to the smartmeter
+   - `TZ` (optional): timezone of the meter, default `Europe/Zurich`
+3. Run `docker compose up`
 
 ### Example files
 
@@ -207,7 +209,7 @@ When `smartmeter-datacollector` has been installed as a Debian package it provid
 
 ```
 DATACOLLECTOR_INI=./datacollector.ini
-SERIAL_DEVICE=/dev/serial/by-id/device
+SMARTMETER_SERIAL_DEVICE=/dev/serial/by-id/device
 ```
 
 #### `datacollector.ini`
