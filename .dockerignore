@@ -1,0 +1,34 @@
+.venv/
+__pycache__/
+.pytest_cache/
+dist/
+deb_dist/
+.git/
+.github/
+.vscode/
+
+# Python artifacts
+*.py[cod]
+*.egg-info/
+*.egg
+
+# Test artifacts
+tests/
+htmlcov/
+.coverage
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Packaging & scripts
+debian-tmpl/
+scripts/
+
+# Local config and secrets
+.env
+*.ini
+Dockerfile
+docker-compose.yml
+
+# OS artifacts
+.DS_Store
