@@ -3,6 +3,8 @@ services:
     build: .
     container_name: smartmeter
     restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Zurich}
     devices:
       - ${SMARTMETER_SERIAL_DEVICE}:/dev/ttyUSB0
     volumes:
