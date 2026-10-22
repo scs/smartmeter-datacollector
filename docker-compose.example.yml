@@ -1,7 +1,10 @@
 services:
   smartmeter:
-    build: .
-    container_name: smartmeter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smartmeter-datacollector
+    container_name: smartmeter-datacollector
     restart: unless-stopped
     environment:
       TZ: ${TZ:-Europe/Zurich}
