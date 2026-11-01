@@ -143,7 +143,7 @@ class Cosem:
         if isinstance(raw_id, (bytes, bytearray)):
             # An ID delivered as an octet-string must be decoded, not repr'd: str(bytearray)
             # yields "bytearray(b'12345678')", which would end up in the meter ID and therefore
-            # in every MQTT topic. Meters that group OBIS and value in a structure (Iskra AM550)
+            # in every MQTT topic. Meters that group OBIS and value in a structure
             # reach this path with the ID still as raw bytes.
             meter_id = bytes(raw_id).decode("ascii", errors="replace").strip("\x00")
         else:

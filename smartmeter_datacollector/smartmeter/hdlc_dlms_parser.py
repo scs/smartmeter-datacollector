@@ -169,7 +169,7 @@ class HdlcDlmsParser:
         ``[class_id, logical_name, attribute_index, data_index]``, so its own first element is
         itself a structure.
 
-        Some meters (e.g. the Iskra AM550) send no push-object-list and instead wrap *every*
+        Some meters send no push-object-list and instead wrap *every*
         data item in a structure of its own -- ``[obis, value]`` or
         ``[obis, value, [scaler, unit]]``. There the first element is a list as well, so testing
         only ``isinstance(data[0], list)`` mistakes such a message for one carrying a
@@ -190,12 +190,18 @@ class HdlcDlmsParser:
 
     def _parse_dlms_without_push_list(self) -> List[GXDLMSObject]:
         """Tries to extract OBIS codes and values from message.
-        Supported message format:
+        Supported message formats:
+            Flat:
             - timestamp
             - obis code 1
             - value 1
             - obis code 2
             - value 2
+            - ...
+
+            Grouped, each OBIS code and value in its own structure:
+            - [obis code 1, value 1]
+            - [obis code 2, value 2, [scaler, unit]]
             - ...
         """
         obis_codes, values = HdlcDlmsParser.extract_obis_and_values(self._dlms_data.value)
@@ -247,7 +253,8 @@ class HdlcDlmsParser:
     def _extract_grouped_obis_and_values(data: List[Any]) -> Optional[Tuple[List[OBISCode], List[Any]]]:
         """Extract OBIS codes and values from a message that groups each pair in a structure.
 
-        Supported message format (Iskra AM550 and similar)::
+        Some meter configurations send no push-object-list and wrap each OBIS code and value in its
+        own structure::
 
             - [obis code 1, value 1]
             - [obis code 2, value 2, [scaler, unit]]
