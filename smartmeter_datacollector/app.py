@@ -8,7 +8,7 @@
 import argparse
 import asyncio
 import logging
-from asyncio import CancelledError
+import signal
 from configparser import ConfigParser
 
 from smartmeter_datacollector import config, factory
@@ -23,11 +23,15 @@ async def build_and_start(app_config: ConfigParser):
 
     await asyncio.gather(*[sink.start() for sink in sinks])
 
+    routine = asyncio.gather(
+        *[reader.start() for reader in readers],
+        data_collector.process_queue())
+
+    add_signal_handlers(routine)
+
     try:
-        await asyncio.gather(
-            *[reader.start() for reader in readers],
-            data_collector.process_queue())
-    except CancelledError:
+        await routine
+    except asyncio.CancelledError:
         pass
     finally:
         logging.info("App shutting down now.")
@@ -42,6 +46,15 @@ def set_logging_levels(app_config: ConfigParser) -> None:
     # configure individual loggers
     for name, level in app_config["logging"].items():
         logging.getLogger(name).setLevel(level)
+
+
+def add_signal_handlers(routine: asyncio.Future) -> None:
+    loop = asyncio.get_running_loop()
+    try:
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, routine.cancel)
+    except NotImplementedError:  # not supported on Windows
+        pass
 
 
 def parse_arguments():
