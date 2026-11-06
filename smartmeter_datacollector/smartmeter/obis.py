@@ -9,14 +9,14 @@ import re
 from dataclasses import dataclass, field
 from typing import ClassVar, Union
 
-REGEX = r"^(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})\W(\d{1,3})$"
-REGEX_SHORT = r"^(\d{1,3})\W(\d{1,3})\W(\d{1,3})$"
+# 2 (c.d), 3 (c.d.e), 5 (a.b.c.d.e) or 6 (a.b.c.d.e.f) octets; the count is checked in code.
+REGEX = r"^\d{1,3}(?:\W\d{1,3}){1,5}$"
+REGEX_OCTET = re.compile(r"\d+")
 
 
 @dataclass(frozen=True)
 class OBISCode:
     PATTERN: ClassVar[re.Pattern] = re.compile(REGEX)
-    PATTERN_SHORT: ClassVar[re.Pattern] = re.compile(REGEX_SHORT)
 
     # pylint: disable=invalid-name
     a: int = field(compare=False)
@@ -37,19 +37,16 @@ class OBISCode:
 
     @classmethod
     def from_string(cls, obis_string: str) -> 'OBISCode':
-        match = cls.PATTERN.match(obis_string)
-        if not match:
+        """Parse an OBIS string with 2 (c.d, e=0), 3 (c.d.e), 5 (a.b.c.d.e) or 6 (a.b.c.d.e.f) octets."""
+        obis_string = obis_string.strip()
+        if not cls.PATTERN.match(obis_string):
             raise ValueError(f"Invalid OBIS string {obis_string}.")
-        groups = match.groups()
-        return cls(*(int(g) for g in groups))
-
-    @classmethod
-    def from_short_string(cls, obis_short_string: str) -> 'OBISCode':
-        match = cls.PATTERN_SHORT.match(obis_short_string)
-        if not match:
-            raise ValueError(f"Invalid short OBIS string {obis_short_string}.")
-        groups = match.groups()
-        return cls(a=1, b=0, c=int(groups[0]), d=int(groups[1]), e=int(groups[2]))
+        groups = [int(g) for g in REGEX_OCTET.findall(obis_string)]
+        if len(groups) in (2, 3):
+            return cls(a=1, b=0, c=groups[0], d=groups[1], e=groups[2] if len(groups) == 3 else 0)
+        if len(groups) in (5, 6):
+            return cls(*groups)
+        raise ValueError(f"Invalid OBIS string {obis_string}.")
 
     @classmethod
     def from_bytes(cls, obis_bytes: Union[bytes, bytearray]) -> 'OBISCode':

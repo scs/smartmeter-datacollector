@@ -156,6 +156,42 @@ The usage of `smartmeter-datacollector` depends on the installation method. Inde
 
 See [Wiki/Configuration](https://github.com/scs/smartmeter-datacollector/wiki/Configuration#manually-write-configuration) for more details on the available configuration options.
 
+#### Custom scaling and units of readings
+
+Each `reader` section supports optional adjustments that are applied **on top of** the meter's built-in behaviour. They let you rescale readings or change the reported unit (e.g. from `W` to `kW`) without changing the source code. All of them are optional — leaving them out reproduces exactly the same values and units as before, so upgrading is a non-breaking change.
+
+**Scaling** — a multiplicative factor on the numeric value:
+
+* `scale` — a single factor applied to **every** register of that meter.
+* `scale.<obis>` — a factor for **one specific OBIS code**, which overrides `scale` for that register.
+
+**Units** — relabel a register's unit and convert its value accordingly:
+
+* `unit.<unit>` — convert **every** register currently reported in `<unit>` (e.g. `unit.W = kW`, `unit.Wh = kWh`).
+* `unit.<obis>` — convert **one specific OBIS code** (e.g. `unit.1.0.3.7.0 = kvar`), which overrides the per-unit rule for that register.
+
+OBIS codes may be written in short form (`c.d.e`, e.g. `3.7.0`) or full form (`a.b.c.d.e`, e.g. `1.0.3.7.0`). Supported unit prefixes are `m` (milli), `k` (kilo), `M` (mega) and `G` (giga) on the base units `W`, `Wh`, `VA`/`var`, `VAh`/`varh`, `V` and `A`.
+
+Scaling and unit conversion compose, so the emitted value is `raw_value * builtin_scaling * scale_factor * unit_conversion` and the emitted unit is the configured target unit. Invalid values, OBIS codes, units or incompatible conversions are logged and ignored (the reading keeps its default behaviour).
+
+Example:
+
+```ini
+[reader0]
+type = lge450
+port = /dev/ttyUSB0
+key =
+# report active power / energy in kilo instead of base units
+unit.W = kW
+unit.Wh = kWh
+# multiply every reading of this meter by 0.5 ...
+scale = 0.5
+# ... but scale reactive power (OBIS 1.0.3.7.0) by 40 instead
+scale.1.0.3.7.0 = 40
+# and report that same register as kvar
+unit.1.0.3.7.0 = kvar
+```
+
 ### smartmeter-datacollector-configurator
 
 To simplify the process of generating a valid `.ini` configuration for `smartmeter-datacollector` the companion [`smartmeter-datacollector-configurator`](https://github.com/scs/smartmeter-datacollector-configurator) web interface can be used. It supports
